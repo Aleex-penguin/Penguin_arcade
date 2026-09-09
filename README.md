@@ -1,4 +1,4 @@
-Hey Alex, delete this line of text, but follow the template below to set this readme up.
+
 # Website Title/Repo Name
 
 A brief description of what this project or website is about.
