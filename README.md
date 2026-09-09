@@ -1,5 +1,5 @@
 
-# Penguin_arcage
+# Penguin_arcade
 
 Aleex’s games hub
 
