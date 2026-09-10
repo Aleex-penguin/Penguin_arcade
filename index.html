@@ -6,36 +6,67 @@
     <title>Aleex's Penguin Arcade</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* Import a futuristic neon-style font */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: 'Orbitron', Arial, sans-serif;
+            background-color: #0a0a0a; /* Dark background to make the neon pop */
+            color: #ffffff;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
         h1 {
-            border-bottom: 2px solid #ccc;
+            border-bottom: 2px solid #ff00de; /* Neon pink border */
             padding-bottom: 10px;
+            color: #ffffff;
+            /* Neon pink text glow */
+            text-shadow: 
+                0 0 5px #fff, 
+                0 0 10px #fff, 
+                0 0 20px #ff00de, 
+                0 0 40px #ff00de, 
+                0 0 80px #ff00de;
+        }
+        p {
+            /* Subtle neon blue glow for plain text */
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
         }
         ul {
             list-style-type: none;
             padding: 0;
         }
         li {
-            background: #fff;
-            margin: 10px 0;
+            background: #111111;
+            margin: 15px 0;
             padding: 15px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            /* Neon green box border and glow */
+            border: 1px solid #39ff14;
+            box-shadow: 0 0 10px #39ff14, inset 0 0 10px #39ff14;
+            color: #ffffff;
+            text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
         }
         a {
-            color: #0066cc;
+            color: #ffffff;
             text-decoration: none;
             word-wrap: break-word; 
+            /* Neon cyan link glow */
+            text-shadow: 
+                0 0 5px #fff, 
+                0 0 10px #00ffff, 
+                0 0 20px #00ffff, 
+                0 0 40px #00ffff;
         }
         a:hover {
-            text-decoration: underline;
+            text-decoration: none;
+            /* Changes to neon pink on hover */
+            text-shadow: 
+                0 0 5px #fff, 
+                0 0 10px #ff00de, 
+                0 0 20px #ff00de, 
+                0 0 40px #ff00de;
         }
     </style>
 </head>
