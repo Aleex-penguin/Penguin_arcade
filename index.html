@@ -72,22 +72,424 @@
 </head>
 <body>
     <h1>Aleex's Penguin Arcade</h1>
-    <p>Click on the raw URLs below to play my games.</p>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Game Vault</title>
+  <style>
+    :root {
+      --bg-color: #141414;
+      --card-bg: #1e1e1e;
+      --accent: #58AAFC;
+      --accent-hover: #3b82c4;
+      --text-main: #ffffff;
+      --text-muted: #a0a0a0;
+    }
 
-    <ul>
-        <li>
-            <strong>Delta Ops:</strong><br>
-            <a href="https://deltaopsishere.oneapp.dev/">https://deltaopsishere.oneapp.dev/</a>
-        </li>
-        <li>
-            <strong>Helicopter Sim:</strong><br>
-            <a href="https://helicoptesim.oneapp.dev/">https://helicoptesim.oneapp.dev/</a>
-        </li>
-    </ul>
-            <strong>Click Da Penguin:</strong><br>
-            <a href="https://clickdapenguin.oneapp.dev/">https://clickdapenguin.oneapp.dev/</a>
-        </li>
-    </ul>
-    <script src="main.js"></script>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar Header */
+    header {
+      background-color: #0d0d0d;
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-bar {
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background-color: var(--card-bg);
+      color: white;
+      outline: none;
+      width: 220px;
+    }
+
+    .search-bar:focus {
+      border-color: var(--accent);
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      color: var(--text-muted);
+      border: 1px solid #333;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      color: var(--bg-color);
+      border-color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* Games Grid */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(88, 170, 252, 0.2);
+      border-color: var(--accent);
+    }
+
+    .card-thumb {
+      height: 140px;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .card-body {
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(88, 170, 252, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-bottom: 1rem;
+    }
+
+    .play-btn {
+      background-color: var(--accent);
+      color: var(--bg-color);
+      border: none;
+      padding: 0.7rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-align: center;
+    }
+
+    .play-btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Modal Launcher Screen */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 950px;
+      padding: 1.5rem;
+      position: relative;
+      border: 1px solid var(--accent);
+      box-shadow: 0 0 25px rgba(88, 170, 252, 0.3);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      color: var(--text-muted);
+      font-size: 2rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .close-btn:hover {
+      color: var(--accent);
+    }
+
+    #game-frame {
+      width: 100%;
+      height: 550px;
+      border: none;
+      border-radius: 8px;
+      background-color: #000;
+      margin-top: 15px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      border-top: 1px solid #2a2a2a;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>GAME VAULT</h1>
+    <div class="controls">
+      <input type="text" id="searchInput" class="search-bar" placeholder="Search games...">
+      <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+      <button class="filter-btn" onclick="filterCategory('sports')">Sports</button>
+      <button class="filter-btn" onclick="filterCategory('arcade')">Arcade</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="game-grid" id="gameGrid"></div>
+  </main>
+
+  <!-- Popup Game Player Modal -->
+  <div class="modal" id="gameModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeGame()">&times;</button>
+      <h2 id="modalTitle" style="color: var(--accent);">Game Title</h2>
+      <iframe id="game-frame"></iframe>
+    </div>
+  </div>
+
+  <footer>
+    &copy; Game Vault — Play free games directly in your browser.
+  </footer>
+
+  <script>
+    // Exact HTML for Retro Bowl Version Select
+    const retroBowlHTML = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Retro Bowl Version Select</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                  margin: 0;
+                  background-color: #141414;
+                  color: #58AAFC;
+              }
+              .link-container {
+                  display: flex;
+                  gap: 20px;
+                  background-color: #1e1e1e;
+                  padding: 20px;
+                  border-radius: 10px;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+              }
+              .link-container a {
+                  text-decoration: none;
+                  color: #58AAFC;
+                  font-size: 18px;
+                  padding: 10px 15px;
+                  border-radius: 5px;
+                  transition: background-color 0.3s, color 0.3s;
+              }
+              .link-container a:hover {
+                  background-color: #58AAFC;
+                  color: #141414;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="link-container">
+              <a href="v1.5.9.0/index.html">New v1.5.9.0</a>
+              <a href="v1.4.9.3/index.html">Old v1.4.9.3</a>
+          </div>
+      </body>
+      </html>
+    `;
+
+    // Games catalog - You can add more games here anytime!
+    const games = [
+      {
+        id: 'retro-bowl',
+        title: 'Retro Bowl',
+        category: 'sports',
+        icon: '🏈',
+        type: 'htmlDoc',
+        content: retroBowlHTML
+      },
+      {
+        id: 'space-huggers',
+        title: 'Space Huggers',
+        category: 'arcade',
+        icon: '🚀',
+        type: 'url',
+        url: 'https://itch.io/embed-upload/4648710?color=141414'
+      },
+      {
+        id: 'tic-tac-toe',
+        title: 'Tic Tac Toe',
+        category: 'arcade',
+        icon: '❌',
+        type: 'url',
+        url: 'https://playtictactoe.org/'
+      }
+    ];
+
+    const gameGrid = document.getElementById('gameGrid');
+    const searchInput = document.getElementById('searchInput');
+    let currentCategory = 'all';
+
+    // Display Game Cards
+    function renderGames() {
+      const query = searchInput.value.toLowerCase();
+      gameGrid.innerHTML = '';
+
+      const filtered = games.filter(g => {
+        const matchesCategory = currentCategory === 'all' || g.category === currentCategory;
+        const matchesSearch = g.title.toLowerCase().includes(query);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        gameGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No games found.</p>';
+        return;
+      }
+
+      filtered.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.onclick = () => openGame(game.id);
+        card.innerHTML = `
+          <div class="card-thumb">${game.icon}</div>
+          <div class="card-body">
+            <div>
+              <div class="card-title">${game.title}</div>
+              <span class="card-category">${game.category}</span>
+            </div>
+            <button class="play-btn">PLAY</button>
+          </div>
+        `;
+        gameGrid.appendChild(card);
+      });
+    }
+
+    // Filter Buttons logic
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.toLowerCase() === cat);
+      });
+      renderGames();
+    }
+
+    searchInput.addEventListener('input', renderGames);
+
+    // Modal / Launch Game
+    const modal = document.getElementById('gameModal');
+    const iframe = document.getElementById('game-frame');
+    const modalTitle = document.getElementById('modalTitle');
+
+    function openGame(id) {
+      const game = games.find(g => g.id === id);
+      if (!game) return;
+
+      modalTitle.innerText = game.title;
+      
+      if (game.type === 'htmlDoc') {
+        iframe.srcdoc = game.content;
+      } else {
+        iframe.removeAttribute('srcdoc');
+        iframe.src = game.url;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeGame() {
+      modal.classList.remove('active');
+      iframe.src = '';
+      iframe.removeAttribute('srcdoc');
+    }
+
+    // Initialize Page
+    renderGames();
+  </script>
 </body>
 </html>
