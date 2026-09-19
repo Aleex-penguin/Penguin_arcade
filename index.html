@@ -71,15 +71,15 @@
     </style>
 </head>
 <body>
-    <h1>Aleex's Penguin Arcade</h1>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DELTA OPS: THE NEW ERA OF PIXEL OPS</title>
+<title>DELTA OPS: A DESERT TO STORM</title>
 <style>
 body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; font-family: 'Segoe UI', sans-serif; user-select: none; }
+
 /* Start Screen */
 #start-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -88,9 +88,62 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
     align-items: center; justify-content: center; color: white; text-align: center;
 }
 #start-screen h1 { font-size: 2.5em; margin-bottom: 30px; color: #00ffff; text-shadow: 0 0 15px rgba(0,255,255,0.6); letter-spacing: 2px; text-transform: uppercase; }
-.start-btn, .ach-btn { padding: 15px 40px; font-size: 1.5em; margin: 10px; background: #ff8800; color: white; border: none; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,136,0,0.4); transition: 0.1s; text-transform: uppercase; font-weight: bold; }
+.start-btn, .ach-btn, .map-sel-btn { padding: 15px 40px; font-size: 1.5em; margin: 10px; background: #ff8800; color: white; border: none; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,136,0,0.4); transition: 0.1s; text-transform: uppercase; font-weight: bold; }
 .ach-btn { background: #00ccff; }
-.start-btn:active, .ach-btn:active { transform: scale(0.95); }
+.upg-tree-btn { padding: 15px 40px; font-size: 1.5em; margin: 10px; background: #22aa55; color: white; border: none; border-radius: 5px; cursor: pointer; box-shadow: 0 4px 15px rgba(34,170,85,0.4); transition: 0.1s; text-transform: uppercase; font-weight: bold; }
+.map-sel-btn { background: #22aa55; box-shadow: 0 4px 15px rgba(34,170,85,0.4); }
+.start-btn:active, .ach-btn:active, .map-sel-btn:active, .upg-tree-btn:active { transform: scale(0.95); }
+#start-level-badge { margin-top: 6px; margin-bottom: 4px; color: #00ffaa; font-size: 1.1em; font-weight: bold; letter-spacing: 1px; }
+
+/* Map Selection Screen */
+#map-select-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 30%, #0d1a0d 0%, #05080e 100%);
+    z-index: 110; display: none; flex-direction: column;
+    align-items: center; justify-content: flex-start; color: white; text-align: center;
+    overflow-y: auto; padding-top: 20px; padding-bottom: 30px; box-sizing: border-box;
+}
+#map-select-screen h2 { font-size: 2em; color: #00ffff; text-shadow: 0 0 12px rgba(0,255,255,0.7); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+#map-select-screen p { color: #aaaaaa; font-size: 1em; margin-bottom: 30px; }
+.map-cards-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; max-width: 1200px; padding: 0 16px; }
+.map-card {
+    width: 260px; background: rgba(20,28,45,0.97); border: 2px solid #334455;
+    border-radius: 12px; overflow: hidden; cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.map-card:hover, .map-card:active { transform: scale(1.04); border-color: #00ffff; box-shadow: 0 0 30px rgba(0,255,255,0.3); }
+.map-card.selected { border-color: #ff8800; box-shadow: 0 0 30px rgba(255,136,0,0.5); }
+.map-card-preview {
+    width: 100%; height: 150px; display: flex; align-items: center; justify-content: center;
+    font-size: 3em; position: relative; overflow: hidden;
+}
+.map-card-preview.city-preview {
+    background: linear-gradient(160deg, #1a2332 0%, #0d1a2a 40%, #1a2332 100%);
+    border-bottom: 2px solid #00aaff;
+}
+.map-card-preview.snow-preview {
+    background: linear-gradient(160deg, #8ab8d4 0%, #b8d8ee 40%, #d4eaf8 100%);
+    border-bottom: 2px solid #aaddff;
+}
+.map-card-preview.jungle-preview {
+    background: linear-gradient(160deg, #0d1a0a 0%, #1a3510 40%, #2a5518 100%);
+    border-bottom: 2px solid #44ff44;
+}
+.city-preview-art { position:absolute; bottom:0; left:0; width:100%; }
+.map-card-info { padding: 14px 16px 18px; text-align: left; }
+.map-card-info h3 { margin: 0 0 6px; font-size: 1.2em; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; }
+.map-card-info p { margin: 0; font-size: 0.82em; color: #8899aa; line-height: 1.4; }
+.map-card-tag { display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 3px; font-size: 0.72em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+.tag-city { background: #00aaff22; color: #00aaff; border: 1px solid #00aaff55; }
+.tag-snow { background: #aaddff22; color: #aaddff; border: 1px solid #aaddff55; }
+.tag-jungle { background: #44ff4422; color: #44ff44; border: 1px solid #44ff4455; }
+.map-card-selected-check { display: none; position: absolute; top: 8px; right: 10px; color: #ff8800; font-size: 1.4em; font-weight: bold; }
+.map-card.selected .map-card-selected-check { display: block; }
+.map-back-btn { margin-top: 24px; padding: 11px 36px; font-size: 1.1em; background: #ff4444; color: white; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+.map-back-btn:active { transform: scale(0.95); }
+.map-deploy-btn { margin-top: 18px; padding: 14px 50px; font-size: 1.4em; background: #ff8800; color: white; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-weight: bold; box-shadow: 0 4px 15px rgba(255,136,0,0.4); }
+.map-deploy-btn:active { transform: scale(0.95); }
 
 /* Achievements Modal */
 #ach-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,8,20,0.97); z-index: 200; display: none; flex-direction: column; align-items: center; color: white; }
@@ -99,6 +152,77 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 .ach-item { background: rgba(30,35,55,0.95); margin: 8px 0; padding: 14px; border-radius: 8px; border-left: 6px solid #555; display: flex; justify-content: space-between; align-items: center; }
 .ach-item.unlocked { border-left-color: #00ff88; }
 .ach-item.locked { opacity: 0.75; }
+
+/* ===================== UPGRADE TREE SCREEN ===================== */
+#upgrade-tree-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(5,10,5,0.98); z-index: 180; display: none;
+    flex-direction: column; align-items: center; color: white;
+    overflow-y: auto; padding-bottom: 30px; box-sizing: border-box;
+}
+#upgrade-tree-screen h2 {
+    margin: 18px 0 4px; color: #00ffaa;
+    font-size: 1.9em; letter-spacing: 2px; text-transform: uppercase;
+    text-shadow: 0 0 14px rgba(0,255,170,0.5);
+}
+#upgrade-tree-level-bar {
+    width: 94%; max-width: 780px; margin: 6px 0 14px;
+    background: rgba(20,30,20,0.9); border: 1px solid #224422;
+    border-radius: 8px; padding: 10px 16px; display: flex;
+    align-items: center; justify-content: space-between;
+    font-size: 0.95em; color: #aaffaa;
+}
+#upgrade-tree-level-bar span { font-weight: bold; color: #00ffaa; font-size: 1.15em; }
+.upgrade-section-header {
+    width: 94%; max-width: 780px; display: flex; align-items: center;
+    margin: 16px 0 8px; font-size: 1.1em; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 2px; gap: 10px;
+}
+.upgrade-section-header .section-icon { font-size: 1.3em; }
+.upgrade-section-header.combat { color: #ff4444; }
+.upgrade-section-header.survivability { color: #4488ff; }
+.upgrade-section-header.weapons { color: #44ff88; }
+.upgrade-section-header .section-line { flex: 1; height: 1px; background: currentColor; opacity: 0.3; }
+.upgrade-cards-grid {
+    width: 94%; max-width: 780px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 4px;
+}
+.upgrade-card {
+    background: rgba(15,22,12,0.95); border: 1.5px solid #2a3a2a;
+    border-radius: 8px; padding: 12px 10px; cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    position: relative; min-height: 110px; display: flex;
+    flex-direction: column; justify-content: space-between;
+}
+.upgrade-card:active { transform: scale(0.96); }
+.upgrade-card.owned { border-color: #00ff88; background: rgba(0,30,15,0.95); }
+.upgrade-card.owned::after { content: '✓ OWNED'; position: absolute; bottom: 8px; right: 8px; color: #00ff88; font-size: 0.68em; font-weight: bold; letter-spacing: 1px; }
+.upgrade-card.can-afford { border-color: #667766; }
+.upgrade-card.can-afford:active { border-color: #00ff88; box-shadow: 0 0 18px rgba(0,255,136,0.3); }
+.upgrade-card.cannot-afford { opacity: 0.55; cursor: not-allowed; }
+.upgrade-card.locked-req { opacity: 0.45; cursor: not-allowed; border-color: #443344; }
+.upgrade-card-icon { font-size: 1.5em; margin-bottom: 4px; }
+.upgrade-card-name { font-size: 0.85em; font-weight: bold; color: #eeffee; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.upgrade-card-desc { font-size: 0.72em; color: #88aa88; line-height: 1.3; flex: 1; }
+.upgrade-card-cost { margin-top: 7px; font-size: 0.75em; font-weight: bold; color: #44ff88; text-transform: uppercase; letter-spacing: 0.5px; }
+.upgrade-card-cost.expensive { color: #ffaa44; }
+.upgrade-card-cost.very-expensive { color: #ff5544; }
+.upgrade-tree-close-btn {
+    margin-top: 20px; padding: 12px 50px; font-size: 1.2em;
+    background: #ff4444; color: white; border: none; border-radius: 6px;
+    cursor: pointer; text-transform: uppercase; font-weight: bold;
+}
+.upgrade-tree-close-btn:active { transform: scale(0.95); }
+
+/* In-game upgrade popup (old system kept but enhanced) */
+#upgrade-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(10,15,30,0.95); z-index: 160; display: none;
+    flex-direction: column; align-items: center; color: white;
+    overflow-y: auto; padding-bottom: 20px;
+}
+.upgrade-btn { padding: 12px 30px; margin: 8px; background: #00aa88; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; }
 
 /* Death Screen */
 #death-screen {
@@ -109,14 +233,6 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 #death-screen h2 { color: #ff3333; font-size: 2.8em; margin: 20px; text-shadow: 0 0 10px #ff0000; }
 .death-btn { padding: 14px 50px; font-size: 1.4em; margin: 12px; background: #ff8800; color: white; border: none; border-radius: 6px; cursor: pointer; }
 
-/* Upgrade Screen */
-#upgrade-screen {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(10,15,30,0.95); z-index: 160; display: none;
-    flex-direction: column; align-items: center; color: white;
-}
-.upgrade-btn { padding: 12px 30px; margin: 8px; background: #00aa88; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; }
-
 /* Achievement Popup */
 #ach-popup {
     position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
@@ -124,6 +240,25 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
     padding: 16px 28px; border-radius: 10px; box-shadow: 0 0 25px rgba(0,255,200,0.9);
     font-weight: bold; z-index: 300; opacity: 0; pointer-events: none;
     transition: all 0.4s ease; text-align: center;
+}
+
+/* Level Up Popup */
+#levelup-popup {
+    position: absolute; top: 120px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #00ff88, #00aa44); color: #000;
+    padding: 14px 28px; border-radius: 10px; box-shadow: 0 0 25px rgba(0,255,136,0.9);
+    font-weight: bold; z-index: 301; opacity: 0; pointer-events: none;
+    transition: all 0.4s ease; text-align: center; white-space: nowrap;
+}
+
+/* Map indicator HUD badge */
+#map-indicator {
+    position: absolute; top: 15px; right: 140px; color: #fff;
+    background: rgba(15,22,38,0.9); padding: 6px 14px;
+    border-left: 4px solid #ff8800; border-radius: 0 6px 6px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6); font-size: 0.82em;
+    font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+    pointer-events: none; z-index: 20;
 }
 
 /* Original UI */
@@ -142,9 +277,22 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 #lean-r-btn { bottom: 235px; left: 95px; width: 60px; height: 60px; border-radius: 50%; border-color: #ff8800; }
 #swap-btn { top: 15px; right: 15px; width: 110px; height: 42px; border-radius: 5px; border-color: #ffa500; }
 #sidearm-btn { top: 68px; right: 15px; width: 110px; height: 42px; border-radius: 5px; border-color: #aa85ff; }
+#ingame-upgrade-btn { bottom: 150px; left: 25px; width: 60px; height: 60px; border-radius: 50%; border-color: #00ffaa; font-size: 9px; background: rgba(0,50,30,0.9); }
 #crosshair { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; transform: translate(-50%, -50%); border-radius: 50%; opacity: 0.9; box-shadow: 0 0 4px rgba(0,0,0,1); }
-#hitmarker { position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none; transition: transform 0.05s ease-out, opacity 0.1s; }
-.hm-line { position: absolute; background: white; width: 2px; height: 8px; box-shadow: 0 0 2px black; }
+#hitmarker {
+    position: absolute; top: 50%; left: 50%; width: 32px; height: 32px;
+    transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none;
+    transition: transform 0.06s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.18s ease-out;
+}
+.hm-line {
+    position: absolute; background: #ffffff; width: 2.5px; height: 14px;
+    box-shadow: 0 0 8px #ff2222, 0 0 12px #ff8800;
+    border-radius: 1px;
+}
+.hm-1 { transform: rotate(45deg); top: 9px; left: 15px; }
+.hm-2 { transform: rotate(-45deg); top: 9px; left: 15px; }
+.hm-3 { transform: rotate(45deg); top: 9px; left: 15px; height: 2.5px; width: 14px; }
+.hm-4 { transform: rotate(-45deg); top: 9px; left: 15px; height: 2.5px; width: 14px; }
 #move-zone { position: absolute; bottom: 0; left: 0; width: 170px; height: 170px; z-index: 50; }
 #aim-joystick-zone { position: absolute; bottom: 0; right: 0; width: 170px; height: 170px; z-index: 50; }
 #aim-zone-swipe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 4; touch-action: none; }
@@ -152,46 +300,405 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 </head>
 <body>
 
+<!-- ===================== START SCREEN ===================== -->
 <div id="start-screen">
-    <h1>DELTA OPS:<br>THE NEW ERA OF PIXEL OPS</h1>
-    <button id="start-btn" class="start-btn">Deploy</button>
+    <h1>DELTA OPS:<br>A DESERT TO STORM</h1>
+    <div id="start-level-badge">LEVEL: 1 | 0 XP</div>
+    <button id="start-btn" class="start-btn">SELECT MAP &amp; DEPLOY</button>
+    <button id="open-upgrade-tree-btn" class="upg-tree-btn">UPGRADES &amp; PERKS</button>
     <button id="ach-btn" class="ach-btn">ACHIEVEMENTS</button>
 </div>
 
+<!-- ===================== MAP SELECTION SCREEN ===================== -->
+<div id="map-select-screen">
+    <h2>SELECT MAP</h2>
+    <p>Choose your battleground and deploy</p>
+    <div class="map-cards-container">
+
+        <!-- City Map Card -->
+        <div class="map-card" id="card-city" onclick="selectMap('city')">
+            <div style="position:relative;">
+                <div class="map-card-selected-check">✓</div>
+                <div class="map-card-preview city-preview">
+                    <svg class="city-preview-art" viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="280" height="150" fill="#0d1a2e"/>
+                        <defs>
+                            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0a1428;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#1a2a4a;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="moonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#fffaed;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e5d87a;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="280" height="150" fill="url(#skyGrad)"/>
+                        <circle cx="230" cy="28" r="14" fill="url(#moonGlow)" opacity="0.85"/>
+                        <circle cx="226" cy="24" r="12" fill="#0d1830" opacity="0.3"/>
+                        <circle cx="30" cy="15" r="1.2" fill="white" opacity="0.7"/>
+                        <circle cx="80" cy="10" r="0.9" fill="white" opacity="0.6"/>
+                        <circle cx="140" cy="18" r="1.1" fill="white" opacity="0.8"/>
+                        <circle cx="195" cy="8" r="0.8" fill="white" opacity="0.5"/>
+                        <circle cx="55" cy="25" r="0.8" fill="white" opacity="0.6"/>
+                        <circle cx="165" cy="35" r="0.7" fill="white" opacity="0.4"/>
+                        <rect x="0" y="65" width="35" height="85" fill="#0f1c30"/>
+                        <rect x="5" y="50" width="22" height="100" fill="#111e35"/>
+                        <rect x="8" y="55" width="4" height="3" fill="#e5c158" opacity="0.9"/>
+                        <rect x="15" y="55" width="4" height="3" fill="#e5c158" opacity="0.7"/>
+                        <rect x="8" y="63" width="4" height="3" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="15" y="63" width="4" height="3" fill="#e5c158" opacity="0.9"/>
+                        <rect x="8" y="71" width="4" height="3" fill="#4a8fff" opacity="0.6"/>
+                        <rect x="15" y="71" width="4" height="3" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="8" y="79" width="4" height="3" fill="#e5c158" opacity="0.9"/>
+                        <rect x="15" y="79" width="4" height="3" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="38" y="72" width="42" height="78" fill="#0e1c32"/>
+                        <rect x="42" y="78" width="8" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="54" y="78" width="8" height="5" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="66" y="78" width="8" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="42" y="88" width="8" height="5" fill="#4a8fff" opacity="0.9"/>
+                        <rect x="54" y="88" width="8" height="5" fill="#e5c158" opacity="0.6"/>
+                        <rect x="66" y="88" width="8" height="5" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="42" y="98" width="8" height="5" fill="#e5c158" opacity="0.7"/>
+                        <rect x="54" y="98" width="8" height="5" fill="#4a8fff" opacity="0.9"/>
+                        <rect x="66" y="98" width="8" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="100" y="40" width="50" height="110" fill="#101e36"/>
+                        <rect x="118" y="30" width="14" height="15" fill="#0f1d34"/>
+                        <line x1="125" y1="30" x2="125" y2="10" stroke="#00aaff" stroke-width="1.5"/>
+                        <circle cx="125" cy="10" r="2.5" fill="#ff3333" opacity="0.9"/>
+                        <rect x="105" y="48" width="8" height="5" fill="#00aaff" opacity="0.9"/>
+                        <rect x="117" y="48" width="8" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="129" y="48" width="8" height="5" fill="#00aaff" opacity="0.7"/>
+                        <rect x="141" y="48" width="5" height="5" fill="#4a8fff" opacity="0.9"/>
+                        <rect x="105" y="58" width="8" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="117" y="58" width="8" height="5" fill="#00aaff" opacity="0.6"/>
+                        <rect x="129" y="58" width="8" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="141" y="58" width="5" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="105" y="68" width="8" height="5" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="117" y="68" width="8" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="129" y="68" width="8" height="5" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="141" y="68" width="5" height="5" fill="#00aaff" opacity="0.6"/>
+                        <rect x="160" y="60" width="38" height="90" fill="#0d1b30"/>
+                        <rect x="165" y="66" width="7" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="176" y="66" width="7" height="5" fill="#4a8fff" opacity="0.9"/>
+                        <rect x="187" y="66" width="7" height="5" fill="#e5c158" opacity="0.7"/>
+                        <rect x="165" y="76" width="7" height="5" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="176" y="76" width="7" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="187" y="76" width="7" height="5" fill="#4a8fff" opacity="0.6"/>
+                        <rect x="165" y="86" width="7" height="5" fill="#e5c158" opacity="0.9"/>
+                        <rect x="176" y="86" width="7" height="5" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="187" y="86" width="7" height="5" fill="#e5c158" opacity="0.8"/>
+                        <rect x="204" y="85" width="30" height="65" fill="#0e1c30"/>
+                        <rect x="208" y="92" width="6" height="4" fill="#00aaff" opacity="0.8"/>
+                        <rect x="218" y="92" width="6" height="4" fill="#e5c158" opacity="0.9"/>
+                        <rect x="228" y="92" width="6" height="4" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="208" y="100" width="6" height="4" fill="#e5c158" opacity="0.9"/>
+                        <rect x="218" y="100" width="6" height="4" fill="#4a8fff" opacity="0.8"/>
+                        <rect x="240" y="70" width="40" height="80" fill="#0c1a2c"/>
+                        <rect x="245" y="76" width="6" height="4" fill="#e5c158" opacity="0.6"/>
+                        <rect x="255" y="76" width="6" height="4" fill="#4a8fff" opacity="0.7"/>
+                        <rect x="265" y="76" width="6" height="4" fill="#e5c158" opacity="0.8"/>
+                        <rect x="0" y="138" width="280" height="12" fill="#252830"/>
+                        <rect x="0" y="136" width="280" height="4" fill="#1a1d22"/>
+                        <rect x="30" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="60" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="90" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="130" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="170" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="210" y="139" width="20" height="2" fill="#e5c158" opacity="0.5"/>
+                        <rect x="0" y="100" width="280" height="50" fill="url(#skyGrad)" opacity="0.18"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="map-card-info">
+                <h3>Urban Warzone</h3>
+                <p>Navigate tight city streets between high-rise towers. Urban combat with multiple angles and sniper vantage points.</p>
+                <span class="map-card-tag tag-city">🏙️ CITY</span>
+            </div>
+        </div>
+
+        <!-- Snow Map Card - Antarctic Freedom -->
+        <div class="map-card" id="card-snow" onclick="selectMap('snow')">
+            <div style="position:relative;">
+                <div class="map-card-selected-check">✓</div>
+                <div class="map-card-preview snow-preview">
+                    <svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+                        <defs>
+                            <linearGradient id="snowSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0a1e3d;stop-opacity:1"/>
+                                <stop offset="50%" style="stop-color:#1a4060;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#2a6080;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="snowGroundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d8eef8;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#a8c8e0;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="auroraGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0"/>
+                                <stop offset="40%" style="stop-color:#00ff88;stop-opacity:0.4"/>
+                                <stop offset="100%" style="stop-color:#0088ff;stop-opacity:0"/>
+                            </linearGradient>
+                            <linearGradient id="auroraGrad2" x1="0%" y1="0%" x2="100%" y2="80%">
+                                <stop offset="0%" style="stop-color:#aa00ff;stop-opacity:0"/>
+                                <stop offset="50%" style="stop-color:#aa00ff;stop-opacity:0.3"/>
+                                <stop offset="100%" style="stop-color:#00ffcc;stop-opacity:0"/>
+                            </linearGradient>
+                            <linearGradient id="iceWallGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#b0ddf4;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#6aadcc;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="pineSnowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a4a2a;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#0d2818;stop-opacity:1"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="280" height="150" fill="url(#snowSkyGrad)"/>
+                        <ellipse cx="140" cy="40" rx="140" ry="28" fill="url(#auroraGrad1)" opacity="0.7"/>
+                        <ellipse cx="160" cy="55" rx="130" ry="20" fill="url(#auroraGrad2)" opacity="0.6"/>
+                        <ellipse cx="100" cy="35" rx="100" ry="18" fill="url(#auroraGrad1)" opacity="0.4"/>
+                        <circle cx="20" cy="12" r="1.2" fill="#e8f4ff" opacity="0.95"/>
+                        <circle cx="55" cy="8" r="0.9" fill="#e8f4ff" opacity="0.85"/>
+                        <circle cx="90" cy="14" r="1.0" fill="#e8f4ff" opacity="0.9"/>
+                        <circle cx="130" cy="10" r="0.8" fill="#ffffff" opacity="0.9"/>
+                        <circle cx="175" cy="7" r="1.1" fill="#e8f4ff" opacity="0.8"/>
+                        <circle cx="215" cy="12" r="0.9" fill="#ffffff" opacity="0.9"/>
+                        <circle cx="250" cy="9" r="0.7" fill="#e8f4ff" opacity="0.85"/>
+                        <circle cx="265" cy="18" r="1.0" fill="#e8f4ff" opacity="0.7"/>
+                        <circle cx="38" cy="22" r="0.7" fill="#ffffff" opacity="0.75"/>
+                        <circle cx="195" cy="20" r="0.8" fill="#e8f4ff" opacity="0.7"/>
+                        <circle cx="242" cy="28" r="16" fill="#c8dff0" opacity="0.4"/>
+                        <circle cx="242" cy="28" r="13" fill="#e8f4fc" opacity="0.92"/>
+                        <circle cx="238" cy="25" r="3.5" fill="#d0e8f4" opacity="0.6"/>
+                        <circle cx="246" cy="30" r="2.2" fill="#d0e8f4" opacity="0.5"/>
+                        <polygon points="0,88 25,52 50,70 80,38 115,60 150,34 185,55 220,40 255,58 280,45 280,88" fill="#5a8aaa" opacity="0.75"/>
+                        <polygon points="0,88 25,60 50,76 80,48 115,68 150,42 185,63 220,48 255,65 280,53 280,88" fill="#7aaac4" opacity="0.6"/>
+                        <polygon points="80,38 73,56 87,56" fill="#e8f4fc" opacity="0.9"/>
+                        <polygon points="150,34 143,52 157,52" fill="#e8f4fc" opacity="0.9"/>
+                        <polygon points="220,40 213,57 227,57" fill="#e8f4fc" opacity="0.85"/>
+                        <polygon points="25,52 19,65 31,65" fill="#e8f4fc" opacity="0.8"/>
+                        <polygon points="255,58 249,70 261,70" fill="#e8f4fc" opacity="0.8"/>
+                        <rect x="6" y="101" width="4" height="14" fill="#4a2e10"/>
+                        <polygon points="8,72 1,103 15,103" fill="url(#pineSnowGrad)"/>
+                        <polygon points="8,80 2,106 14,106" fill="#0d2818" opacity="0.6"/>
+                        <polygon points="8,72 3,88 13,88" fill="#d8eef8" opacity="0.85"/>
+                        <rect x="22" y="103" width="3.5" height="12" fill="#4a2e10"/>
+                        <polygon points="23.5,77 17,105 30,105" fill="url(#pineSnowGrad)"/>
+                        <polygon points="23.5,77 19,93 28,93" fill="#d8eef8" opacity="0.85"/>
+                        <rect x="36" y="108" width="3" height="8" fill="#4a2e10"/>
+                        <polygon points="37.5,88 32,110 43,110" fill="url(#pineSnowGrad)"/>
+                        <polygon points="37.5,88 33,100 42,100" fill="#d8eef8" opacity="0.8"/>
+                        <rect x="240" y="101" width="4" height="14" fill="#4a2e10"/>
+                        <polygon points="242,72 235,103 249,103" fill="url(#pineSnowGrad)"/>
+                        <polygon points="242,80 236,106 248,106" fill="#0d2818" opacity="0.6"/>
+                        <polygon points="242,72 237,88 247,88" fill="#d8eef8" opacity="0.85"/>
+                        <rect x="254" y="103" width="3.5" height="12" fill="#4a2e10"/>
+                        <polygon points="255.5,77 249,105 262,105" fill="url(#pineSnowGrad)"/>
+                        <polygon points="255.5,77 251,93 260,93" fill="#d8eef8" opacity="0.85"/>
+                        <rect x="268" y="108" width="3" height="8" fill="#4a2e10"/>
+                        <polygon points="269.5,88 264,110 275,110" fill="url(#pineSnowGrad)"/>
+                        <polygon points="269.5,88 265,100 274,100" fill="#d8eef8" opacity="0.8"/>
+                        <rect x="88" y="86" width="104" height="30" fill="url(#iceWallGrad)" opacity="0.95"/>
+                        <rect x="88" y="82" width="104" height="6" fill="#c8e8f4"/>
+                        <rect x="92" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="108" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="124" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="148" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="164" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="180" y="76" width="10" height="8" fill="#b0ddf4"/>
+                        <rect x="137" y="68" width="2" height="12" fill="#8aaabb"/>
+                        <ellipse cx="138" cy="68" rx="8" ry="4" fill="#9abccc" opacity="0.9"/>
+                        <rect x="96" y="92" width="11" height="7" fill="#1a3850" opacity="0.9"/>
+                        <rect x="113" y="92" width="11" height="7" fill="#1a3850" opacity="0.9"/>
+                        <rect x="158" y="92" width="11" height="7" fill="#1a3850" opacity="0.9"/>
+                        <rect x="175" y="92" width="11" height="7" fill="#1a3850" opacity="0.9"/>
+                        <circle cx="100" cy="88" r="2" fill="#ff3333" opacity="0.9"/>
+                        <circle cx="180" cy="88" r="2" fill="#ff3333" opacity="0.9"/>
+                        <rect x="130" y="95" width="20" height="21" fill="#1e3a55" opacity="0.95"/>
+                        <line x1="140" y1="95" x2="140" y2="116" stroke="#2a4a65" stroke-width="1"/>
+                        <rect x="60" y="78" width="20" height="38" fill="url(#iceWallGrad)" opacity="0.95"/>
+                        <rect x="56" y="74" width="28" height="8" fill="#c0ddf0"/>
+                        <rect x="58" y="68" width="7" height="8" fill="#c0ddf0"/>
+                        <rect x="70" y="68" width="7" height="8" fill="#c0ddf0"/>
+                        <rect x="68" y="82" width="7" height="6" fill="#1a3850" opacity="0.9"/>
+                        <ellipse cx="70" cy="74" rx="12" ry="3" fill="#eef8ff" opacity="0.9"/>
+                        <rect x="200" y="78" width="20" height="38" fill="url(#iceWallGrad)" opacity="0.95"/>
+                        <rect x="196" y="74" width="28" height="8" fill="#c0ddf0"/>
+                        <rect x="198" y="68" width="7" height="8" fill="#c0ddf0"/>
+                        <rect x="210" y="68" width="7" height="8" fill="#c0ddf0"/>
+                        <rect x="208" y="82" width="7" height="6" fill="#1a3850" opacity="0.9"/>
+                        <ellipse cx="210" cy="74" rx="12" ry="3" fill="#eef8ff" opacity="0.9"/>
+                        <ellipse cx="140" cy="130" rx="90" ry="9" fill="#88c8e8" opacity="0.55"/>
+                        <ellipse cx="140" cy="130" rx="65" ry="5.5" fill="#aadcf4" opacity="0.65"/>
+                        <rect x="0" y="114" width="280" height="36" fill="url(#snowGroundGrad)"/>
+                        <ellipse cx="50" cy="114" rx="60" ry="9" fill="#eef8ff" opacity="0.75"/>
+                        <ellipse cx="200" cy="114" rx="70" ry="8" fill="#eaf6fc" opacity="0.65"/>
+                        <rect x="0" y="0" width="280" height="150" fill="#0a2040" opacity="0.08"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="map-card-info">
+                <h3>Antarctic Freedom</h3>
+                <p>Frozen tundra under the aurora borealis. Reinforced ice bunkers, blizzard conditions, and frozen rivers cut through the battlefield.</p>
+                <span class="map-card-tag tag-snow">❄️ SNOW</span>
+            </div>
+        </div>
+
+        <!-- Jungle Map Card - Rolling Thunder -->
+        <div class="map-card" id="card-jungle" onclick="selectMap('jungle')">
+            <div style="position:relative;">
+                <div class="map-card-selected-check">✓</div>
+                <div class="map-card-preview jungle-preview">
+                    <svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+                        <defs>
+                            <linearGradient id="jungleSkyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0a1a08;stop-opacity:1"/>
+                                <stop offset="40%" style="stop-color:#0f2a0c;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#1a3d10;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="jungleFloor" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a3a0a;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#0d2005;stop-opacity:1"/>
+                            </linearGradient>
+                            <radialGradient id="lightningGlow" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:#ffffaa;stop-opacity:0.8"/>
+                                <stop offset="100%" style="stop-color:#ffff00;stop-opacity:0"/>
+                            </radialGradient>
+                            <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#3a2208;stop-opacity:1"/>
+                                <stop offset="50%" style="stop-color:#5a3a12;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#3a2208;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="canopyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1e6010;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#0d3808;stop-opacity:1"/>
+                            </linearGradient>
+                            <linearGradient id="stormCloud" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a1a22;stop-opacity:1"/>
+                                <stop offset="100%" style="stop-color:#2a2a35;stop-opacity:1"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="280" height="150" fill="url(#jungleSkyGrad)"/>
+                        <ellipse cx="60" cy="22" rx="55" ry="20" fill="url(#stormCloud)" opacity="0.9"/>
+                        <ellipse cx="150" cy="18" rx="70" ry="22" fill="url(#stormCloud)" opacity="0.85"/>
+                        <ellipse cx="230" cy="24" rx="55" ry="18" fill="url(#stormCloud)" opacity="0.88"/>
+                        <ellipse cx="100" cy="30" rx="50" ry="16" fill="#1a1a28" opacity="0.8"/>
+                        <ellipse cx="200" cy="28" rx="60" ry="18" fill="#1a1a28" opacity="0.75"/>
+                        <ellipse cx="48" cy="20" rx="20" ry="10" fill="url(#lightningGlow)" opacity="0.6"/>
+                        <polyline points="48,30 44,45 50,45 43,68" stroke="#ffffaa" stroke-width="2.5" fill="none" opacity="0.95"/>
+                        <polyline points="48,30 44,45 50,45 43,68" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.9"/>
+                        <ellipse cx="228" cy="22" rx="18" ry="10" fill="url(#lightningGlow)" opacity="0.5"/>
+                        <polyline points="228,32 225,46 231,44 226,65" stroke="#ffffaa" stroke-width="2" fill="none" opacity="0.85"/>
+                        <ellipse cx="15" cy="72" rx="22" ry="18" fill="url(#canopyGrad)" opacity="0.9"/>
+                        <ellipse cx="45" cy="65" rx="28" ry="22" fill="#1a5a10" opacity="0.95"/>
+                        <ellipse cx="80" cy="70" rx="25" ry="20" fill="url(#canopyGrad)" opacity="0.9"/>
+                        <ellipse cx="115" cy="62" rx="30" ry="24" fill="#1e6212" opacity="0.95"/>
+                        <ellipse cx="155" cy="67" rx="28" ry="22" fill="url(#canopyGrad)" opacity="0.9"/>
+                        <ellipse cx="195" cy="63" rx="30" ry="24" fill="#1a5a10" opacity="0.95"/>
+                        <ellipse cx="235" cy="68" rx="26" ry="20" fill="url(#canopyGrad)" opacity="0.9"/>
+                        <ellipse cx="268" cy="72" rx="20" ry="18" fill="#1e6212" opacity="0.9"/>
+                        <rect x="10" y="80" width="10" height="70" fill="url(#trunkGrad)"/>
+                        <rect x="40" y="75" width="12" height="75" fill="url(#trunkGrad)"/>
+                        <rect x="78" y="78" width="10" height="72" fill="url(#trunkGrad)"/>
+                        <rect x="112" y="72" width="13" height="78" fill="url(#trunkGrad)"/>
+                        <rect x="152" y="75" width="12" height="75" fill="url(#trunkGrad)"/>
+                        <rect x="192" y="73" width="13" height="77" fill="url(#trunkGrad)"/>
+                        <rect x="230" y="76" width="11" height="74" fill="url(#trunkGrad)"/>
+                        <rect x="262" y="80" width="9" height="70" fill="url(#trunkGrad)"/>
+                        <rect x="100" y="88" width="80" height="38" fill="#3a4830" opacity="0.95"/>
+                        <rect x="106" y="94" width="10" height="7" fill="#0d1a08" opacity="0.95"/>
+                        <rect x="122" y="94" width="10" height="7" fill="#0d1a08" opacity="0.95"/>
+                        <rect x="152" y="94" width="10" height="7" fill="#0d1a08" opacity="0.95"/>
+                        <rect x="168" y="94" width="10" height="7" fill="#0d1a08" opacity="0.95"/>
+                        <rect x="134" y="100" width="12" height="26" fill="#0d1a08" opacity="0.95"/>
+                        <circle cx="140" cy="98" r="2.5" fill="#00ff44" opacity="0.9"/>
+                        <rect x="0" y="120" width="280" height="30" fill="url(#jungleFloor)"/>
+                        <rect x="0" y="125" width="280" height="25" fill="#111a08"/>
+                        <rect x="0" y="0" width="280" height="150" fill="#0a2005" opacity="0.12"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="map-card-info">
+                <h3>Rolling Thunder</h3>
+                <p>Dense jungle canopy, monsoon storms, and lightning-split skies. Vine-covered bunkers and treacherous muddy terrain hide the enemy.</p>
+                <span class="map-card-tag tag-jungle">🌿 JUNGLE</span>
+            </div>
+        </div>
+
+    </div>
+    <button class="map-back-btn" onclick="goBackToStart()">BACK</button>
+</div>
+
+<!-- ===================== UPGRADE TREE SCREEN ===================== -->
+<div id="upgrade-tree-screen">
+    <h2>⚙ UPGRADES &amp; PERKS</h2>
+    <div id="upgrade-tree-level-bar">
+        <div>LEVEL: <span id="utree-level">1</span> &nbsp;|&nbsp; XP: <span id="utree-xp">0</span> / <span id="utree-xp-next">100</span></div>
+        <div>Available: <span id="utree-points">0</span>× (spend levels on upgrades)</div>
+    </div>
+
+    <!-- COMBAT SECTION -->
+    <div class="upgrade-section-header combat">
+        <span class="section-icon">✖</span> COMBAT
+        <span class="section-line"></span>
+    </div>
+    <div class="upgrade-cards-grid" id="combat-grid"></div>
+
+    <!-- SURVIVABILITY SECTION -->
+    <div class="upgrade-section-header survivability">
+        <span class="section-icon">🛡</span> SURVIVABILITY
+        <span class="section-line"></span>
+    </div>
+    <div class="upgrade-cards-grid" id="survivability-grid"></div>
+
+    <!-- UNLOCK WEAPONS SECTION -->
+    <div class="upgrade-section-header weapons">
+        <span class="section-icon" style="transform:scaleX(-1);display:inline-block;">🔫</span> UNLOCK WEAPONS
+        <span class="section-line"></span>
+    </div>
+    <div class="upgrade-cards-grid" id="weapons-grid"></div>
+
+    <button class="upgrade-tree-close-btn" onclick="closeUpgradeTree()">CLOSE</button>
+</div>
+
+<!-- ===================== ACHIEVEMENTS MODAL ===================== -->
 <div id="ach-modal">
     <h2>ACHIEVEMENTS <span id="ach-count" style="font-size:0.6em;color:#888;">(0/200)</span></h2>
     <div class="ach-list" id="ach-list"></div>
     <button onclick="closeAchievements()" style="margin:20px;padding:12px 40px;background:#ff4444;color:white;border:none;border-radius:6px;">CLOSE</button>
+    <button onclick="goHome()" style="margin:10px;padding:12px 40px;background:#00ccff;color:white;border:none;border-radius:6px;">HOME</button>
 </div>
 
+<!-- ===================== DEATH SCREEN ===================== -->
 <div id="death-screen">
     <h2>GAME OVER</h2>
     <p style="font-size:1.3em;margin:10px;">Final Kills: <span id="final-kills">0</span></p>
+    <p style="font-size:1em;margin:6px;color:#00ffaa;">XP Earned: <span id="final-xp">0</span></p>
     <button id="redeploy-btn" class="death-btn">REDEPLOY</button>
     <button id="home-btn" class="death-btn">HOME</button>
 </div>
 
+<!-- ===================== IN-GAME UPGRADE POPUP ===================== -->
 <div id="upgrade-screen">
-    <h2>WEAPON UPGRADES & ATTACHMENTS</h2>
-    <p>Upgrade Points: <span id="upgrade-points">0</span></p>
-    <button onclick="upgradeDamage()" class="upgrade-btn">Damage +25% (Cost 5)</button>
-    <button onclick="upgradeFireRate()" class="upgrade-btn">Fire Rate + (Cost 8)</button>
-    <button onclick="attachSuppressor()" class="upgrade-btn">Suppressor (Cost 6)</button>
-    <button onclick="attachRedDot()" class="upgrade-btn">Red Dot Sight (Cost 4)</button>
-    <button onclick="closeUpgrade()" style="margin-top:20px;padding:10px 30px;background:#ff4444;color:white;border:none;border-radius:6px;">Close</button>
+    <h2 style="color:#00ffaa;margin:18px 0 6px;">LEVEL UP!</h2>
+    <p style="color:#aaffaa;margin:0 0 12px;font-size:1em;">Open the full upgrade tree to spend your level points.</p>
+    <p style="color:#fff;font-size:1.1em;">Level: <span id="upgrade-level-disp">1</span> | Points: <span id="upgrade-points">0</span></p>
+    <button onclick="openUpgradeTreeInGame()" class="upgrade-btn" style="background:#00aa66;">OPEN UPGRADES</button>
+    <button onclick="closeUpgrade()" style="margin-top:20px;padding:10px 30px;background:#ff4444;color:white;border:none;border-radius:6px;">CLOSE</button>
 </div>
 
 <div id="damage-overlay"></div>
 <div id="ach-popup"></div>
+<div id="levelup-popup"></div>
 
 <div id="ui">
 <div class="hud">
     <div id="w-name" style="font-size: 1.25em; font-weight: bold; margin-bottom: 6px; color:#ffa500; letter-spacing: 0.5px;">AUG</div>
     <div style="margin-bottom: 4px;">Ammo: <span id="ammo-count" style="color:#55ff55; font-weight:bold;">30</span>/&infin;</div>
-    <div style="margin-bottom: 4px;">Health: <span id="health-count" style="color:#ff5555; font-weight:bold;">100</span></div>
+    <div style="margin-bottom: 4px;">HP: <span id="health-count" style="color:#ff5555; font-weight:bold;">100</span></div>
     <div style="margin-bottom: 4px;">Kills: <span id="kill-count" style="color:#00ffff; font-weight:bold;">0</span></div>
+    <div style="margin-bottom: 4px;">LVL: <span id="hud-level" style="color:#00ffaa; font-weight:bold;">1</span></div>
     <div>Best: <span id="highscore-count" style="color:#e5c158; font-weight:bold;">0</span></div>
 </div>
+<div id="map-indicator">🏙️ CITY</div>
 <div id="crosshair"></div>
 <div id="hitmarker">
     <div class="hm-line hm-1"></div><div class="hm-line hm-2"></div>
@@ -207,7 +714,7 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 <button id="lean-r-btn" class="btn">LEAN R</button>
 <button id="swap-btn" class="btn">NEXT MAIN</button>
 <button id="sidearm-btn" class="btn">SIDEARM</button>
-<button id="vehicle-btn" class="btn" style="top:120px;right:15px;width:110px;height:42px;">VEHICLE</button>
+<button id="ingame-upgrade-btn" class="btn">UPGRADES</button>
 </div>
 
 <div id="move-zone"></div>
@@ -217,6 +724,232 @@ body { margin: 0; overflow: hidden; background: #1a1c23; touch-action: none; fon
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.9.0/nipplejs.min.js"></script>
 <script>
+
+// ===================== PERSISTENT PLAYER PROGRESSION =====================
+// XP thresholds: level N requires xpTable[N-1] total XP
+function xpForLevel(lvl) { return Math.floor(100 * Math.pow(lvl, 1.35)); }
+
+let playerProgression = {
+    level: 1,
+    xp: 0,
+    levelPoints: 0,   // unspent level-up points
+    ownedUpgrades: [], // array of upgrade IDs
+    sessionKills: 0
+};
+
+function saveProgression() {
+    localStorage.setItem('deltaOpsProgression', JSON.stringify(playerProgression));
+}
+function loadProgression() {
+    const saved = localStorage.getItem('deltaOpsProgression');
+    if (saved) {
+        try { playerProgression = JSON.parse(saved); } catch(e) {}
+    }
+}
+
+function addXP(amount) {
+    // Apply XP boosts from upgrades
+    if (playerProgression.ownedUpgrades.indexOf('xp_boost') !== -1) amount = Math.floor(amount * 1.25);
+    playerProgression.xp += amount;
+    let leveled = false;
+    while (playerProgression.xp >= xpForLevel(playerProgression.level)) {
+        playerProgression.xp -= xpForLevel(playerProgression.level);
+        playerProgression.level++;
+        playerProgression.levelPoints++;
+        leveled = true;
+        showLevelUpPopup(playerProgression.level);
+    }
+    saveProgression();
+    updateHUDLevel();
+    if (leveled && document.getElementById('upgrade-screen').style.display !== 'flex') {
+        document.getElementById('upgrade-level-disp').innerText = playerProgression.level;
+        document.getElementById('upgrade-points').innerText = playerProgression.levelPoints;
+        document.getElementById('upgrade-screen').style.display = 'flex';
+    }
+}
+
+function showLevelUpPopup(lvl) {
+    const popup = document.getElementById('levelup-popup');
+    popup.innerHTML = '⬆ LEVEL UP! Now Level ' + lvl;
+    popup.style.opacity = '1';
+    popup.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(function() {
+        popup.style.opacity = '0';
+        popup.style.transform = 'translateX(-50%) translateY(-40px)';
+    }, 2800);
+}
+
+function updateHUDLevel() {
+    document.getElementById('hud-level').innerText = playerProgression.level;
+    document.getElementById('start-level-badge').innerText = 'LEVEL: ' + playerProgression.level + ' | ' + playerProgression.xp + ' XP / ' + xpForLevel(playerProgression.level) + ' XP';
+}
+
+// ===================== UPGRADE TREE DEFINITION =====================
+// Each upgrade: id, name, desc, icon, cost (in level points), section, requires (id or null), effect (function or null)
+const upgradeTree = [
+    // COMBAT
+    { id: 'sharp1',      name: 'Sharp Rounds I',     desc: 'All weapon damage +15%',              icon: '🎯', cost: 1, section: 'combat',        requires: null },
+    { id: 'sharp2',      name: 'Sharp Rounds II',     desc: 'All weapon damage +25%',              icon: '🎯', cost: 6, section: 'combat',        requires: 'sharp1' },
+    { id: 'trigger',     name: 'Trigger Discipline',  desc: 'Fire rate +15%',                      icon: '⚡', cost: 4, section: 'combat',        requires: null },
+    { id: 'steady',      name: 'Steady Hands',        desc: 'Spread / recoil -30%',                icon: '🎖', cost: 3, section: 'combat',        requires: null },
+    { id: 'quickmag',    name: 'Quick Mag',           desc: 'Reload speed +25%',                   icon: '🔄', cost: 4, section: 'combat',        requires: null },
+    { id: 'ap_rounds',   name: 'AP Rounds',           desc: 'Bullets pierce through 1 enemy',      icon: '💥', cost: 7, section: 'combat',        requires: 'sharp1' },
+    // SURVIVABILITY
+    { id: 'flak1',       name: 'Flak Jacket I',       desc: 'Max HP +25',                          icon: '🛡', cost: 3, section: 'survivability', requires: null },
+    { id: 'flak2',       name: 'Flak Jacket II',      desc: 'Max HP +50',                          icon: '🛡', cost: 6, section: 'survivability', requires: 'flak1' },
+    { id: 'regen',       name: 'Combat Regen',        desc: 'HP slowly regens over time',          icon: '💊', cost: 5, section: 'survivability', requires: null },
+    { id: 'lifedrain',   name: 'Life Drain',          desc: 'Kills restore +5 HP',                 icon: '🩸', cost: 4, section: 'survivability', requires: null },
+    { id: 'lightfeet',   name: 'Light Feet',          desc: 'Move speed +20%',                     icon: '👟', cost: 4, section: 'survivability', requires: null },
+    { id: 'xp_boost',    name: 'Field Intel',         desc: 'XP gain +25%',                        icon: '📡', cost: 3, section: 'survivability', requires: null },
+    // UNLOCK WEAPONS
+    { id: 'w_minigun',   name: 'Minigun',             desc: 'Ridiculous fire rate, low dmg, huge mag. Unlock extra weapon slot.',    icon: '🔫', cost: 10, section: 'weapons', requires: null },
+    { id: 'w_shotgun',   name: 'Super Shotgun',       desc: 'Extreme damage, infinite pierce, high fire rate. Unlock extra weapon slot.', icon: '💥', cost: 10, section: 'weapons', requires: null },
+    { id: 'w_flamer',    name: 'Flamethrower',        desc: 'Short-range fire stream. Fuel recharges on its own. Burns enemies.',   icon: '🔥', cost: 10, section: 'weapons', requires: null }
+];
+
+function isUpgradeOwned(id) { return playerProgression.ownedUpgrades.indexOf(id) !== -1; }
+function isUpgradeRequirementMet(upg) {
+    if (!upg.requires) return true;
+    return isUpgradeOwned(upg.requires);
+}
+
+function renderUpgradeTree() {
+    document.getElementById('utree-level').innerText = playerProgression.level;
+    document.getElementById('utree-xp').innerText = playerProgression.xp;
+    document.getElementById('utree-xp-next').innerText = xpForLevel(playerProgression.level);
+    document.getElementById('utree-points').innerText = playerProgression.levelPoints;
+
+    ['combat','survivability','weapons'].forEach(function(section) {
+        const grid = document.getElementById(section + '-grid');
+        grid.innerHTML = '';
+        const upgrades = upgradeTree.filter(function(u) { return u.section === section; });
+        upgrades.forEach(function(upg) {
+            const owned = isUpgradeOwned(upg.id);
+            const reqMet = isUpgradeRequirementMet(upg);
+            const canAfford = playerProgression.levelPoints >= upg.cost;
+            let cardClass = 'upgrade-card';
+            if (owned) cardClass += ' owned';
+            else if (!reqMet) cardClass += ' locked-req';
+            else if (canAfford) cardClass += ' can-afford';
+            else cardClass += ' cannot-afford';
+
+            let costClass = 'upgrade-card-cost';
+            if (upg.cost >= 10) costClass += ' very-expensive';
+            else if (upg.cost >= 6) costClass += ' expensive';
+
+            let reqText = '';
+            if (!owned && upg.requires && !reqMet) {
+                const reqUpg = upgradeTree.find(function(u) { return u.id === upg.requires; });
+                reqText = '<div style="font-size:0.65em;color:#aa6655;margin-top:3px;">Requires: ' + (reqUpg ? reqUpg.name : upg.requires) + '</div>';
+            }
+            let costText = owned ? '' : '<div class="' + costClass + '">Cost: ' + upg.cost + ' level' + (upg.cost !== 1 ? 's' : '') + '</div>';
+
+            const div = document.createElement('div');
+            div.className = cardClass;
+            div.innerHTML = '<div class="upgrade-card-icon">' + upg.icon + '</div>'
+                + '<div class="upgrade-card-name">' + upg.name + '</div>'
+                + '<div class="upgrade-card-desc">' + upg.desc + reqText + '</div>'
+                + costText;
+            if (!owned && reqMet && canAfford) {
+                div.addEventListener('click', function() { purchaseUpgrade(upg.id); });
+                div.addEventListener('touchstart', function(e) { e.preventDefault(); purchaseUpgrade(upg.id); }, { passive: false });
+            }
+            grid.appendChild(div);
+        });
+    });
+}
+
+function purchaseUpgrade(id) {
+    const upg = upgradeTree.find(function(u) { return u.id === id; });
+    if (!upg) return;
+    if (isUpgradeOwned(id)) return;
+    if (!isUpgradeRequirementMet(upg)) return;
+    if (playerProgression.levelPoints < upg.cost) return;
+    playerProgression.levelPoints -= upg.cost;
+    playerProgression.ownedUpgrades.push(id);
+    saveProgression();
+    applyUpgradeEffect(id);
+    renderUpgradeTree();
+    showAchievementPopup('UPGRADE UNLOCKED', upg.name + ' equipped!');
+}
+
+function applyUpgradeEffect(id) {
+    switch(id) {
+        case 'sharp1': weapons.forEach(function(w) { w.damage = Math.round(w.damage * 1.15); }); break;
+        case 'sharp2': weapons.forEach(function(w) { w.damage = Math.round(w.damage * 1.25); }); break;
+        case 'trigger': weapons.forEach(function(w) { w.rate = Math.max(30, Math.floor(w.rate * 0.85)); }); break;
+        case 'steady': weapons.forEach(function(w) { w.recoil *= 0.7; w.camRecoil *= 0.7; }); break;
+        case 'flak1': playerMaxHealth = Math.min(250, playerMaxHealth + 25); playerHealth = Math.min(playerMaxHealth, playerHealth + 25); document.getElementById('health-count').innerText = Math.floor(playerHealth); break;
+        case 'flak2': playerMaxHealth = Math.min(250, playerMaxHealth + 50); playerHealth = Math.min(playerMaxHealth, playerHealth + 50); document.getElementById('health-count').innerText = Math.floor(playerHealth); break;
+        case 'lightfeet': moveSpeed = Math.min(0.38, moveSpeed * 1.2); break;
+        case 'w_minigun': addWeapon_minigun(); break;
+        case 'w_shotgun': addWeapon_shotgun(); break;
+        case 'w_flamer': addWeapon_flamer(); break;
+    }
+}
+
+function reapplyAllUpgrades() {
+    // Reset base weapon stats
+    weapons.forEach(function(w, i) {
+        const base = baseWeaponStats[i];
+        if (base) { w.damage = base.damage; w.rate = base.rate; w.recoil = base.recoil; w.camRecoil = base.camRecoil; }
+    });
+    playerMaxHealth = 100;
+    moveSpeed = 0.18;
+    // Remove any bonus weapons added by upgrades
+    while (weapons.length > baseWeaponStats.length) { weapons.pop(); }
+    // Reapply
+    playerProgression.ownedUpgrades.forEach(function(id) { applyUpgradeEffect(id); });
+}
+
+function openUpgradeTree() {
+    renderUpgradeTree();
+    document.getElementById('upgrade-tree-screen').style.display = 'flex';
+}
+function closeUpgradeTree() {
+    document.getElementById('upgrade-tree-screen').style.display = 'none';
+}
+function openUpgradeTreeInGame() {
+    closeUpgrade();
+    openUpgradeTree();
+}
+
+// ===================== GLOBAL MAP STATE =====================
+let currentMap = 'city';
+let selectedMapOnCard = 'city';
+
+function selectMap(mapId) {
+    selectedMapOnCard = mapId;
+    document.querySelectorAll('.map-card').forEach(function(c) { c.classList.remove('selected'); });
+    document.getElementById('card-' + mapId).classList.add('selected');
+}
+
+function goBackToStart() {
+    document.getElementById('map-select-screen').style.display = 'none';
+    document.getElementById('start-screen').style.display = 'flex';
+    updateHUDLevel();
+}
+
+function deploySelectedMap() {
+    currentMap = selectedMapOnCard;
+    document.getElementById('map-select-screen').style.display = 'none';
+    buildMap(currentMap);
+    resetPlayerState();
+    const mapIndicator = document.getElementById('map-indicator');
+    if (currentMap === 'snow') {
+        mapIndicator.textContent = '❄️ ANTARCTIC FREEDOM';
+        mapIndicator.style.borderLeftColor = '#aaddff';
+    } else if (currentMap === 'jungle') {
+        mapIndicator.textContent = '🌿 ROLLING THUNDER';
+        mapIndicator.style.borderLeftColor = '#44ff44';
+    } else {
+        mapIndicator.textContent = '🏙️ CITY';
+        mapIndicator.style.borderLeftColor = '#00aaff';
+    }
+}
+
+selectMap('city');
+
 // ===================== ACHIEVEMENTS =====================
 let achievements = [
     {id:"first_blood", name:"FIRST BLOOD", desc:"Kill your first enemy in DELTA OPS", unlocked:false, progress:0, max:1},
@@ -240,12 +973,12 @@ let achievements = [
     {id:"perfectionist", name:"PERFECTIONIST", desc:"Complete a life with 95%+ accuracy", unlocked:false, progress:0, max:1},
     {id:"bloodbath", name:"BLOODBATH", desc:"Get 25 kills in a single life", unlocked:false, progress:0, max:1}
 ];
-for(let i = 20; i < 200; i++) {
+for (let i = 20; i < 200; i++) {
     const types = ["KILLER", "SURVIVOR", "MARKSMAN", "ELIMINATOR", "ASSASSIN", "WARRIOR", "TACTICIAN"];
-    const weapons = ["AUG","SCAR-H","M4A1","CZ-3A1","MP7","GLOCK"];
-    const type = types[Math.floor(Math.random()*types.length)];
-    const w = weapons[Math.floor(Math.random()*weapons.length)];
-    achievements.push({id: "ach_" + i, name: type + " " + (i-15), desc: "Reach " + (i*12) + " kills using " + w, unlocked: false, progress: 0, max: i*12});
+    const weapons2 = ["AUG","SCAR-H","M4A1","CZ-3A1","MP7","GLOCK"];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const w2 = weapons2[Math.floor(Math.random() * weapons2.length)];
+    achievements.push({id: "ach_" + i, name: type + " " + (i - 15), desc: "Reach " + (i * 12) + " kills using " + w2, unlocked: false, progress: 0, max: i * 12});
 }
 function saveAchievements() { localStorage.setItem('deltaOpsAchievements', JSON.stringify(achievements)); }
 function loadAchievements() {
@@ -253,7 +986,7 @@ function loadAchievements() {
     if (saved) achievements = JSON.parse(saved);
 }
 function unlockAchievement(id) {
-    const ach = achievements.find(a => a.id === id);
+    const ach = achievements.find(function(a) { return a.id === id; });
     if (ach && !ach.unlocked) {
         ach.unlocked = true;
         showAchievementPopup(ach.name, ach.desc);
@@ -263,66 +996,50 @@ function unlockAchievement(id) {
 }
 function showAchievementPopup(name, desc) {
     const popup = document.getElementById('ach-popup');
-    popup.innerHTML = `<strong>${name}</strong><br><small>${desc}</small>`;
+    popup.innerHTML = '<strong>' + name + '</strong><br><small>' + desc + '</small>';
     popup.style.opacity = '1';
     popup.style.transform = 'translateX(-50%) translateY(0)';
-    setTimeout(() => { popup.style.opacity = '0'; popup.style.transform = 'translateX(-50%) translateY(-40px)'; }, 3200);
+    setTimeout(function() { popup.style.opacity = '0'; popup.style.transform = 'translateX(-50%) translateY(-40px)'; }, 3200);
 }
 function renderAchievements() {
     const container = document.getElementById('ach-list');
     container.innerHTML = '';
     let count = 0;
-    achievements.forEach(ach => {
+    achievements.forEach(function(ach) {
         if (ach.unlocked) count++;
         const div = document.createElement('div');
-        div.className = `ach-item ${ach.unlocked ? 'unlocked' : 'locked'}`;
-        div.innerHTML = `<div><strong>${ach.name}</strong><br><small>${ach.desc}</small></div><div style="color:${ach.unlocked?'#00ff88':'#666'}">${ach.unlocked?'✓':ach.progress+'/'+ach.max}</div>`;
+        div.className = 'ach-item ' + (ach.unlocked ? 'unlocked' : 'locked');
+        div.innerHTML = '<div><strong>' + ach.name + '</strong><br><small>' + ach.desc + '</small></div><div style="color:' + (ach.unlocked ? '#00ff88' : '#666') + '">' + (ach.unlocked ? '✓' : ach.progress + '/' + ach.max) + '</div>';
         container.appendChild(div);
     });
-    document.getElementById('ach-count').innerText = `(${count}/200)`;
+    document.getElementById('ach-count').innerText = '(' + count + '/200)';
 }
 function openAchievements() { renderAchievements(); document.getElementById('ach-modal').style.display = 'flex'; }
 function closeAchievements() { document.getElementById('ach-modal').style.display = 'none'; }
-
-// ===================== WEAPON ATTACHMENTS & UPGRADES =====================
-let upgradePoints = 0;
-let attachments = { suppressor: false, redDot: false };
-
-function upgradeDamage() { if (upgradePoints >= 5) { upgradePoints -= 5; weapons[curIdx].damage = Math.floor(weapons[curIdx].damage * 1.25); } }
-function upgradeFireRate() { if (upgradePoints >= 8) { upgradePoints -= 8; weapons[curIdx].rate = Math.max(40, Math.floor(weapons[curIdx].rate * 0.8)); } }
-function attachSuppressor() { if (upgradePoints >= 6) { upgradePoints -= 6; attachments.suppressor = true; weapons[curIdx].recoil *= 0.65; } }
-function attachRedDot() { if (upgradePoints >= 4) { upgradePoints -= 4; attachments.redDot = true; } }
-function openUpgrade() { document.getElementById('upgrade-points').innerText = upgradePoints; document.getElementById('upgrade-screen').style.display = 'flex'; }
-function closeUpgrade() { document.getElementById('upgrade-screen').style.display = 'none'; }
-
-// ===================== VEHICLE COMBAT =====================
-let inVehicle = false;
-let vehicle;
-let vehicleSpeed = 0.4;
-let vehicleHealth = 300;
-
-function createVehicle() {
-    vehicle = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(3, 1.2, 5), new THREE.MeshStandardMaterial({color: 0x3366aa}));
-    const turret = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.8, 2), new THREE.MeshStandardMaterial({color: 0x222222}));
-    turret.position.set(0, 1.2, 0);
-    vehicle.add(body, turret);
-    vehicle.position.set(50, 1, 50);
-    scene.add(vehicle);
-    return vehicle;
+function goHome() {
+    closeAchievements();
+    document.getElementById('start-screen').style.display = 'flex';
+    updateHUDLevel();
 }
 
-// ===================== FULL GAME LOGIC =====================
-let hasFirstBlood = false;
+// ===================== ENEMY TYPES =====================
+const enemyTypes = [
+    {color: 0x3d4f3f, health: 145, fireRate: 1600, damage: 15, projColor: 0xff0000},
+    {color: 0x8b0000, health: 190, fireRate: 1100, damage: 24, projColor: 0xff5500},
+    {color: 0xffd700, health: 240, fireRate: 580,  damage: 18, projColor: 0xffff00},
+    {color: 0xff8c00, health: 195, fireRate: 1650, damage: 38, projColor: 0xffaa00},
+    {color: 0x9b30ff, health: 340, fireRate: 240,  damage: 14, projColor: 0xcc00ff}
+];
+function getRandomEnemyType() { return enemyTypes[Math.floor(Math.random() * enemyTypes.length)]; }
 
+// ===================== TEXTURE GENERATORS =====================
 function generateBuildingTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#1e2126';
-    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillStyle = '#1e2126'; ctx.fillRect(0, 0, 256, 256);
     ctx.fillStyle = '#0f1115';
-    for(let x = 4; x < 256; x += 16) for(let y = 4; y < 256; y += 16) ctx.fillRect(x, y, 10, 10);
+    for (let x = 4; x < 256; x += 16) for (let y = 4; y < 256; y += 16) ctx.fillRect(x, y, 10, 10);
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
     return tex;
@@ -331,15 +1048,150 @@ function generateRoadTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512; canvas.height = 512;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#303032';
-    ctx.fillRect(0, 0, 512, 512);
+    ctx.fillStyle = '#303032'; ctx.fillRect(0, 0, 512, 512);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    for(let i=0; i<3000; i++) {
+    for (let i = 0; i < 3000; i++) {
         const sz = Math.random() * 4 + 2;
-        ctx.fillRect(Math.random()*512, Math.random()*512, sz, sz/2);
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, sz, sz / 2);
     }
-    ctx.fillStyle = '#d4c04e';
-    ctx.fillRect(30, 0, 45, 512);
+    ctx.fillStyle = '#d4c04e'; ctx.fillRect(30, 0, 45, 512);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+function generateSnowTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#d8eef8'; ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 8000; i++) {
+        const alpha = Math.random() * 0.2 + 0.03;
+        const bright = Math.floor(200 + Math.random() * 55);
+        ctx.fillStyle = 'rgba(' + bright + ', ' + bright + ', ' + (bright + 8) + ', ' + alpha + ')';
+        const sz = Math.random() * 5 + 1;
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, sz, sz);
+    }
+    for (let row = 0; row < 40; row++) {
+        ctx.strokeStyle = 'rgba(180, 210, 230, ' + (Math.random() * 0.1 + 0.03) + ')';
+        ctx.lineWidth = Math.random() * 2 + 0.5;
+        ctx.beginPath();
+        const startY = row * 13 + Math.random() * 6;
+        ctx.moveTo(0, startY);
+        for (let x = 0; x < 512; x += 15) {
+            ctx.lineTo(x + 15, startY + Math.sin(x * 0.04) * 4 + Math.random() * 2);
+        }
+        ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+function generateIceTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#a8d8f0'; ctx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 60; i++) {
+        ctx.strokeStyle = 'rgba(180,220,240,' + (Math.random() * 0.3 + 0.1) + ')';
+        ctx.lineWidth = Math.random() * 1.5 + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(Math.random()*256, Math.random()*256);
+        ctx.lineTo(Math.random()*256, Math.random()*256);
+        ctx.stroke();
+    }
+    for (let x = 0; x < 256; x += 24) for (let y = 0; y < 256; y += 24) {
+        const shade = Math.random() * 0.12 - 0.06;
+        const r = Math.min(255, Math.max(0, Math.floor(168 + shade * 255)));
+        const g = Math.min(255, Math.max(0, Math.floor(216 + shade * 255)));
+        const b = Math.min(255, Math.max(0, Math.floor(240 + shade * 80)));
+        ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',0.3)';
+        ctx.fillRect(x, y, 22, 22);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+function generateJungleFloorTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1a2e0a'; ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 7000; i++) {
+        const alpha = Math.random() * 0.22 + 0.04;
+        const r = Math.floor(10 + Math.random() * 30);
+        const g = Math.floor(40 + Math.random() * 60);
+        const b = Math.floor(5 + Math.random() * 20);
+        ctx.fillStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+        const sz = Math.random() * 8 + 1;
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, sz, sz * (0.3 + Math.random() * 0.7));
+    }
+    for (let i = 0; i < 3000; i++) {
+        const alpha = Math.random() * 0.15 + 0.03;
+        ctx.fillStyle = 'rgba(15, 60, 8, ' + alpha + ')';
+        const sz = Math.random() * 5 + 1;
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, sz, sz * 0.3);
+    }
+    for (let i = 0; i < 80; i++) {
+        ctx.strokeStyle = 'rgba(20, 80, 10, ' + (Math.random() * 0.18 + 0.05) + ')';
+        ctx.lineWidth = Math.random() * 3 + 0.5;
+        const x = Math.random() * 512; const y = Math.random() * 512;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x + Math.random()*40-20, y + Math.random()*40-20, x + Math.random()*60-30, y + Math.random()*60-30, x + Math.random()*80-40, y + Math.random()*80-40);
+        ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+function generateJungleBarkTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#3a2208'; ctx.fillRect(0, 0, 128, 256);
+    for (let y = 0; y < 256; y += 8) {
+        ctx.strokeStyle = 'rgba(20,12,4,' + (Math.random() * 0.4 + 0.1) + ')';
+        ctx.lineWidth = Math.random() * 2 + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(0, y + Math.random()*4);
+        for (let x = 0; x < 128; x += 12) {
+            ctx.lineTo(x+12, y + Math.random()*6 - 3);
+        }
+        ctx.stroke();
+    }
+    for (let i = 0; i < 300; i++) {
+        ctx.fillStyle = 'rgba(60,40,12,' + (Math.random()*0.2) + ')';
+        ctx.fillRect(Math.random()*128, Math.random()*256, Math.random()*6+1, Math.random()*3+1);
+    }
+    for (let i = 0; i < 40; i++) {
+        const alpha = Math.random() * 0.25 + 0.05;
+        ctx.fillStyle = 'rgba(20,60,10,' + alpha + ')';
+        ctx.fillRect(Math.random()*128, Math.random()*256, Math.random()*15+4, Math.random()*8+2);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+}
+function generateJungleBunkerTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#3a4830'; ctx.fillRect(0, 0, 256, 256);
+    for (let x = 0; x < 256; x += 20) for (let y = 0; y < 256; y += 14) {
+        const shade = Math.random() * 0.14 - 0.07;
+        const r = Math.min(255, Math.max(0, Math.floor(58 + shade * 200)));
+        const g = Math.min(255, Math.max(0, Math.floor(72 + shade * 200)));
+        const b = Math.min(255, Math.max(0, Math.floor(48 + shade * 150)));
+        ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+        ctx.fillRect(x + (y % 20 === 0 ? 10 : 0), y, 19, 13);
+        ctx.fillStyle = '#1a2510';
+        ctx.fillRect(x + (y % 20 === 0 ? 10 : 0), y, 19, 1);
+        ctx.fillRect(x + (y % 20 === 0 ? 10 : 0), y, 1, 13);
+    }
+    for (let i = 0; i < 600; i++) {
+        ctx.fillStyle = 'rgba(20,50,10,' + (Math.random()*0.18) + ')';
+        ctx.fillRect(Math.random()*256, Math.random()*256, Math.random()*10+2, Math.random()*5+1);
+    }
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
     return tex;
@@ -348,13 +1200,13 @@ function generateDigitalCamo(color1, color2, color3) {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = color1; ctx.fillRect(0,0,256,256);
-    for(let i=0; i<1500; i++) {
+    ctx.fillStyle = color1; ctx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 1500; i++) {
         ctx.fillStyle = Math.random() > 0.5 ? color2 : color3;
         let sz = Math.floor(Math.random() * 3 + 1) * 8;
         let x = Math.floor(Math.random() * 32) * 8;
         let y = Math.floor(Math.random() * 32) * 8;
-        ctx.fillRect(x,y,sz,sz);
+        ctx.fillRect(x, y, sz, sz);
     }
     const tex = new THREE.CanvasTexture(canvas);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -367,10 +1219,15 @@ const whiteCamoTex = generateDigitalCamo('#f4f4f6', '#d0d4d9', '#a0a5ab');
 const forestCamoTex = generateDigitalCamo('#2e3b32', '#1a2421', '#4a5e42');
 const czPurpleCamoTex = generateDigitalCamo('#1a1a2e', '#4b2e6b', '#2a1f3d');
 const mp7DesertCamoTex = generateDigitalCamo('#d2b48c', '#8b6f47', '#5c4733');
-
 const bldgTex = generateBuildingTexture(); bldgTex.repeat.set(2, 6);
 const roadTex = generateRoadTexture(); roadTex.repeat.set(60, 60);
+const snowTex = generateSnowTexture(); snowTex.repeat.set(80, 80);
+const iceTex = generateIceTexture(); iceTex.repeat.set(3, 6);
+const jungleFloorTex = generateJungleFloorTexture(); jungleFloorTex.repeat.set(80, 80);
+const jungleBarkTex = generateJungleBarkTexture(); jungleBarkTex.repeat.set(2, 6);
+const jungleBunkerTex = generateJungleBunkerTexture(); jungleBunkerTex.repeat.set(2, 4);
 
+// ===================== THREE.JS SCENE SETUP =====================
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x8ec5fc);
 scene.fog = new THREE.FogExp2(0x8ec5fc, 0.003);
@@ -395,58 +1252,361 @@ scene.add(sun);
 const muzzleFlash = new THREE.PointLight(0xffaa22, 0, 25);
 scene.add(muzzleFlash);
 
+// ===================== MAP BUILDING SYSTEM =====================
 const collisionBoxes = [];
 const solidObstacles = [];
+let floorMesh = null;
+let mapObjects = [];
 
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.9 }));
-floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
-scene.add(floor);
+function clearMapObjects() {
+    for (let i = mapObjects.length - 1; i >= 0; i--) { scene.remove(mapObjects[i]); }
+    mapObjects = [];
+    collisionBoxes.length = 0;
+    solidObstacles.length = 0;
+    if (floorMesh) { scene.remove(floorMesh); floorMesh = null; }
+}
 
-const structMat = new THREE.MeshStandardMaterial({ map: bldgTex, roughness: 0.8, metalness: 0.1 });
-function createStructure(w, h, d, x, z) {
-    const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), structMat);
+function createStructure(w, h, d, x, z, mat) {
+    const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
     box.position.set(x, h / 2, z); box.castShadow = true; box.receiveShadow = true;
     scene.add(box);
+    mapObjects.push(box);
     solidObstacles.push(box);
-    collisionBoxes.push({ minX: x - w/2, maxX: x + w/2, minZ: z - d/2, maxZ: z + d/2 });
-}
-createStructure(16, 45, 16, -25, -45);
-createStructure(18, 60, 18, 35, -75);
-createStructure(28, 40, 14, -2, -105);
-createStructure(14, 55, 14, -60, -85);
-createStructure(20, 65, 20, 65, -35);
-createStructure(10, 30, 32, -75, -25);
-createStructure(32, 25, 10, 0, -35);
-createStructure(15, 35, 15, -45, -130);
-createStructure(22, 50, 22, 50, -120);
-createStructure(20, 70, 20, -40, -15);
-createStructure(15, 40, 30, 25, -20);
-createStructure(25, 80, 25, 10, -80);
-createStructure(18, 50, 18, -25, -80);
-createStructure(40, 60, 20, 70, -70);
-createStructure(25, 45, 25, -55, 15);
-createStructure(30, 55, 30, 45, 10);
-createStructure(30, 45, 20, 0, 45);
-createStructure(20, 60, 20, -35, 40);
-createStructure(25, 50, 25, 30, 50);
-for(let i=0; i<150; i++) {
-    let w = 15 + Math.random() * 30;
-    let d = 15 + Math.random() * 30;
-    let h = 20 + Math.random() * 120;
-    let x = (Math.random() - 0.5) * 1200;
-    let z = (Math.random() - 0.5) * 1200;
-    if (Math.abs(x) < 50 && Math.abs(z - 15) < 50) continue;
-    createStructure(w, h, d, x, z);
+    collisionBoxes.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2 });
 }
 
-function checkCollision(posX, posZ, radius = 0.65) {
+function createCylinder(radiusTop, radiusBottom, height, x, z, mat) {
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 10), mat);
+    cyl.position.set(x, height / 2, z); cyl.castShadow = true; cyl.receiveShadow = true;
+    scene.add(cyl);
+    mapObjects.push(cyl);
+    solidObstacles.push(cyl);
+    const r = Math.max(radiusTop, radiusBottom);
+    collisionBoxes.push({ minX: x - r, maxX: x + r, minZ: z - r, maxZ: z + r });
+}
+
+function buildMap(mapId) {
+    clearMapObjects();
+    if (mapId === 'city') {
+        scene.background = new THREE.Color(0x8ec5fc);
+        scene.fog = new THREE.FogExp2(0x8ec5fc, 0.003);
+        hemiLight.color.set(0xffffff); hemiLight.groundColor.set(0x445566); hemiLight.intensity = 0.8;
+        sun.color.set(0xfffaed); sun.intensity = 1.5;
+        sun.position.set(60, 120, 40);
+        floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ map: roadTex, roughness: 0.9 }));
+        floorMesh.rotation.x = -Math.PI / 2; floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
+        const structMat = new THREE.MeshStandardMaterial({ map: bldgTex, roughness: 0.8, metalness: 0.1 });
+        createStructure(16, 45, 16, -25, -45, structMat);
+        createStructure(18, 60, 18, 35, -75, structMat);
+        createStructure(28, 40, 14, -2, -105, structMat);
+        createStructure(14, 55, 14, -60, -85, structMat);
+        createStructure(20, 65, 20, 65, -35, structMat);
+        createStructure(10, 30, 32, -75, -25, structMat);
+        createStructure(32, 25, 10, 0, -35, structMat);
+        createStructure(15, 35, 15, -45, -130, structMat);
+        createStructure(22, 50, 22, 50, -120, structMat);
+        createStructure(20, 70, 20, -40, -15, structMat);
+        createStructure(15, 40, 30, 25, -20, structMat);
+        createStructure(25, 80, 25, 10, -80, structMat);
+        createStructure(18, 50, 18, -25, -80, structMat);
+        createStructure(40, 60, 20, 70, -70, structMat);
+        createStructure(25, 45, 25, -55, 15, structMat);
+        createStructure(30, 55, 30, 45, 10, structMat);
+        createStructure(30, 45, 20, 0, 45, structMat);
+        createStructure(20, 60, 20, -35, 40, structMat);
+        createStructure(25, 50, 25, 30, 50, structMat);
+        for (let i = 0; i < 150; i++) {
+            let bw = 15 + Math.random() * 30;
+            let bd = 15 + Math.random() * 30;
+            let bh = 20 + Math.random() * 120;
+            let bx = (Math.random() - 0.5) * 1200;
+            let bz = (Math.random() - 0.5) * 1200;
+            if (Math.abs(bx) < 50 && Math.abs(bz - 15) < 50) continue;
+            createStructure(bw, bh, bd, bx, bz, structMat);
+        }
+    } else if (mapId === 'snow') {
+        scene.background = new THREE.Color(0x0a1e3d);
+        scene.fog = new THREE.FogExp2(0x0a1e3d, 0.0018);
+        hemiLight.color.set(0x88ccee); hemiLight.groundColor.set(0x334466); hemiLight.intensity = 0.55;
+        sun.color.set(0xaaddff); sun.intensity = 0.7;
+        sun.position.set(-80, 100, -60);
+        const auroraLight = new THREE.PointLight(0x00ff88, 0.4, 800);
+        auroraLight.position.set(0, 200, 0);
+        scene.add(auroraLight); mapObjects.push(auroraLight);
+        const auroraLight2 = new THREE.PointLight(0xaa00ff, 0.3, 600);
+        auroraLight2.position.set(100, 180, -50);
+        scene.add(auroraLight2); mapObjects.push(auroraLight2);
+        const snowFloorMat = new THREE.MeshStandardMaterial({ map: snowTex, roughness: 1.0, metalness: 0.0, color: 0xd0e8f4 });
+        floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), snowFloorMat);
+        floorMesh.rotation.x = -Math.PI / 2; floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
+        const iceMat = new THREE.MeshStandardMaterial({ map: iceTex, roughness: 0.15, metalness: 0.05, color: 0xaad8f0, transparent: true, opacity: 0.92 });
+        const snowWallMat = new THREE.MeshStandardMaterial({ map: snowTex, roughness: 0.95, metalness: 0.0, color: 0xc8e0f0 });
+        const snowWallDarkMat = new THREE.MeshStandardMaterial({ map: iceTex, roughness: 0.9, metalness: 0.0, color: 0x8aacc0 });
+        const steelMat = new THREE.MeshStandardMaterial({ color: 0x445566, roughness: 0.5, metalness: 0.8 });
+        const concreteMat2 = new THREE.MeshStandardMaterial({ color: 0x6a7a8a, roughness: 0.9, metalness: 0.1 });
+        createStructure(30, 5, 22, 0, -30, snowWallMat);
+        createStructure(26, 3, 18, 0, -30, iceMat);
+        createStructure(4, 3, 3, -12, -20, snowWallMat);
+        createStructure(4, 3, 3, -4, -20, snowWallMat);
+        createStructure(4, 3, 3, 4, -20, snowWallMat);
+        createStructure(4, 3, 3, 12, -20, snowWallMat);
+        createStructure(3, 3, 4, -16, -30, snowWallMat);
+        createStructure(3, 3, 4, 16, -30, snowWallMat);
+        createStructure(4, 4, 2, -4, -20, snowWallMat);
+        createStructure(4, 4, 2, 4, -20, snowWallMat);
+        createStructure(10, 1.5, 1.5, -20, -18, snowWallDarkMat);
+        createStructure(10, 1.5, 1.5, 20, -18, snowWallDarkMat);
+        createStructure(1.5, 1.5, 10, -28, -26, snowWallDarkMat);
+        createStructure(1.5, 1.5, 10, 28, -26, snowWallDarkMat);
+        createStructure(8, 1.5, 1.5, -10, -40, snowWallDarkMat);
+        createStructure(8, 1.5, 1.5, 10, -40, snowWallDarkMat);
+        createStructure(3, 22, 3, -55, -32, steelMat);
+        createStructure(10, 3, 10, -55, -22, concreteMat2);
+        createStructure(1.2, 2.5, 10, -55 - 5, -22, concreteMat2);
+        createStructure(1.2, 2.5, 10, -55 + 5, -22, concreteMat2);
+        createStructure(10, 2.5, 1.2, -55, -22 - 5, concreteMat2);
+        createStructure(10, 2.5, 1.2, -55, -22 + 5, concreteMat2);
+        createStructure(9, 1, 9, -55, -22 + 1.5 + 0.5, snowWallMat);
+        createStructure(3, 22, 3, 55, -32, steelMat);
+        createStructure(10, 3, 10, 55, -22, concreteMat2);
+        createStructure(1.2, 2.5, 10, 55 - 5, -22, concreteMat2);
+        createStructure(1.2, 2.5, 10, 55 + 5, -22, concreteMat2);
+        createStructure(10, 2.5, 1.2, 55, -22 - 5, concreteMat2);
+        createStructure(10, 2.5, 1.2, 55, -22 + 5, concreteMat2);
+        createStructure(9, 1, 9, 55, -22 + 1.5 + 0.5, snowWallMat);
+        createStructure(100, 6, 3.5, 0, -115, snowWallMat);
+        createStructure(3.5, 6, 50, -50, -90, snowWallMat);
+        createStructure(3.5, 6, 50, 50, -90, snowWallMat);
+        createStructure(24, 9, 20, 0, -105, snowWallDarkMat);
+        createStructure(20, 7, 16, 0, -105, iceMat);
+        createStructure(2, 14, 2, -30, -60, steelMat);
+        createStructure(8, 1, 8, -30, -53, steelMat);
+        createStructure(3, 0.5, 3, -30, -52.5, snowWallMat);
+        createStructure(6, 4, 6, -38, -30, steelMat);
+        createStructure(6, 4, 6, 38, -30, steelMat);
+        createStructure(6, 4, 6, -38, -50, steelMat);
+        createStructure(6, 4, 6, 38, -50, steelMat);
+        createStructure(180, 0.3, 14, 0, 20, iceMat);
+        createStructure(14, 0.3, 120, -50, -30, iceMat);
+        createStructure(14, 0.3, 120, 50, -30, iceMat);
+        const pineTrunkMat = new THREE.MeshStandardMaterial({ color: 0x4a2e10, roughness: 0.9 });
+        const pineLeafMat = new THREE.MeshStandardMaterial({ color: 0x1a4a22, roughness: 0.95 });
+        const snowCapMat = new THREE.MeshStandardMaterial({ color: 0xe8f4fc, roughness: 1.0 });
+        const pinePositionsLeft = [[-85,0],[-95,-15],[-105,5],[-80,-30],[-110,-40],[-90,30],[-100,45],[-75,50],[-115,20],[-88,-55]];
+        pinePositionsLeft.forEach(function(pp) {
+            const px = pp[0]; const pz = pp[1];
+            const trunkH = 8 + Math.random() * 5;
+            createCylinder(0.3, 0.5, trunkH, px, pz, pineTrunkMat);
+            createCylinder(0, 3.5 + Math.random()*1.5, trunkH * 0.65, px, pz, pineLeafMat);
+            createCylinder(0, 2.5 + Math.random()*1.0, trunkH * 0.80, px, pz, pineLeafMat);
+            createCylinder(0, 1.5 + Math.random()*0.8, trunkH * 0.93, px, pz, pineLeafMat);
+            createCylinder(0, 2.5, trunkH * 0.7, px, pz, snowCapMat);
+            createCylinder(0, 1.5, trunkH * 0.85, px, pz, snowCapMat);
+        });
+        const pinePositionsRight = [[85,0],[95,-15],[105,5],[80,-30],[110,-40],[90,30],[100,45],[75,50],[115,20],[88,-55]];
+        pinePositionsRight.forEach(function(pp) {
+            const px = pp[0]; const pz = pp[1];
+            const trunkH = 8 + Math.random() * 5;
+            createCylinder(0.3, 0.5, trunkH, px, pz, pineTrunkMat);
+            createCylinder(0, 3.5 + Math.random()*1.5, trunkH * 0.65, px, pz, pineLeafMat);
+            createCylinder(0, 2.5 + Math.random()*1.0, trunkH * 0.80, px, pz, pineLeafMat);
+            createCylinder(0, 1.5 + Math.random()*0.8, trunkH * 0.93, px, pz, pineLeafMat);
+            createCylinder(0, 2.5, trunkH * 0.7, px, pz, snowCapMat);
+            createCylinder(0, 1.5, trunkH * 0.85, px, pz, snowCapMat);
+        });
+        for (let i = 0; i < 50; i++) {
+            let dw = 5 + Math.random() * 14; let dd = 4 + Math.random() * 10; let dh = 1 + Math.random() * 3.5;
+            let dx = (Math.random() - 0.5) * 400; let dz = (Math.random() - 0.5) * 400;
+            if (Math.abs(dx) < 40 && Math.abs(dz - 15) < 40) continue;
+            createStructure(dw, dh, dd, dx, dz, snowWallMat);
+        }
+        const iceRockMat = new THREE.MeshStandardMaterial({ color: 0x88b8d0, roughness: 0.5, metalness: 0.1, transparent: true, opacity: 0.88 });
+        for (let i = 0; i < 40; i++) {
+            let bw = 2 + Math.random() * 7; let bh = 2 + Math.random() * 5; let bd = 2 + Math.random() * 7;
+            let bx = (Math.random() - 0.5) * 600; let bz = (Math.random() - 0.5) * 600;
+            if (Math.abs(bx) < 40 && Math.abs(bz - 15) < 40) continue;
+            createStructure(bw, bh, bd, bx, bz, iceRockMat);
+        }
+        const frozenMetalMat = new THREE.MeshStandardMaterial({ color: 0x3a4a5a, roughness: 0.8, metalness: 0.6 });
+        createStructure(5, 2, 9, -28, -14, frozenMetalMat);
+        createStructure(5, 2, 9, 28, -14, frozenMetalMat);
+        createStructure(4, 1.8, 8, 0, -8, frozenMetalMat);
+        createStructure(6, 2.5, 10, -40, 20, frozenMetalMat);
+        createStructure(6, 2.5, 10, 40, 20, frozenMetalMat);
+        for (let i = 0; i < 28; i++) {
+            let angle = (i / 28) * Math.PI * 2; let dist = 290 + Math.random() * 90;
+            let dw = 50 + Math.random() * 80; let dh = 8 + Math.random() * 18; let dd = 50 + Math.random() * 80;
+            createStructure(dw, dh, dd, Math.cos(angle) * dist, Math.sin(angle) * dist, snowWallMat);
+        }
+        for (let i = 0; i < 70; i++) {
+            let bw = 6 + Math.random() * 20; let bd = 6 + Math.random() * 20; let bh = 3 + Math.random() * 14;
+            let bx = (Math.random() - 0.5) * 1100; let bz = (Math.random() - 0.5) * 1100;
+            if (Math.abs(bx) < 60 && Math.abs(bz - 15) < 60) continue;
+            createStructure(bw, bh, bd, bx, bz, Math.random() > 0.5 ? snowWallMat : snowWallDarkMat);
+        }
+    } else if (mapId === 'jungle') {
+        scene.background = new THREE.Color(0x0a1408);
+        scene.fog = new THREE.FogExp2(0x0a1a08, 0.0035);
+        hemiLight.color.set(0x449944); hemiLight.groundColor.set(0x1a2a08); hemiLight.intensity = 0.45;
+        sun.color.set(0xaaffaa); sun.intensity = 0.3;
+        sun.position.set(20, 80, 10);
+        const stormLight = new THREE.PointLight(0xffffaa, 0.6, 1200);
+        stormLight.position.set(-80, 300, -100);
+        scene.add(stormLight); mapObjects.push(stormLight);
+        const stormLight2 = new THREE.PointLight(0xccffcc, 0.4, 900);
+        stormLight2.position.set(120, 280, 60);
+        scene.add(stormLight2); mapObjects.push(stormLight2);
+        const jungleAmbient = new THREE.PointLight(0x224422, 1.2, 800);
+        jungleAmbient.position.set(0, 30, 0);
+        scene.add(jungleAmbient); mapObjects.push(jungleAmbient);
+        const jungleGroundMat = new THREE.MeshStandardMaterial({ map: jungleFloorTex, roughness: 1.0, metalness: 0.0, color: 0x1a2e0a });
+        floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), jungleGroundMat);
+        floorMesh.rotation.x = -Math.PI / 2; floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
+        const jungleBunkerMat = new THREE.MeshStandardMaterial({ map: jungleBunkerTex, roughness: 0.95, metalness: 0.0, color: 0x3a4830 });
+        const jungleBunkerDarkMat = new THREE.MeshStandardMaterial({ map: jungleBunkerTex, roughness: 0.95, metalness: 0.0, color: 0x1e2e14 });
+        const jungleMetalMat = new THREE.MeshStandardMaterial({ color: 0x2a3a22, roughness: 0.7, metalness: 0.5 });
+        const jungleConcrMat = new THREE.MeshStandardMaterial({ color: 0x3a4a28, roughness: 0.95, metalness: 0.0 });
+        const jungleBarkMat = new THREE.MeshStandardMaterial({ map: jungleBarkTex, roughness: 0.98, metalness: 0.0, color: 0x3a2208 });
+        const jungleCanopyMat = new THREE.MeshStandardMaterial({ color: 0x1a5010, roughness: 0.98, metalness: 0.0 });
+        const jungleCanopyDarkMat = new THREE.MeshStandardMaterial({ color: 0x0d3008, roughness: 0.98, metalness: 0.0 });
+        const vineMat = new THREE.MeshStandardMaterial({ color: 0x2a5a18, roughness: 0.98, metalness: 0.0 });
+        const mudMat = new THREE.MeshStandardMaterial({ color: 0x1a1408, roughness: 1.0, metalness: 0.0 });
+        createStructure(28, 5, 20, 0, -30, jungleBunkerMat);
+        createStructure(24, 3, 16, 0, -30, jungleBunkerDarkMat);
+        createStructure(4, 3, 3, -11, -21, jungleBunkerMat);
+        createStructure(4, 3, 3, -3, -21, jungleBunkerMat);
+        createStructure(4, 3, 3, 5, -21, jungleBunkerMat);
+        createStructure(4, 3, 3, 13, -21, jungleBunkerMat);
+        createStructure(3, 3, 4, -15, -30, jungleBunkerMat);
+        createStructure(3, 3, 4, 15, -30, jungleBunkerMat);
+        createStructure(5, 4, 2, -5, -21, jungleBunkerMat);
+        createStructure(5, 4, 2, 5, -21, jungleBunkerMat);
+        createStructure(10, 1.5, 1.5, -22, -17, jungleBunkerDarkMat);
+        createStructure(10, 1.5, 1.5, 22, -17, jungleBunkerDarkMat);
+        createStructure(1.5, 1.5, 10, -30, -26, jungleBunkerDarkMat);
+        createStructure(1.5, 1.5, 10, 30, -26, jungleBunkerDarkMat);
+        createStructure(8, 1.5, 1.5, -12, -42, jungleBunkerDarkMat);
+        createStructure(8, 1.5, 1.5, 12, -42, jungleBunkerDarkMat);
+        createStructure(2.5, 24, 2.5, -55, -32, jungleMetalMat);
+        createStructure(10, 3, 10, -55, -20, jungleConcrMat);
+        createStructure(1.2, 2.5, 10, -60, -20, jungleBarkMat);
+        createStructure(1.2, 2.5, 10, -50, -20, jungleBarkMat);
+        createStructure(10, 2.5, 1.2, -55, -15, jungleBarkMat);
+        createStructure(10, 2.5, 1.2, -55, -25, jungleBarkMat);
+        createStructure(10, 0.4, 10, -55, -18.8, jungleCanopyMat);
+        createStructure(2.5, 24, 2.5, 55, -32, jungleMetalMat);
+        createStructure(10, 3, 10, 55, -20, jungleConcrMat);
+        createStructure(1.2, 2.5, 10, 60, -20, jungleBarkMat);
+        createStructure(1.2, 2.5, 10, 50, -20, jungleBarkMat);
+        createStructure(10, 2.5, 1.2, 55, -15, jungleBarkMat);
+        createStructure(10, 2.5, 1.2, 55, -25, jungleBarkMat);
+        createStructure(10, 0.4, 10, 55, -18.8, jungleCanopyMat);
+        createStructure(90, 5.5, 3, 0, -115, jungleBunkerMat);
+        createStructure(3, 5.5, 46, -44, -93, jungleBunkerMat);
+        createStructure(3, 5.5, 46, 44, -93, jungleBunkerMat);
+        createStructure(22, 8, 18, 0, -106, jungleBunkerDarkMat);
+        createStructure(2.5, 1.8, 2.5, -10, -20, jungleBunkerDarkMat);
+        createStructure(2.5, 1.8, 2.5, 10, -20, jungleBunkerDarkMat);
+        createStructure(2.5, 1.8, 2.5, -10, -42, jungleBunkerDarkMat);
+        createStructure(2.5, 1.8, 2.5, 10, -42, jungleBunkerDarkMat);
+        createStructure(16, 7, 14, -68, -58, jungleBunkerMat);
+        createStructure(6, 10, 6, -62, -52, jungleBunkerMat);
+        createStructure(3, 12, 14, -80, -58, jungleBunkerMat);
+        createStructure(14, 4, 3, -68, -68, jungleBunkerDarkMat);
+        createStructure(8, 9, 8, -58, -78, jungleBunkerMat);
+        createStructure(4, 5, 4, -72, -78, jungleBunkerDarkMat);
+        createStructure(16, 7, 14, 68, -58, jungleBunkerMat);
+        createStructure(6, 10, 6, 62, -52, jungleBunkerMat);
+        createStructure(3, 12, 14, 80, -58, jungleBunkerMat);
+        createStructure(14, 4, 3, 68, -68, jungleBunkerDarkMat);
+        createStructure(8, 9, 8, 58, -78, jungleBunkerMat);
+        createStructure(4, 5, 4, 72, -78, jungleBunkerDarkMat);
+        createStructure(2, 2, 30, -16, -60, jungleConcrMat);
+        createStructure(2, 2, 30, 16, -60, jungleConcrMat);
+        createStructure(30, 2, 2, 0, -76, jungleConcrMat);
+        createStructure(5, 2, 9, -30, -14, jungleMetalMat);
+        createStructure(5, 2, 9, 30, -14, jungleMetalMat);
+        createStructure(4, 1.8, 8, 0, -9, jungleMetalMat);
+        const innerTreePositions = [[-30,10],[30,10],[-40,-5],[40,-5],[-35,30],[35,30],[-22,45],[22,45],[-45,-70],[45,-70],[-30,-80],[30,-80],[-50,15],[50,15],[-55,0],[55,0],[-25,-12],[25,-12],[-18,55],[18,55],[-30,60],[30,60]];
+        innerTreePositions.forEach(function(tp) {
+            const tx = tp[0]; const tz = tp[1];
+            if (Math.abs(tx) < 20 && Math.abs(tz - 0) < 18) return;
+            const trunkH = 18 + Math.random() * 14;
+            const trunkR = 0.6 + Math.random() * 0.5;
+            createCylinder(trunkR * 0.7, trunkR, trunkH, tx, tz, jungleBarkMat);
+            createCylinder(0, 7 + Math.random()*3, trunkH * 0.55, tx, tz, jungleCanopyMat);
+            createCylinder(0, 8 + Math.random()*4, trunkH * 0.65, tx, tz, jungleCanopyDarkMat);
+            createCylinder(0, 6 + Math.random()*3, trunkH * 0.78, tx, tz, jungleCanopyMat);
+            createCylinder(0, 4 + Math.random()*2, trunkH * 0.90, tx, tz, jungleCanopyDarkMat);
+            createStructure(trunkR*3, 1.5, trunkR, tx + trunkR*1.5, tz, jungleBarkMat);
+            createStructure(trunkR*3, 1.5, trunkR, tx - trunkR*1.5, tz, jungleBarkMat);
+            createStructure(trunkR, 1.5, trunkR*3, tx, tz + trunkR*1.5, jungleBarkMat);
+        });
+        for (let i = 0; i < 60; i++) {
+            let angle = (i / 60) * Math.PI * 2;
+            let dist = 80 + Math.random() * 60;
+            let tx = Math.cos(angle) * dist; let tz = Math.sin(angle) * dist;
+            if (Math.abs(tx) < 20 && Math.abs(tz - 0) < 20) continue;
+            const trunkH = 14 + Math.random() * 12;
+            const trunkR = 0.4 + Math.random() * 0.6;
+            createCylinder(trunkR * 0.6, trunkR, trunkH, tx, tz, jungleBarkMat);
+            createCylinder(0, 6 + Math.random()*3, trunkH * 0.6, tx, tz, jungleCanopyMat);
+            createCylinder(0, 7 + Math.random()*3, trunkH * 0.72, tx, tz, jungleCanopyDarkMat);
+            createCylinder(0, 4 + Math.random()*2, trunkH * 0.86, tx, tz, jungleCanopyMat);
+        }
+        createStructure(18, 0.9, 1.5, -25, 5, jungleBarkMat);
+        createStructure(14, 0.9, 1.5, 22, 8, jungleBarkMat);
+        createStructure(16, 0.9, 1.5, -15, -55, jungleBarkMat);
+        createStructure(12, 0.9, 1.5, 18, -60, jungleBarkMat);
+        createStructure(20, 0.9, 1.5, -38, 40, jungleBarkMat);
+        createStructure(15, 0.9, 1.5, 35, 42, jungleBarkMat);
+        createStructure(1.2, 8, 20, -62, 5, vineMat);
+        createStructure(1.2, 8, 20, 62, 5, vineMat);
+        createStructure(20, 8, 1.2, 0, -14, vineMat);
+        createStructure(18, 0.2, 12, -38, 22, mudMat);
+        createStructure(14, 0.2, 10, 35, 25, mudMat);
+        createStructure(20, 0.2, 14, 0, 38, mudMat);
+        for (let i = 0; i < 36; i++) {
+            let angle = (i / 36) * Math.PI * 2; let dist = 200 + Math.random() * 80;
+            let tw = 20 + Math.random() * 40; let th = 15 + Math.random() * 20; let td = 20 + Math.random() * 40;
+            createStructure(tw, th, td, Math.cos(angle) * dist, Math.sin(angle) * dist, jungleCanopyDarkMat);
+        }
+        for (let i = 0; i < 90; i++) {
+            let bw = 5 + Math.random() * 22; let bd = 5 + Math.random() * 22; let bh = 3 + Math.random() * 20;
+            let bx = (Math.random() - 0.5) * 1100; let bz = (Math.random() - 0.5) * 1100;
+            if (Math.abs(bx) < 55 && Math.abs(bz - 15) < 55) continue;
+            createStructure(bw, bh, bd, bx, bz, Math.random() > 0.5 ? jungleCanopyMat : jungleCanopyDarkMat);
+        }
+        for (let i = 0; i < 60; i++) {
+            let fw = 3 + Math.random() * 8; let fd = 3 + Math.random() * 8; let fh = 0.5 + Math.random() * 1.2;
+            let fx = (Math.random() - 0.5) * 300; let fz = (Math.random() - 0.5) * 300;
+            if (Math.abs(fx) < 22 && Math.abs(fz - 5) < 22) continue;
+            createStructure(fw, fh, fd, fx, fz, vineMat);
+        }
+    }
+}
+
+// ===================== HELPER FUNCTIONS =====================
+function checkCollision(posX, posZ, radius) {
+    if (radius === undefined) radius = 0.65;
     for (let i = 0; i < collisionBoxes.length; i++) {
         const box = collisionBoxes[i];
         if (posX + radius > box.minX && posX - radius < box.maxX && posZ + radius > box.minZ && posZ - radius < box.maxZ) return true;
     }
     return false;
 }
+function hasLineOfSight(start, target) {
+    const direction = new THREE.Vector3().subVectors(target, start).normalize();
+    const distance = start.distanceTo(target);
+    const raycaster = new THREE.Raycaster(start, direction, 0.1, distance);
+    const intersects = raycaster.intersectObjects(solidObstacles);
+    return intersects.length === 0;
+}
 
+// ===================== BLOOD PARTICLES =====================
 const bloodParticles = [];
 const bloodMat = new THREE.MeshBasicMaterial({ color: 0xaa0000 });
 const bloodGeo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
@@ -460,28 +1620,40 @@ function spawnBlood(position) {
     }
 }
 
-let highScore = localStorage.getItem('tacticalStrikeHighScore') || 0;
+// ===================== SCORE =====================
+let highScore = localStorage.getItem('deltaOpsHighScore') || 0;
 document.getElementById('highscore-count').innerText = highScore;
 function updateHighScore(k) {
     if (k > highScore) {
         highScore = k;
-        localStorage.setItem('tacticalStrikeHighScore', highScore);
+        localStorage.setItem('deltaOpsHighScore', highScore);
         document.getElementById('highscore-count').innerText = highScore;
     }
 }
 
+// ===================== ENEMIES =====================
 const enemies = [];
 const enemyProjectiles = [];
-let kills = 0, playerHealth = 100, lastHitTime = 0;
+let kills = 0;
+let playerHealth = 100;
+let playerMaxHealth = 100;
 
 const patrolRoutes = [
-    [new THREE.Vector3(-250,0,-250), new THREE.Vector3(250,0,-250), new THREE.Vector3(250,0,250), new THREE.Vector3(-250,0,250)],
-    [new THREE.Vector3(0,0,-350), new THREE.Vector3(350,0,0), new THREE.Vector3(0,0,350), new THREE.Vector3(-350,0,0)]
+    [new THREE.Vector3(-250, 0, -250), new THREE.Vector3(250, 0, -250), new THREE.Vector3(250, 0, 250), new THREE.Vector3(-250, 0, 250)],
+    [new THREE.Vector3(0, 0, -350), new THREE.Vector3(350, 0, 0), new THREE.Vector3(0, 0, 350), new THREE.Vector3(-350, 0, 0)]
 ];
 
+function clearEnemies() {
+    for (let i = enemies.length - 1; i >= 0; i--) { scene.remove(enemies[i]); }
+    enemies.length = 0;
+    for (let i = enemyProjectiles.length - 1; i >= 0; i--) { scene.remove(enemyProjectiles[i]); }
+    enemyProjectiles.length = 0;
+}
+
 function spawnEnemy() {
+    const type = getRandomEnemyType();
     const enemyGroup = new THREE.Group();
-    const uniformMat = new THREE.MeshStandardMaterial({ color: 0x3d4f3f, roughness: 0.8 });
+    const uniformMat = new THREE.MeshStandardMaterial({ color: type.color, roughness: 0.8 });
     const skinMat = new THREE.MeshStandardMaterial({ color: 0xe0a982, roughness: 0.5 });
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), skinMat); head.position.y = 1.6; head.castShadow = true;
     const torso = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.9, 0.36), uniformMat); torso.position.y = 0.95; torso.castShadow = true;
@@ -490,10 +1662,11 @@ function spawnEnemy() {
     const legL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.8, 0.24), uniformMat); legL.position.set(-0.18, 0.4, 0); legL.castShadow = true;
     const legR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.8, 0.24), uniformMat); legR.position.set(0.18, 0.4, 0); legR.castShadow = true;
     enemyGroup.add(head, torso, armL, armR, legL, legR);
-    enemyGroup.parts = {head, torso, armL, armR, legL, legR};
+    enemyGroup.parts = { head: head, torso: torso, armL: armL, armR: armR, legL: legL, legR: legR };
     const hitBox = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.9, 0.7), new THREE.MeshBasicMaterial({ visible: false }));
     hitBox.position.y = 0.9; enemyGroup.add(hitBox); enemyGroup.hitBox = hitBox;
-    enemyGroup.health = 145;
+    enemyGroup.health = type.health;
+    enemyGroup.enemyType = type;
     enemyGroup.isDead = false; enemyGroup.deathProgress = 0; enemyGroup.respawning = false;
     enemyGroup.strafeDir = Math.random() > 0.5 ? 1 : -1;
     enemyGroup.nextStateChange = Date.now() + 1000 + Math.random() * 2000;
@@ -501,30 +1674,112 @@ function spawnEnemy() {
     enemyGroup.walkTime = Math.random() * 10;
     enemyGroup.patrolRoute = patrolRoutes[Math.floor(Math.random() * patrolRoutes.length)];
     enemyGroup.patrolIndex = 0;
-    let validSpawning = false, finalX = 0, finalZ = 0;
-    while(!validSpawning) {
-        const angle = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 60;
+    let validSpawning = false; let finalX = 0; let finalZ = 0; let attempts = 0;
+    while (!validSpawning && attempts < 200) {
+        attempts++;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 60;
         finalX = camera.position.x + Math.cos(angle) * dist;
         finalZ = camera.position.z + Math.sin(angle) * dist;
-        if(!checkCollision(finalX, finalZ, 0.8)) validSpawning = true;
+        if (!checkCollision(finalX, finalZ, 0.8)) validSpawning = true;
     }
     enemyGroup.position.set(finalX, 0, finalZ);
     scene.add(enemyGroup); enemies.push(enemyGroup);
 }
-for (let i = 0; i < 12; i++) spawnEnemy();
+
+// ===================== WEAPONS =====================
+// Base weapon definitions — stored so upgrades can reset/reapply
+const baseWeaponStats = [
+    { name: "AUG",      damage: 35, rate: 100, recoil: 0.03,  camRecoil: 0.006  },
+    { name: "SCAR-H",   damage: 50, rate: 130, recoil: 0.04,  camRecoil: 0.009  },
+    { name: "M4A1",     damage: 32, rate: 85,  recoil: 0.025, camRecoil: 0.004  },
+    { name: "CZ-3A1",   damage: 34, rate: 92,  recoil: 0.028, camRecoil: 0.0055 },
+    { name: "MP7",      damage: 24, rate: 65,  recoil: 0.018, camRecoil: 0.0035 },
+    { name: "GLOCK-17", damage: 22, rate: 160, recoil: 0.04,  camRecoil: 0.012  }
+];
 
 const weapons = [
-    { name: "AUG", forestCamo: true, ads: { x: 0, y: -0.12, z: -0.2 }, ads2: { x: -0.062, y: -0.076, z: -0.18 }, rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 }, fov: 42, rate: 100, recoil: 0.03, camRecoil: 0.006, reticle: 0x00ff00, damage: 35, maxAmmo: 30, curAmmo: 30, hasCanted: true },
-    { name: "SCAR-H", whiteCamo: true, ads: { x: 0, y: -0.12, z: -0.25 }, ads2: { x: -0.062, y: -0.076, z: -0.22 }, rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 }, fov: 45, rate: 130, recoil: 0.04, camRecoil: 0.009, reticle: 0xff0000, damage: 50, maxAmmo: 20, curAmmo: 20, hasCanted: true },
-    { name: "M4A1", camo: true, ads: { x: 0, y: -0.12, z: -0.22 }, ads2: { x: -0.062, y: -0.076, z: -0.2 }, rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 }, fov: 46, rate: 85, recoil: 0.025, camRecoil: 0.004, reticle: 0xff0000, damage: 32, maxAmmo: 30, curAmmo: 30, hasCanted: true },
-    { name: "CZ-3A1", purpleCamo: true, ads: { x: 0, y: -0.11, z: -0.21 }, ads2: { x: -0.065, y: -0.07, z: -0.19 }, rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 }, fov: 44, rate: 92, recoil: 0.028, camRecoil: 0.0055, reticle: 0xff2200, damage: 34, maxAmmo: 30, curAmmo: 30, hasCanted: true },
-    { name: "MP7", desertCamo: true, ads: { x: 0, y: -0.105, z: -0.18 }, ads2: { x: -0.06, y: -0.068, z: -0.16 }, rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 }, fov: 48, rate: 65, recoil: 0.018, camRecoil: 0.0035, reticle: 0x00ff88, damage: 24, maxAmmo: 40, curAmmo: 40, hasCanted: true },
-    { name: "GLOCK-17", navyCamo: true, ads: { x: 0, y: -0.058, z: -0.15 }, rot: { x: 0, y: 0, z: 0 }, fov: 55, rate: 160, recoil: 0.04, camRecoil: 0.012, damage: 22, maxAmmo: 17, curAmmo: 17, hasCanted: false }
+    { name: "AUG",      forestCamo: true,
+      // ADS: centered optic, adjusted so reticle aligns with screen center
+      ads:  { x: 0, y: -0.145, z: -0.38 },
+      ads2: { x: -0.062, y: -0.076, z: -0.18 },
+      rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 },
+      fov: 42, rate: 100, recoil: 0.03, camRecoil: 0.006,
+      reticle: 0x00ff00, damage: 35, maxAmmo: 30, curAmmo: 30, hasCanted: true },
+    { name: "SCAR-H",   whiteCamo: true,
+      ads:  { x: 0, y: -0.145, z: -0.42 },
+      ads2: { x: -0.062, y: -0.076, z: -0.22 },
+      rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 },
+      fov: 45, rate: 130, recoil: 0.04, camRecoil: 0.009,
+      reticle: 0xff0000, damage: 50, maxAmmo: 20, curAmmo: 20, hasCanted: true },
+    { name: "M4A1",     camo: true,
+      ads:  { x: 0, y: -0.145, z: -0.40 },
+      ads2: { x: -0.062, y: -0.076, z: -0.20 },
+      rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 },
+      fov: 46, rate: 85,  recoil: 0.025, camRecoil: 0.004,
+      reticle: 0xff0000, damage: 32, maxAmmo: 30, curAmmo: 30, hasCanted: true },
+    { name: "CZ-3A1",   purpleCamo: true,
+      ads:  { x: 0, y: -0.145, z: -0.38 },
+      ads2: { x: -0.065, y: -0.07, z: -0.19 },
+      rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 },
+      fov: 44, rate: 92,  recoil: 0.028, camRecoil: 0.0055,
+      reticle: 0xff2200, damage: 34, maxAmmo: 30, curAmmo: 30, hasCanted: true },
+    { name: "MP7",      desertCamo: true,
+      ads:  { x: 0, y: -0.135, z: -0.34 },
+      ads2: { x: -0.06,  y: -0.068, z: -0.16 },
+      rot: { x: 0, y: 0, z: 0 }, rot2: { x: 0, y: 0, z: 0.785 },
+      fov: 48, rate: 65,  recoil: 0.018, camRecoil: 0.0035,
+      reticle: 0x00ff88, damage: 24, maxAmmo: 40, curAmmo: 40, hasCanted: true },
+    { name: "GLOCK-17", navyCamo: true,
+      ads:  { x: 0, y: -0.095, z: -0.30 },
+      rot: { x: 0, y: 0, z: 0 },
+      fov: 55, rate: 160, recoil: 0.04, camRecoil: 0.012,
+      damage: 22, maxAmmo: 17, curAmmo: 17, hasCanted: false }
 ];
+
+// Bonus weapons (added by upgrades)
+function addWeapon_minigun() {
+    if (weapons.find(function(w) { return w.name === "MINIGUN"; })) return;
+    weapons.push({
+        name: "MINIGUN", camo: true,
+        ads: { x: 0, y: -0.18, z: -0.45 },
+        rot: { x: 0, y: 0, z: 0 },
+        fov: 55, rate: 45, recoil: 0.01, camRecoil: 0.002,
+        damage: 12, maxAmmo: 200, curAmmo: 200, hasCanted: false,
+        isMinigun: true
+    });
+    baseWeaponStats.push({ name: "MINIGUN", damage: 12, rate: 45, recoil: 0.01, camRecoil: 0.002 });
+}
+function addWeapon_shotgun() {
+    if (weapons.find(function(w) { return w.name === "SUPER SG"; })) return;
+    weapons.push({
+        name: "SUPER SG", whiteCamo: true,
+        ads: { x: 0, y: -0.155, z: -0.40 },
+        rot: { x: 0, y: 0, z: 0 },
+        fov: 50, rate: 200, recoil: 0.08, camRecoil: 0.018,
+        damage: 120, maxAmmo: 8, curAmmo: 8, hasCanted: false,
+        isShotgun: true
+    });
+    baseWeaponStats.push({ name: "SUPER SG", damage: 120, rate: 200, recoil: 0.08, camRecoil: 0.018 });
+}
+function addWeapon_flamer() {
+    if (weapons.find(function(w) { return w.name === "FLAMER"; })) return;
+    weapons.push({
+        name: "FLAMER", forestCamo: true,
+        ads: { x: 0, y: -0.155, z: -0.38 },
+        rot: { x: 0, y: 0, z: 0 },
+        fov: 52, rate: 60, recoil: 0.005, camRecoil: 0.001,
+        damage: 18, maxAmmo: 60, curAmmo: 60, hasCanted: false,
+        isFlamer: true
+    });
+    baseWeaponStats.push({ name: "FLAMER", damage: 18, rate: 60, recoil: 0.005, camRecoil: 0.001 });
+}
 
 let curIdx = 0, isReloading = false, reloadProgress = 0, activeAdsMode = 0;
 let playerVelY = 0, targetHeight = 1.7, moveSpeed = 0.18, isGrounded = true;
 let basePlayerPos = new THREE.Vector3(0, 1.7, 15);
+let lastDamageTime = 0;
+let sessionXPEarned = 0;
 
 const gunAnchor = new THREE.Group();
 const cantedPivot = new THREE.Group();
@@ -536,45 +1791,105 @@ camera.position.copy(basePlayerPos);
 let gunModel = new THREE.Group();
 cantedPivot.add(gunModel);
 
-function addLaser(color, side = -0.08) {
+function addLaser(color, side) {
+    if (side === undefined) side = -0.08;
     const laserBox = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, 0.1), new THREE.MeshPhongMaterial({ color: 0x222222 }));
     laserBox.position.set(side, 0.05, -0.25);
-    const laserBeam = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,-30)]), new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.45 }));
+    const laserBeam = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -30)]), new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.45 }));
     laserBeam.position.set(side, 0.05, -0.3);
     gunModel.add(laserBox, laserBeam);
 }
+
+// ===================== OPTIC BUILDER — CENTERED =====================
+// All optics built so that when ADS is active, the reticle sits at (0,0) in camera space
+// i.e. the optic's reticle is at gunModel-local Y=0, X=0 — perfectly centered on screen
+
 function buildTopOptic(w, opticHousingMat) {
     const topOptic = new THREE.Group();
-    const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.06), opticHousingMat); sideL.position.x = -0.05;
-    const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.06), opticHousingMat); sideR.position.x = 0.05;
-    const top = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.01, 0.06), opticHousingMat); top.position.y = 0.05;
+    // Optic housing sides and top
+    const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.10, 0.07), opticHousingMat); sideL.position.x = -0.052;
+    const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.10, 0.07), opticHousingMat); sideR.position.x =  0.052;
+    const top =   new THREE.Mesh(new THREE.BoxGeometry(0.116, 0.012, 0.07), opticHousingMat); top.position.y = 0.05;
     topOptic.add(sideL, sideR, top);
-    topOptic.add(new THREE.Mesh(new THREE.TorusGeometry(0.014, 0.002, 16, 32), new THREE.MeshBasicMaterial({ color: w.reticle })));
-    topOptic.add(new THREE.Mesh(new THREE.SphereGeometry(0.004), new THREE.MeshBasicMaterial({ color: w.reticle })));
-    topOptic.position.set(0, 0.12, -0.1);
+    // Reticle ring placed at exactly Y=0, X=0 so it aligns with viewport center when ADS
+    const reticleRing = new THREE.Mesh(new THREE.TorusGeometry(0.014, 0.002, 16, 32), new THREE.MeshBasicMaterial({ color: w.reticle }));
+    reticleRing.position.set(0, 0, 0);
+    const reticleDot  = new THREE.Mesh(new THREE.SphereGeometry(0.004), new THREE.MeshBasicMaterial({ color: w.reticle }));
+    reticleDot.position.set(0, 0, 0);
+    topOptic.add(reticleRing, reticleDot);
+    // Position optic body so housing sits above the rail, reticle at gun-model origin height
+    topOptic.position.set(0, 0.0, -0.12);
     gunModel.add(topOptic);
 }
-function buildCantedSight(w, opticHousingMat, cantedColor = 0xff0000) {
+
+function buildCantedSight(w, opticHousingMat, cantedColor) {
+    if (cantedColor === undefined) cantedColor = 0xff0000;
     const bracketArm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.012, 0.04), opticHousingMat);
     bracketArm.position.set(0.042, 0.062, -0.1); bracketArm.rotation.z = -0.785;
     gunModel.add(bracketArm);
     const cantedSightFrame = new THREE.Group();
-    const cSideL = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.08, 0.05), opticHousingMat); cSideL.position.x = -0.04;
-    const cSideR = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.08, 0.05), opticHousingMat); cSideR.position.x = 0.04;
-    const cTop = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.01, 0.05), opticHousingMat); cTop.position.y = 0.04;
+    const cSideL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.08, 0.05), opticHousingMat); cSideL.position.x = -0.04;
+    const cSideR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.08, 0.05), opticHousingMat); cSideR.position.x =  0.04;
+    const cTop   = new THREE.Mesh(new THREE.BoxGeometry(0.092, 0.012, 0.05), opticHousingMat); cTop.position.y = 0.04;
     cantedSightFrame.add(cSideL, cSideR, cTop);
-    const redDotReticle = new THREE.Mesh(new THREE.SphereGeometry(0.0035, 8, 8), new THREE.MeshBasicMaterial({ color: cantedColor }));
-    redDotReticle.position.set(0, 0.018, -0.01); cantedSightFrame.add(redDotReticle);
-    cantedSightFrame.rotation.z = -0.785; cantedSightFrame.scale.set(0.75, 0.75, 0.75);
-    cantedSightFrame.position.set(0.062, 0.076, -0.1); gunModel.add(cantedSightFrame);
+    // Canted red dot — at frame-local center (0,0,0)
+    const cantedDot = new THREE.Mesh(new THREE.SphereGeometry(0.0038, 8, 8), new THREE.MeshBasicMaterial({ color: cantedColor }));
+    cantedDot.position.set(0, 0, 0);
+    cantedSightFrame.add(cantedDot);
+    cantedSightFrame.rotation.z = -0.785;
+    cantedSightFrame.scale.set(0.75, 0.75, 0.75);
+    cantedSightFrame.position.set(0.062, 0.076, -0.1);
+    gunModel.add(cantedSightFrame);
 }
+
+function buildIronSightsGlock(ironSightMat) {
+    // Glock rear and front sights — aligned so notch center = gun X/Y origin for ADS
+    const rearL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.016, 0.012), ironSightMat); rearL.position.set(-0.014, 0.0, 0.16);
+    const rearR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.016, 0.012), ironSightMat); rearR.position.set( 0.014, 0.0, 0.16);
+    const front = new THREE.Mesh(new THREE.BoxGeometry(0.010, 0.016, 0.018), ironSightMat); front.position.set(0, 0.0, -0.19);
+    gunModel.add(rearL, rearR, front);
+}
+
 function buildGun() {
     gunModel.clear(); gunModel.position.set(0, 0, 0); gunModel.rotation.set(0, 0, 0);
     cantedPivot.position.set(0, 0, 0); cantedPivot.rotation.set(0, 0, 0);
     const w = weapons[curIdx];
     const opticHousingMat = new THREE.MeshStandardMaterial({ color: 0x1a1c21, roughness: 0.7, metalness: 0.6 });
     const blackMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6, metalness: 0.7 });
-    if (w.name === "AUG" || w.name === "SCAR-H" || w.name === "M4A1" || w.name === "CZ-3A1" || w.name === "MP7") {
+
+    if (w.name === "MINIGUN") {
+        const bodyMat = new THREE.MeshStandardMaterial({ map: camoTex, roughness: 0.8, metalness: 0.4 });
+        const barrelMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.5, metalness: 0.8 });
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.9, 12), bodyMat);
+        body.rotation.x = Math.PI / 2; gunModel.add(body);
+        for (let bi = 0; bi < 6; bi++) {
+            const angle = (bi / 6) * Math.PI * 2;
+            const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.1, 8), barrelMat);
+            barrel.rotation.x = Math.PI / 2;
+            barrel.position.set(Math.cos(angle) * 0.065, Math.sin(angle) * 0.065, -0.1);
+            gunModel.add(barrel);
+        }
+        gunModel.add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.06), blackMat));
+        buildTopOptic(w, opticHousingMat);
+    } else if (w.isShotgun) {
+        let bodyMat = new THREE.MeshStandardMaterial({ map: whiteCamoTex, roughness: 0.8, metalness: 0.2 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.14, 0.85), bodyMat);
+        body.castShadow = true; gunModel.add(body);
+        const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.5), blackMat);
+        barrel.rotation.x = Math.PI / 2; barrel.position.z = -0.67; gunModel.add(barrel);
+        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.18, 0.06), blackMat);
+        grip.position.set(0, -0.15, -0.18); grip.rotation.x = 0.25; gunModel.add(grip);
+        buildTopOptic(w, opticHousingMat);
+    } else if (w.isFlamer) {
+        let bodyMat = new THREE.MeshStandardMaterial({ map: forestCamoTex, roughness: 0.9, metalness: 0.3 });
+        const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.7, 10), bodyMat);
+        tank.rotation.x = Math.PI / 2; gunModel.add(tank);
+        const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.035, 0.55, 8), blackMat);
+        nozzle.rotation.x = Math.PI / 2; nozzle.position.z = -0.6; gunModel.add(nozzle);
+        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.16, 0.06), blackMat);
+        grip.position.set(0, -0.15, -0.1); grip.rotation.x = 0.25; gunModel.add(grip);
+        buildTopOptic(w, opticHousingMat);
+    } else if (w.name === "AUG" || w.name === "SCAR-H" || w.name === "M4A1" || w.name === "CZ-3A1" || w.name === "MP7") {
         let bodyMat;
         if (w.purpleCamo) bodyMat = new THREE.MeshStandardMaterial({ map: czPurpleCamoTex, roughness: 0.8, metalness: 0.1 });
         else if (w.desertCamo) bodyMat = new THREE.MeshStandardMaterial({ map: mp7DesertCamoTex, roughness: 0.8, metalness: 0.1 });
@@ -582,14 +1897,13 @@ function buildGun() {
         else if (w.forestCamo) bodyMat = new THREE.MeshStandardMaterial({ map: forestCamoTex, roughness: 0.8, metalness: 0.1 });
         else if (w.camo) bodyMat = new THREE.MeshStandardMaterial({ map: camoTex, roughness: 0.8, metalness: 0.1 });
         else bodyMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.75, metalness: 0.3 });
-        const attachMat = blackMat;
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.15, w.name === "MP7" ? 0.65 : 0.95), bodyMat);
         body.castShadow = true; gunModel.add(body);
-        const sil = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, w.name === "MP7" ? 0.45 : 0.4), attachMat);
-        sil.rotation.x = Math.PI/2; sil.position.z = w.name === "MP7" ? -0.52 : -0.68; gunModel.add(sil);
-        const mag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.11), attachMat);
+        const sil = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, w.name === "MP7" ? 0.45 : 0.4), blackMat);
+        sil.rotation.x = Math.PI / 2; sil.position.z = w.name === "MP7" ? -0.52 : -0.68; gunModel.add(sil);
+        const mag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.11), blackMat);
         mag.position.set(0, -0.18, 0.08); gunModel.add(mag);
-        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.16, 0.05), attachMat);
+        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.16, 0.05), blackMat);
         grip.position.set(0, -0.15, -0.22); grip.rotation.x = 0.28; gunModel.add(grip);
         if (w.name === "CZ-3A1") addLaser(0x00aaff, 0.085);
         if (w.name === "MP7") addLaser(0xff0000, -0.085);
@@ -597,8 +1911,7 @@ function buildGun() {
         if (w.name === "AUG" || w.name === "SCAR-H") addLaser(0xff0000, 0.085);
         buildTopOptic(w, opticHousingMat);
         buildCantedSight(w, opticHousingMat, w.name === "MP7" ? 0x00ff88 : 0xff0000);
-    }
-    if (w.name === "GLOCK-17") {
+    } else if (w.name === "GLOCK-17") {
         const frameMat = w.navyCamo ? new THREE.MeshStandardMaterial({ map: navyCamoTex, roughness: 0.8, metalness: 0.1 }) : new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9, metalness: 0.05 });
         const slideMat = new THREE.MeshStandardMaterial({ color: 0x2d3035, roughness: 0.5, metalness: 0.6 });
         const ironSightMat = new THREE.MeshStandardMaterial({ color: 0x1a1c21, roughness: 0.8, metalness: 0.6 });
@@ -609,14 +1922,11 @@ function buildGun() {
         const slide = new THREE.Mesh(new THREE.BoxGeometry(0.062, 0.040, 0.37), slideMat);
         slide.position.set(0, 0.03, -0.015); slide.castShadow = true; gunModel.add(slide);
         const outerBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.04), slideMat);
-        outerBarrel.rotation.x = Math.PI/2; outerBarrel.position.set(0, 0.032, -0.2); gunModel.add(outerBarrel);
-        const rearSightL = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.016, 0.012), ironSightMat);
-        rearSightL.position.set(-0.014, 0.058, 0.16); gunModel.add(rearSightL);
-        const rearSightR = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.016, 0.012), ironSightMat);
-        rearSightR.position.set(0.014, 0.058, 0.16); gunModel.add(rearSightR);
-        const frontSight = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.016, 0.018), ironSightMat);
-        frontSight.position.set(0, 0.058, -0.19); gunModel.add(frontSight);
+        outerBarrel.rotation.x = Math.PI / 2; outerBarrel.position.set(0, 0.032, -0.2); gunModel.add(outerBarrel);
+        buildIronSightsGlock(ironSightMat);
     }
+
+    // Set gun position for ADS/canted/hip modes
     if (activeAdsMode === 2 && w.hasCanted) gunModel.position.set(-0.062, -0.076, 0);
     document.getElementById('w-name').innerText = w.name;
     document.getElementById('ammo-count').innerText = w.curAmmo;
@@ -624,24 +1934,26 @@ function buildGun() {
 }
 buildGun();
 
-let mVec = {x:0, y:0}, aimVec = {x:0, y:0}, isFiring = false, lastFire = 0;
+// ===================== CONTROLS =====================
+let mVec = { x: 0, y: 0 }, aimVec = { x: 0, y: 0 }, isFiring = false, lastFire = 0;
 let targetLeanAngle = 0, currentLeanAngle = 0;
 let targetLeanOffset = 0, currentLeanOffset = 0;
 const raycaster = new THREE.Raycaster();
+let hasFirstBlood = false;
 
-nipplejs.create({ zone: document.getElementById('move-zone'), mode: 'static', position: { left:'85px', bottom:'85px' }, color: 'white' })
-.on('move', (e, d) => mVec = d.vector).on('end', () => mVec = { x:0, y:0 });
-nipplejs.create({ zone: document.getElementById('aim-joystick-zone'), mode: 'static', position: { right:'85px', bottom:'85px' }, color: '#00ffff' })
-.on('move', (e, d) => aimVec = d.vector).on('end', () => aimVec = { x:0, y:0 });
+nipplejs.create({ zone: document.getElementById('move-zone'), mode: 'static', position: { left: '85px', bottom: '85px' }, color: 'white' })
+    .on('move', function(e, d) { mVec = d.vector; }).on('end', function() { mVec = { x: 0, y: 0 }; });
+nipplejs.create({ zone: document.getElementById('aim-joystick-zone'), mode: 'static', position: { right: '85px', bottom: '85px' }, color: '#00ffff' })
+    .on('move', function(e, d) { aimVec = d.vector; }).on('end', function() { aimVec = { x: 0, y: 0 }; });
 
 const aimZoneSwipe = document.getElementById('aim-zone-swipe');
 let activeTouchId = null; let prevMousePos = { x: 0, y: 0 }; const swipeSens = 0.0045;
-aimZoneSwipe.addEventListener('touchstart', (e) => {
+aimZoneSwipe.addEventListener('touchstart', function(e) {
     for (let i = 0; i < e.changedTouches.length; i++) {
         if (activeTouchId === null) { activeTouchId = e.changedTouches[i].identifier; prevMousePos = { x: e.changedTouches[i].clientX, y: e.changedTouches[i].clientY }; break; }
     }
 }, { passive: true });
-aimZoneSwipe.addEventListener('touchmove', (e) => {
+aimZoneSwipe.addEventListener('touchmove', function(e) {
     for (let i = 0; i < e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === activeTouchId) {
             camera.rotation.y -= (e.changedTouches[i].clientX - prevMousePos.x) * swipeSens;
@@ -651,50 +1963,71 @@ aimZoneSwipe.addEventListener('touchmove', (e) => {
         }
     }
 }, { passive: true });
-const endTouch = (e) => { for (let i=0; i<e.changedTouches.length; i++) { if (e.changedTouches[i].identifier === activeTouchId) { activeTouchId = null; break; } } };
-aimZoneSwipe.addEventListener('touchend', endTouch, { passive: true }); aimZoneSwipe.addEventListener('touchcancel', endTouch, { passive: true });
+function endTouch(e) { for (let i = 0; i < e.changedTouches.length; i++) { if (e.changedTouches[i].identifier === activeTouchId) { activeTouchId = null; break; } } }
+aimZoneSwipe.addEventListener('touchend', endTouch, { passive: true });
+aimZoneSwipe.addEventListener('touchcancel', endTouch, { passive: true });
 
 function triggerHitmarker() {
     const hm = document.getElementById('hitmarker');
-    hm.style.opacity = '1'; hm.style.transform = 'translate(-50%, -50%) scale(1.0)';
-    setTimeout(() => { hm.style.transform = 'translate(-50%, -50%) scale(0)'; hm.style.opacity = '0'; }, 100);
+    hm.style.transition = 'none';
+    hm.style.transform = 'translate(-50%, -50%) scale(0.3)';
+    hm.style.opacity = '0';
+    void hm.offsetWidth;
+    hm.style.transition = 'transform 0.06s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.18s ease-out';
+    hm.style.transform = 'translate(-50%, -50%) scale(1.35)';
+    hm.style.opacity = '0.95';
+    setTimeout(function() { hm.style.transform = 'translate(-50%, -50%) scale(0.75)'; hm.style.opacity = '0'; }, 90);
 }
 function triggerReload() { if (!isReloading) { isReloading = true; reloadProgress = 0; } }
 
 function resetPlayerState() {
-    playerHealth = 100; kills = 0; hasFirstBlood = false; upgradePoints = 0;
+    // Re-apply all persistent upgrades to weapon stats, move speed, max health
+    reapplyAllUpgrades();
+    playerHealth = playerMaxHealth;
+    kills = 0; hasFirstBlood = false; lastDamageTime = 0; sessionXPEarned = 0;
     document.getElementById('health-count').innerText = playerHealth;
     document.getElementById('kill-count').innerText = kills;
     basePlayerPos.set(0, 1.7, 15);
     camera.position.copy(basePlayerPos);
-    weapons.forEach(w => w.curAmmo = w.maxAmmo);
-    document.getElementById('ammo-count').innerText = weapons[curIdx].maxAmmo;
-    inVehicle = false;
+    camera.rotation.set(0, 0, 0);
+    weapons.forEach(function(w) { w.curAmmo = w.maxAmmo; });
+    curIdx = 0; activeAdsMode = 0; buildGun();
+    clearEnemies();
+    for (let i = 0; i < bloodParticles.length; i++) scene.remove(bloodParticles[i]);
+    bloodParticles.length = 0;
+    for (let i = 0; i < 22; i++) spawnEnemy();
+    updateHUDLevel();
 }
 
-const handleAction = (id, fn) => { document.getElementById(id).addEventListener('touchstart', (e) => { e.stopPropagation(); e.preventDefault(); fn(); }, { passive: false }); };
+function handleAction(id, fn) { document.getElementById(id).addEventListener('touchstart', function(e) { e.stopPropagation(); e.preventDefault(); fn(); }, { passive: false }); }
 
-handleAction('fire-btn', () => isFiring = true);
-['touchend', 'touchcancel'].forEach(ev => { document.getElementById('fire-btn').addEventListener(ev, (e) => { e.stopPropagation(); e.preventDefault(); isFiring = false; }, { passive: false }); });
-handleAction('aim-btn', () => { activeAdsMode = (activeAdsMode === 1) ? 0 : 1; buildGun(); });
-handleAction('ads2-btn', () => { if(weapons[curIdx].hasCanted) { activeAdsMode = (activeAdsMode === 2) ? 0 : 2; buildGun(); } });
-handleAction('reload-btn', () => triggerReload());
-handleAction('swap-btn', () => {
+handleAction('fire-btn', function() { isFiring = true; });
+['touchend', 'touchcancel'].forEach(function(ev) { document.getElementById('fire-btn').addEventListener(ev, function(e) { e.stopPropagation(); e.preventDefault(); isFiring = false; }, { passive: false }); });
+handleAction('aim-btn', function() { activeAdsMode = (activeAdsMode === 1) ? 0 : 1; buildGun(); });
+handleAction('ads2-btn', function() { if (weapons[curIdx].hasCanted) { activeAdsMode = (activeAdsMode === 2) ? 0 : 2; buildGun(); } });
+handleAction('reload-btn', function() { triggerReload(); });
+handleAction('swap-btn', function() {
     let n = curIdx;
-    do { n = (n + 1) % weapons.length; } while (weapons[n].name === "GLOCK-17");
+    do { n = (n + 1) % weapons.length; } while (weapons[n].name === "GLOCK-17" && weapons.length > 1);
     curIdx = n; activeAdsMode = 0; buildGun();
 });
-handleAction('sidearm-btn', () => {
-    const g = weapons.findIndex(w => w.name === "GLOCK-17");
+handleAction('sidearm-btn', function() {
+    const g = weapons.findIndex(function(w) { return w.name === "GLOCK-17"; });
     if (g !== -1) { curIdx = g; activeAdsMode = 0; buildGun(); }
 });
-handleAction('jump-btn', () => { if (isGrounded) playerVelY = 0.17; isGrounded = false; });
-handleAction('crouch-btn', () => targetHeight = targetHeight === 0.95 ? 1.7 : 0.95);
-handleAction('lean-l-btn', () => { targetLeanAngle = 0.25; targetLeanOffset = -0.65; });
-['touchend', 'touchcancel'].forEach(ev => document.getElementById('lean-l-btn').addEventListener(ev, () => { targetLeanAngle = 0; targetLeanOffset = 0; }, { passive: true }));
-handleAction('lean-r-btn', () => { targetLeanAngle = -0.25; targetLeanOffset = 0.65; });
-['touchend', 'touchcancel'].forEach(ev => document.getElementById('lean-r-btn').addEventListener(ev, () => { targetLeanAngle = 0; targetLeanOffset = 0; }, { passive: true }));
+handleAction('jump-btn', function() { if (isGrounded) playerVelY = 0.17; isGrounded = false; });
+handleAction('crouch-btn', function() { targetHeight = targetHeight === 0.95 ? 1.7 : 0.95; });
+handleAction('lean-l-btn', function() { targetLeanAngle = 0.25; targetLeanOffset = -0.65; });
+['touchend', 'touchcancel'].forEach(function(ev) { document.getElementById('lean-l-btn').addEventListener(ev, function() { targetLeanAngle = 0; targetLeanOffset = 0; }, { passive: true }); });
+handleAction('lean-r-btn', function() { targetLeanAngle = -0.25; targetLeanOffset = 0.65; });
+['touchend', 'touchcancel'].forEach(function(ev) { document.getElementById('lean-r-btn').addEventListener(ev, function() { targetLeanAngle = 0; targetLeanOffset = 0; }, { passive: true }); });
+handleAction('ingame-upgrade-btn', function() {
+    document.getElementById('upgrade-screen').style.display = 'flex';
+    document.getElementById('upgrade-level-disp').innerText = playerProgression.level;
+    document.getElementById('upgrade-points').innerText = playerProgression.levelPoints;
+});
 
+// ===================== ACHIEVEMENTS CHECK =====================
 function checkAchievements() {
     if (kills >= 1 && !hasFirstBlood) { unlockAchievement("first_blood"); hasFirstBlood = true; }
     if (kills >= 2) unlockAchievement("double_kill");
@@ -704,16 +2037,28 @@ function checkAchievements() {
     if (kills >= 1000) unlockAchievement("iron_man");
 }
 
+// ===================== MAIN GAME LOOP =====================
 function animate() {
     requestAnimationFrame(animate);
     if (document.getElementById('start-screen').style.display !== 'none') return;
+    if (document.getElementById('map-select-screen').style.display !== 'none') return;
 
-    const now = Date.now(); const w = weapons[curIdx];
+    const now = Date.now();
+    const w = weapons[curIdx];
 
     if (playerHealth <= 0) {
         document.getElementById('final-kills').innerText = kills;
+        document.getElementById('final-xp').innerText = sessionXPEarned;
         document.getElementById('death-screen').style.display = 'flex';
         return;
+    }
+
+    // Regenerative Health — always if combat regen perk owned, otherwise only with base regen
+    const hasRegen = isUpgradeOwned('regen');
+    if (playerHealth < playerMaxHealth && now - lastDamageTime > (hasRegen ? 1500 : 3000)) {
+        const regenRate = hasRegen ? 0.22 : 0.08;
+        playerHealth = Math.min(playerMaxHealth, playerHealth + regenRate);
+        document.getElementById('health-count').innerText = Math.floor(playerHealth);
     }
 
     if (aimVec.x !== 0 || aimVec.y !== 0) {
@@ -725,7 +2070,7 @@ function animate() {
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion); forward.y = 0; forward.normalize();
     const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion); right.y = 0; right.normalize();
     const pVelocity = new THREE.Vector3().addScaledVector(forward, mVec.y * moveSpeed).addScaledVector(right, mVec.x * moveSpeed);
-    
+
     let targetX = basePlayerPos.x + pVelocity.x; let targetZ = basePlayerPos.z + pVelocity.z;
     if (!checkCollision(targetX, targetZ, 0.65)) { basePlayerPos.x = targetX; basePlayerPos.z = targetZ; }
     else if (!checkCollision(basePlayerPos.x, targetZ, 0.65)) { basePlayerPos.z = targetZ; }
@@ -745,7 +2090,8 @@ function animate() {
     let reloadOffsetZ = 0, reloadOffsetY = 0;
     if (isReloading) {
         reloadProgress += 0.05;
-        reloadOffsetY = -Math.sin(reloadProgress * Math.PI) * 0.25; reloadOffsetZ = Math.sin(reloadProgress * Math.PI) * 0.15;
+        reloadOffsetY = -Math.sin(reloadProgress * Math.PI) * 0.25;
+        reloadOffsetZ = Math.sin(reloadProgress * Math.PI) * 0.15;
         if (reloadProgress >= 1.0) { isReloading = false; w.curAmmo = w.maxAmmo; document.getElementById('ammo-count').innerText = w.curAmmo; }
     }
 
@@ -755,10 +2101,7 @@ function animate() {
         p.userData.vel.y -= 0.015;
         p.userData.life -= 0.02;
         p.scale.setScalar(Math.max(0, p.userData.life));
-        if (p.userData.life <= 0 || p.position.y <= 0) {
-            scene.remove(p);
-            bloodParticles.splice(i, 1);
-        }
+        if (p.userData.life <= 0 || p.position.y <= 0) { scene.remove(p); bloodParticles.splice(i, 1); }
     }
 
     if (isFiring && !isReloading && now - lastFire > w.rate) {
@@ -766,69 +2109,59 @@ function animate() {
             w.curAmmo--; document.getElementById('ammo-count').innerText = w.curAmmo;
             lastFire = now; gunAnchor.position.z += w.recoil; camera.rotation.x += w.camRecoil;
             muzzleFlash.position.copy(camera.position).addScaledVector(forward, 1.15); muzzleFlash.intensity = 2.4;
-            raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-            const hitTargets = [...enemies.filter(e => !e.isDead).map(e => e.hitBox), ...solidObstacles];
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const hitTargets = enemies.filter(function(e) { return !e.isDead; }).map(function(e) { return e.hitBox; }).concat(solidObstacles);
             const intersects = raycaster.intersectObjects(hitTargets);
-            if (intersects.length > 0) {
-                const hitObj = intersects[0].object;
-                if(hitObj.parent && hitObj.parent.health !== undefined) {
+            const hasPierce = isUpgradeOwned('ap_rounds');
+            const maxPierceHits = hasPierce ? 2 : 1;
+            let pierceCount = 0;
+            for (let ix = 0; ix < intersects.length && pierceCount < maxPierceHits; ix++) {
+                const hitObj = intersects[ix].object;
+                if (hitObj.parent && hitObj.parent.health !== undefined) {
                     const eGrp = hitObj.parent;
                     eGrp.health -= w.damage;
                     triggerHitmarker();
-                    spawnBlood(intersects[0].point);
+                    spawnBlood(intersects[ix].point);
+                    pierceCount++;
                     if (eGrp.health <= 0) {
                         eGrp.isDead = true; kills++;
                         document.getElementById('kill-count').innerText = kills;
                         updateHighScore(kills);
-                        upgradePoints += 4;
-                        if (kills % 8 === 0) openUpgrade();
+                        // Life drain
+                        if (isUpgradeOwned('lifedrain')) {
+                            playerHealth = Math.min(playerMaxHealth, playerHealth + 5);
+                            document.getElementById('health-count').innerText = Math.floor(playerHealth);
+                        }
+                        // Award XP per kill
+                        const xpPerKill = 12 + (eGrp.enemyType.health / 20);
+                        sessionXPEarned += Math.floor(xpPerKill);
+                        addXP(Math.floor(xpPerKill));
                     }
+                } else {
+                    break; // hit a wall, stop piercing
                 }
             }
         } else { triggerReload(); }
     }
     if (muzzleFlash.intensity > 0) muzzleFlash.intensity -= 0.4;
 
-    for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
-        const p = enemyProjectiles[i];
-        const oldPos = p.position.clone();
-        p.position.add(p.userData.velocity);
-        const dist = p.userData.velocity.length();
-        const pRay = new THREE.Raycaster(oldPos, p.userData.velocity.clone().normalize());
-        const hits = pRay.intersectObjects(solidObstacles);
-        if (hits.length > 0 && hits[0].distance < dist) {
-            scene.remove(p); enemyProjectiles.splice(i, 1); continue;
-        }
-        const dx = p.position.x - basePlayerPos.x;
-        const dz = p.position.z - basePlayerPos.z;
-        const dy = p.position.y - (basePlayerPos.y - targetHeight/2);
-        if (Math.sqrt(dx*dx + dz*dz) < 0.6 && Math.abs(dy) < targetHeight/2 + 0.3) {
-            playerHealth -= 15; lastHitTime = now;
-            document.getElementById('health-count').innerText = Math.max(0, Math.floor(playerHealth));
-            const overlay = document.getElementById('damage-overlay'); overlay.style.opacity = '0.5';
-            setTimeout(() => overlay.style.opacity = '0', 120);
-            if (playerHealth <= 0) {
-                document.getElementById('final-kills').innerText = kills;
-                document.getElementById('death-screen').style.display = 'flex';
-            }
-            scene.remove(p); enemyProjectiles.splice(i, 1);
-        }
+    // Flamethrower ammo auto-regen
+    if (w.isFlamer && !isFiring && w.curAmmo < w.maxAmmo && now - lastFire > 1200) {
+        w.curAmmo = Math.min(w.maxAmmo, w.curAmmo + 0.05);
+        document.getElementById('ammo-count').innerText = Math.floor(w.curAmmo);
     }
 
-    enemies.forEach((enemy) => {
+    // Enhanced Enemy AI
+    enemies.forEach(function(enemy) {
         if (enemy.isDead) {
             enemy.deathProgress += 0.04;
-            if(enemy.deathProgress <= 0.5) {
-                enemy.position.y -= 0.03;
-                enemy.rotation.x = enemy.deathProgress * Math.PI;
-            } else {
-                enemy.position.y -= 0.05;
-            }
+            if (enemy.deathProgress <= 0.5) { enemy.position.y -= 0.03; enemy.rotation.x = enemy.deathProgress * Math.PI; }
+            else { enemy.position.y -= 0.05; }
             if (enemy.deathProgress >= 1.0) {
                 enemy.visible = false;
-                if(!enemy.respawning) {
+                if (!enemy.respawning) {
                     enemy.respawning = true;
-                    setTimeout(() => { scene.remove(enemy); enemies.splice(enemies.indexOf(enemy), 1); spawnEnemy(); }, 1500);
+                    setTimeout(function() { scene.remove(enemy); const idx = enemies.indexOf(enemy); if (idx !== -1) enemies.splice(idx, 1); spawnEnemy(); }, 1500);
                 }
             }
             return;
@@ -836,34 +2169,74 @@ function animate() {
         const dist = enemy.position.distanceTo(camera.position);
         if (dist < 95 && dist > 1.5) {
             const tPoint = camera.position.clone();
-            if (now > enemy.nextStateChange) { enemy.strafeDir = Math.random() > 0.5 ? 1 : -1; enemy.nextStateChange = now + 1500; }
+            if (now > (enemy.nextStateChange || 0)) { enemy.strafeDir = Math.random() > 0.5 ? 1 : -1; enemy.nextStateChange = now + 1500; }
             enemy.lookAt(tPoint.x, enemy.position.y, tPoint.z);
-            enemy.walkTime += 0.16; const swing = Math.sin(enemy.walkTime) * 0.55;
-            enemy.parts.armL.rotation.x = swing; enemy.parts.armR.rotation.x = -swing;
-            
-            const target = enemy.patrolRoute[enemy.patrolIndex];
-            const dir = new THREE.Vector3().subVectors(target, enemy.position).normalize();
-            enemy.position.x += dir.x * 0.06;
-            enemy.position.z += dir.z * 0.06;
-            if (enemy.position.distanceTo(target) < 25) enemy.patrolIndex = (enemy.patrolIndex + 1) % enemy.patrolRoute.length;
-
-            if (now > enemy.nextFire && dist < 45) {
-                enemy.nextFire = now + 1600;
+            enemy.walkTime = (enemy.walkTime || 0) + 0.16;
+            const swing = Math.sin(enemy.walkTime) * 0.55;
+            if (enemy.parts) { enemy.parts.armL.rotation.x = swing; enemy.parts.armR.rotation.x = -swing; }
+            if (enemy.patrolRoute) {
+                const target = enemy.patrolRoute[enemy.patrolIndex || 0];
+                let dir = new THREE.Vector3().subVectors(target, enemy.position).normalize();
+                let newX = enemy.position.x + dir.x * 0.05;
+                let newZ = enemy.position.z + dir.z * 0.05;
+                if (!checkCollision(newX, newZ, 0.8)) { enemy.position.x = newX; enemy.position.z = newZ; }
+                else {
+                    dir = new THREE.Vector3(dir.z * (enemy.strafeDir || 1), 0, -dir.x * (enemy.strafeDir || 1));
+                    newX = enemy.position.x + dir.x * 0.05; newZ = enemy.position.z + dir.z * 0.05;
+                    if (!checkCollision(newX, newZ, 0.8)) { enemy.position.x = newX; enemy.position.z = newZ; }
+                }
+                if (enemy.position.distanceTo(target) < 25) {
+                    enemy.patrolIndex = ((enemy.patrolIndex || 0) + 1) % enemy.patrolRoute.length;
+                }
+            }
+            if (now > enemy.nextFire && dist < 45 && hasLineOfSight(enemy.position.clone().setY(1.3), camera.position.clone().setY(1.4))) {
+                enemy.nextFire = now + enemy.enemyType.fireRate;
                 const laserDir = camera.position.clone().sub(enemy.position.clone().setY(1.3)).normalize();
-                laserDir.x += (Math.random()-0.5)*0.015;
-                laserDir.y += (Math.random()-0.5)*0.015;
-                laserDir.z += (Math.random()-0.5)*0.015;
+                laserDir.x += (Math.random() - 0.5) * 0.008;
+                laserDir.y += (Math.random() - 0.5) * 0.008;
+                laserDir.z += (Math.random() - 0.5) * 0.008;
                 laserDir.normalize();
-                const projGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.8, 6); projGeo.rotateX(Math.PI / 2);
-                const proj = new THREE.Mesh(projGeo, new THREE.MeshBasicMaterial({color: 0xff0000}));
+                const projGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.4, 8);
+                projGeo.rotateX(Math.PI / 2);
+                const projMat = new THREE.MeshBasicMaterial({ color: enemy.enemyType.projColor, transparent: true, opacity: 0.95 });
+                const proj = new THREE.Mesh(projGeo, projMat);
                 proj.position.copy(enemy.position).setY(1.3);
-                proj.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), laserDir);
-                proj.userData = { velocity: laserDir.multiplyScalar(0.55) };
+                proj.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), laserDir);
+                proj.userData = { velocity: laserDir.multiplyScalar(0.78), damage: enemy.enemyType.damage };
                 scene.add(proj); enemyProjectiles.push(proj);
             }
         }
     });
 
+    // Projectile collision
+    for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+        const p = enemyProjectiles[i];
+        const oldPosition = p.position.clone();
+        p.position.add(p.userData.velocity);
+        const projDirection = new THREE.Vector3().subVectors(p.position, oldPosition).normalize();
+        const projDistance = oldPosition.distanceTo(p.position);
+        raycaster.set(oldPosition, projDirection);
+        const wallIntersects = raycaster.intersectObjects(solidObstacles);
+        if (wallIntersects.length > 0 && wallIntersects[0].distance <= projDistance + 0.05) { scene.remove(p); enemyProjectiles.splice(i, 1); continue; }
+        const dx = p.position.x - basePlayerPos.x;
+        const dz = p.position.z - basePlayerPos.z;
+        if (Math.sqrt(dx * dx + dz * dz) < 0.7) {
+            playerHealth -= p.userData.damage || 15;
+            document.getElementById('health-count').innerText = Math.max(0, Math.floor(playerHealth));
+            lastDamageTime = Date.now();
+            const overlay = document.getElementById('damage-overlay');
+            overlay.style.opacity = '0.5';
+            setTimeout(function() { overlay.style.opacity = '0'; }, 120);
+            scene.remove(p); enemyProjectiles.splice(i, 1);
+        }
+    }
+
+    // Remove out-of-range projectiles
+    for (let i = enemyProjectiles.length - 1; i >= 0; i--) {
+        if (enemyProjectiles[i].position.distanceTo(camera.position) > 300) { scene.remove(enemyProjectiles[i]); enemyProjectiles.splice(i, 1); }
+    }
+
+    // Gun position lerp — ADS moves optic to screen center (x=0, y set to align reticle with crosshair)
     let tPos = { x: 0.32, y: -0.32, z: -0.48 }, tRot = { x: 0, y: 0, z: 0 };
     if (activeAdsMode === 1) { tPos = w.ads; tRot = w.rot; }
     else if (activeAdsMode === 2 && w.hasCanted) { tPos = w.ads2; tRot = w.rot2; }
@@ -881,24 +2254,62 @@ function animate() {
     checkAchievements();
 }
 
-window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+// ===================== WINDOW EVENTS =====================
+window.addEventListener('resize', function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
-document.getElementById('start-btn').addEventListener('click', () => {
+// ===================== BUTTON EVENTS =====================
+document.getElementById('start-btn').addEventListener('click', function() {
     document.getElementById('start-screen').style.display = 'none';
-    resetPlayerState();
+    document.getElementById('map-select-screen').style.display = 'flex';
 });
-
 document.getElementById('ach-btn').addEventListener('click', openAchievements);
-document.getElementById('redeploy-btn').addEventListener('click', () => {
+document.getElementById('open-upgrade-tree-btn').addEventListener('click', function() {
+    openUpgradeTree();
+});
+document.getElementById('redeploy-btn').addEventListener('click', function() {
     document.getElementById('death-screen').style.display = 'none';
+    buildMap(currentMap);
     resetPlayerState();
 });
-document.getElementById('home-btn').addEventListener('click', () => {
+document.getElementById('home-btn').addEventListener('click', function() {
     document.getElementById('death-screen').style.display = 'none';
     document.getElementById('start-screen').style.display = 'flex';
+    updateHUDLevel();
 });
 
+// Map card double-tap to deploy
+let lastCardTap = 0;
+document.querySelectorAll('.map-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+        const now = Date.now();
+        if (now - lastCardTap < 400) { deploySelectedMap(); }
+        lastCardTap = now;
+    });
+});
+
+// Deploy button
+(function() {
+    const deployBtn = document.createElement('button');
+    deployBtn.className = 'map-deploy-btn';
+    deployBtn.textContent = 'DEPLOY';
+    deployBtn.addEventListener('click', deploySelectedMap);
+    const mapScreen = document.getElementById('map-select-screen');
+    const backBtn = mapScreen.querySelector('.map-back-btn');
+    mapScreen.insertBefore(deployBtn, backBtn);
+})();
+
+// In-game upgrade screen close
+function closeUpgrade() { document.getElementById('upgrade-screen').style.display = 'none'; }
+
+// ===================== INIT =====================
 loadAchievements();
+loadProgression();
+updateHUDLevel();
+reapplyAllUpgrades(); // apply any upgrades already purchased in previous sessions
 animate();
 </script>
 </body>
