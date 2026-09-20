@@ -14,11 +14,7 @@
     --bg: #020804;
   }
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: #0a0c0b;
@@ -39,10 +35,7 @@
     background: linear-gradient(145deg, #1c211e, #121614);
     border: 8px solid #2a322e;
     border-radius: 12px;
-    box-shadow: 
-      0 0 0 4px #0a0c0b,
-      inset 0 0 30px rgba(0,0,0,0.8),
-      0 20px 50px rgba(0,0,0,0.7);
+    box-shadow: 0 0 0 4px #0a0c0b, inset 0 0 30px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.7);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -62,74 +55,36 @@
     color: var(--phosphor-dim);
   }
 
-  .status-left, .status-right {
-    display: flex;
-    gap: 18px;
-    align-items: center;
-  }
+  .status-left, .status-right { display: flex; gap: 18px; align-items: center; }
 
   .led {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #333;
-    box-shadow: inset 0 0 3px #000;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #333; box-shadow: inset 0 0 3px #000;
   }
-
-  .led.on {
-    background: var(--phosphor);
-    box-shadow: 0 0 8px var(--phosphor);
-  }
+  .led.on { background: var(--phosphor); box-shadow: 0 0 8px var(--phosphor); }
 
   .crt-bezel {
-    flex: 1;
-    margin: 12px;
-    background: #0a0c0b;
-    border: 14px solid #1a221e;
-    border-radius: 18px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 
-      inset 0 0 40px rgba(0,0,0,0.9),
-      0 0 0 3px #0d120f;
+    flex: 1; margin: 12px; background: #0a0c0b;
+    border: 14px solid #1a221e; border-radius: 18px;
+    position: relative; overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 0 3px #0d120f;
   }
 
   .crt-screen {
-    width: 100%;
-    height: 100%;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    width: 100%; height: 100%; background: var(--bg);
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
   }
 
   .crt-screen::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 2px,
-      rgba(0, 0, 0, 0.25) 2px,
-      rgba(0, 0, 0, 0.25) 4px
-    );
-    pointer-events: none;
-    z-index: 10;
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.25) 2px, rgba(0,0,0,0.25) 4px);
+    pointer-events: none; z-index: 10;
   }
 
   .crt-screen::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      ellipse at center,
-      transparent 50%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
-    pointer-events: none;
-    z-index: 11;
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none; z-index: 11;
   }
 
   @keyframes flicker {
@@ -140,92 +95,41 @@
   }
 
   .crt-content {
-    flex: 1;
-    padding: 24px 28px;
-    position: relative;
-    z-index: 5;
-    overflow-y: auto;
-    animation: flicker 4s infinite;
+    flex: 1; padding: 24px 28px; position: relative; z-index: 5;
+    overflow-y: auto; animation: flicker 4s infinite;
   }
 
-  #boot-screen {
-    font-size: 15px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-  }
+  #boot-screen { font-size: 15px; line-height: 1.5; white-space: pre-wrap; }
 
-  .boot-line {
-    opacity: 0;
-    animation: bootFade 0.3s forwards;
-  }
+  .boot-line { opacity: 0; animation: bootFade 0.3s forwards; }
+  @keyframes bootFade { to { opacity: 1; } }
 
-  @keyframes bootFade {
-    to { opacity: 1; }
-  }
-
-  #main-interface {
-    display: none;
-    height: 100%;
-    flex-direction: column;
-  }
+  #main-interface { display: none; height: 100%; flex-direction: column; }
 
   .header {
-    text-align: center;
-    margin-bottom: 22px;
-    border-bottom: 1px solid var(--phosphor-dim);
-    padding-bottom: 14px;
+    text-align: center; margin-bottom: 22px;
+    border-bottom: 1px solid var(--phosphor-dim); padding-bottom: 14px;
   }
-
   .header h1 {
-    font-size: 28px;
-    letter-spacing: 3px;
-    text-shadow: 0 0 12px var(--phosphor);
-    color: var(--phosphor-bright);
+    font-size: 28px; letter-spacing: 3px;
+    text-shadow: 0 0 12px var(--phosphor); color: var(--phosphor-bright);
   }
+  .header .subtitle { font-size: 13px; color: var(--phosphor-dim); margin-top: 4px; }
 
-  .header .subtitle {
-    font-size: 13px;
-    color: var(--phosphor-dim);
-    margin-top: 4px;
-  }
-
-  .cartridge-bay {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
+  .cartridge-bay { flex: 1; display: flex; flex-direction: column; gap: 18px; }
   .bay-label {
-    font-size: 14px;
-    letter-spacing: 2px;
-    color: var(--phosphor-dim);
-    border-left: 3px solid var(--phosphor);
-    padding-left: 10px;
+    font-size: 14px; letter-spacing: 2px; color: var(--phosphor-dim);
+    border-left: 3px solid var(--phosphor); padding-left: 10px;
   }
 
-  .slots {
-    display: flex;
-    gap: 28px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
+  .slots { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
 
-  /* Cartridge style */
   .cartridge {
-    width: 260px;
-    background: linear-gradient(160deg, #0d140f, #08100a);
-    border: 3px solid var(--phosphor-dim);
-    border-radius: 8px;
-    padding: 0;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 0 1px #0a100c;
+    width: 260px; background: linear-gradient(160deg, #0d140f, #08100a);
+    border: 3px solid var(--phosphor-dim); border-radius: 8px;
+    padding: 0; text-align: center; cursor: pointer; transition: all 0.25s;
+    position: relative; overflow: hidden; box-shadow: 0 0 0 1px #0a100c;
   }
-
   .cartridge:hover {
     border-color: var(--phosphor);
     box-shadow: 0 0 28px rgba(51, 255, 102, 0.35);
@@ -233,139 +137,95 @@
   }
 
   .cartridge-image {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    display: block;
+    width: 100%; height: 160px; object-fit: cover; display: block;
     border-bottom: 2px solid var(--phosphor-dim);
   }
 
-  /* Fallback visual for Apache Down (no custom image provided) */
   .cartridge-fallback {
-    width: 100%;
-    height: 160px;
+    width: 100%; height: 160px;
     background: linear-gradient(160deg, #0a120e, #061008);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 2px solid var(--phosphor-dim);
-    gap: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-bottom: 2px solid var(--phosphor-dim); gap: 8px;
   }
+  .cartridge-fallback .icon { font-size: 52px; filter: drop-shadow(0 0 10px var(--phosphor)); }
+  .cartridge-fallback .label { font-size: 13px; letter-spacing: 2px; color: var(--phosphor-dim); }
 
-  .cartridge-fallback .icon {
-    font-size: 52px;
-    filter: drop-shadow(0 0 10px var(--phosphor));
-  }
-
-  .cartridge-fallback .label {
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: var(--phosphor-dim);
-  }
-
-  .cartridge-info {
-    padding: 16px 14px 18px;
-  }
-
+  .cartridge-info { padding: 16px 14px 18px; }
   .cart-name {
-    font-size: 18px;
-    letter-spacing: 2px;
-    margin-bottom: 6px;
-    color: var(--phosphor-bright);
-    text-shadow: 0 0 8px var(--phosphor);
+    font-size: 18px; letter-spacing: 2px; margin-bottom: 6px;
+    color: var(--phosphor-bright); text-shadow: 0 0 8px var(--phosphor);
   }
-
-  .cart-status {
-    font-size: 12px;
-    color: var(--phosphor);
-    letter-spacing: 1px;
-  }
+  .cart-status { font-size: 12px; color: var(--phosphor); letter-spacing: 1px; }
 
   .command-line {
-    margin-top: 20px;
-    border-top: 1px solid var(--phosphor-dim);
-    padding-top: 14px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin-top: 20px; border-top: 1px solid var(--phosphor-dim);
+    padding-top: 14px; font-size: 14px; display: flex; align-items: center; gap: 8px;
   }
-
-  .prompt {
-    color: var(--phosphor-bright);
-  }
-
+  .prompt { color: var(--phosphor-bright); }
   .cursor {
-    display: inline-block;
-    width: 10px;
-    height: 16px;
-    background: var(--phosphor);
+    display: inline-block; width: 10px; height: 16px; background: var(--phosphor);
     animation: blink 1s step-end infinite;
   }
-
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
+  @keyframes blink { 50% { opacity: 0; } }
 
   .controls {
-    height: 70px;
-    background: #151a17;
-    border-top: 3px solid #2a322e;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
+    height: 70px; background: #151a17; border-top: 3px solid #2a322e;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
   }
 
   .btn {
-    background: #1e2622;
-    border: 2px solid #3a443e;
-    color: var(--phosphor-dim);
-    font-family: inherit;
-    font-size: 12px;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.15s;
+    background: #1e2622; border: 2px solid #3a443e; color: var(--phosphor-dim);
+    font-family: inherit; font-size: 12px; padding: 8px 16px; border-radius: 4px;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.15s;
   }
-
   .btn:hover {
-    border-color: var(--phosphor);
-    color: var(--phosphor);
+    border-color: var(--phosphor); color: var(--phosphor);
     box-shadow: 0 0 10px rgba(51, 255, 102, 0.3);
   }
-
-  .btn:active {
-    transform: scale(0.96);
-  }
+  .btn:active { transform: scale(0.96); }
 
   .power-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+    width: 42px; height: 42px; border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, #3a443e, #1a201c);
-    border: 3px solid #2a322e;
-    cursor: pointer;
-    position: relative;
+    border: 3px solid #2a322e; cursor: pointer; position: relative;
   }
-
   .power-btn::after {
-    content: "";
+    content: ""; position: absolute; top: 50%; left: 50%;
+    width: 14px; height: 14px; border: 2px solid var(--phosphor-dim);
+    border-radius: 50%; transform: translate(-50%, -50%);
+  }
+  .power-btn.on::after { border-color: var(--phosphor); box-shadow: 0 0 8px var(--phosphor); }
+
+  /* Weather Overlay */
+  #weather-overlay {
+    display: none;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--phosphor-dim);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
+    background: rgba(2, 8, 4, 0.92);
+    z-index: 50;
+    padding: 30px;
+    overflow-y: auto;
+  }
+  #weather-overlay.active { display: block; }
+
+  .weather-header {
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding-bottom: 10px;
+    color: var(--phosphor-bright);
+    text-shadow: 0 0 10px var(--phosphor);
   }
 
-  .power-btn.on::after {
-    border-color: var(--phosphor);
-    box-shadow: 0 0 8px var(--phosphor);
+  .weather-content {
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .weather-close {
+    margin-top: 24px;
   }
 
   @media (max-width: 700px) {
@@ -378,7 +238,6 @@
 <body>
 
 <div class="terminal-case">
-  <!-- Top status bar -->
   <div class="status-bar">
     <div class="status-left">
       <div class="led on"></div>
@@ -391,14 +250,11 @@
     </div>
   </div>
 
-  <!-- CRT Bezel + Screen -->
   <div class="crt-bezel">
     <div class="crt-screen">
       <div class="crt-content">
-        <!-- BOOT SEQUENCE -->
         <div id="boot-screen"></div>
 
-        <!-- MAIN INTERFACE -->
         <div id="main-interface">
           <div class="header">
             <h1>ALEEX’S PENGUIN ARCADE</h1>
@@ -409,20 +265,18 @@
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
             
             <div class="slots">
-              <!-- CARTRIDGE 1: DELTA OPS -->
+              <!-- DELTA OPS -->
               <div class="cartridge" onclick="launchGame('DELTA OPS', 'https://deltaopsishere.oneapp.dev/')">
-                <img 
-                  class="cartridge-image" 
-                  src="data:image/webp;base64,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"
-                  alt="DELTA OPS"
-                >
+                <img class="cartridge-image" 
+                  src="data:image/jpeg;base64,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"
+                  alt="DELTA OPS">
                 <div class="cartridge-info">
                   <div class="cart-name">DELTA OPS</div>
                   <div class="cart-status">READY • CLICK TO DEPLOY</div>
                 </div>
               </div>
 
-              <!-- CARTRIDGE 2: APACHE DOWN -->
+              <!-- APACHE DOWN -->
               <div class="cartridge" onclick="launchGame('APACHE DOWN', 'https://helicoptesim.oneapp.dev/')">
                 <div class="cartridge-fallback">
                   <div class="icon">🚁</div>
@@ -442,14 +296,21 @@
             <span class="cursor"></span>
           </div>
         </div>
+
+        <!-- Weather Overlay -->
+        <div id="weather-overlay">
+          <div class="weather-header">METEOROLOGICAL SCAN // FIELD REPORT</div>
+          <div class="weather-content" id="weather-content">Initializing sensors...</div>
+          <button class="btn weather-close" onclick="closeWeather()">[ CLOSE REPORT ]</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Physical controls -->
   <div class="controls">
     <div style="display:flex;gap:12px;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
+      <button class="btn" onclick="startWeatherScan()">WEATHER SCAN</button>
     </div>
     <div class="power-btn on" title="Power"></div>
     <div style="display:flex;gap:12px;">
@@ -509,13 +370,102 @@
     document.getElementById('main-interface').style.display = 'flex';
   }
 
-  // Launch any game
+  // Launch game
   function launchGame(name, url) {
     document.getElementById('cmd-text').textContent = ` deploying ${name}...`;
     setTimeout(() => {
       window.open(url, '_blank');
       document.getElementById('cmd-text').textContent = ` ${name} deployed — standby_`;
     }, 400);
+  }
+
+  // ========== WEATHER SCAN ==========
+  function startWeatherScan() {
+    const overlay = document.getElementById('weather-overlay');
+    const content = document.getElementById('weather-content');
+    overlay.classList.add('active');
+    content.textContent = "Requesting geolocation clearance...\nAllow location access when prompted.";
+
+    if (!navigator.geolocation) {
+      content.textContent = "ERROR: Geolocation not supported by this terminal.";
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        content.textContent = `Location acquired: ${lat.toFixed(4)}, ${lon.toFixed(4)}\nQuerying meteorological satellites...`;
+
+        try {
+          // Open-Meteo API (no key required, accurate)
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=5`;
+          
+          const res = await fetch(url);
+          const data = await res.json();
+
+          const current = data.current;
+          const daily = data.daily;
+
+          const weatherCodes = {
+            0: "Clear sky",
+            1: "Mainly clear",
+            2: "Partly cloudy",
+            3: "Overcast",
+            45: "Fog",
+            48: "Depositing rime fog",
+            51: "Light drizzle",
+            53: "Moderate drizzle",
+            55: "Dense drizzle",
+            61: "Slight rain",
+            63: "Moderate rain",
+            65: "Heavy rain",
+            71: "Slight snow",
+            73: "Moderate snow",
+            75: "Heavy snow",
+            80: "Slight rain showers",
+            81: "Moderate rain showers",
+            82: "Violent rain showers",
+            95: "Thunderstorm",
+            96: "Thunderstorm with slight hail",
+            99: "Thunderstorm with heavy hail"
+          };
+
+          let report = `CURRENT CONDITIONS\n`;
+          report += `──────────────────────────────\n`;
+          report += `Temperature     : ${current.temperature_2m}°C\n`;
+          report += `Feels like      : ${current.apparent_temperature}°C\n`;
+          report += `Humidity        : ${current.relative_humidity_2m}%\n`;
+          report += `Wind            : ${current.wind_speed_10m} km/h\n`;
+          report += `Conditions      : ${weatherCodes[current.weather_code] || "Unknown"}\n\n`;
+
+          report += `5-DAY FORECAST\n`;
+          report += `──────────────────────────────\n`;
+
+          for (let i = 0; i < daily.time.length; i++) {
+            const date = daily.time[i];
+            const max = daily.temperature_2m_max[i];
+            const min = daily.temperature_2m_min[i];
+            const precip = daily.precipitation_sum[i];
+            const code = daily.weather_code[i];
+            report += `${date}  ${min}°/${max}°C   ${weatherCodes[code] || "—"}   Precip: ${precip}mm\n`;
+          }
+
+          report += `\nData source: Open-Meteo // Field Terminal MK-7`;
+          content.textContent = report;
+        } catch (err) {
+          content.textContent = "ERROR: Failed to retrieve meteorological data.\nCheck network connection and try again.";
+        }
+      },
+      (err) => {
+        content.textContent = `ERROR: Location access denied or unavailable.\nCode: ${err.code}\nEnable location services and retry.`;
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  function closeWeather() {
+    document.getElementById('weather-overlay').classList.remove('active');
   }
 
   window.onload = runBoot;
