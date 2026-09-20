@@ -122,10 +122,10 @@
     border-left: 3px solid var(--phosphor); padding-left: 10px;
   }
 
-  .slots { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
+  .slots { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
 
   .cartridge {
-    width: 260px; background: linear-gradient(160deg, #0d140f, #08100a);
+    width: 240px; background: linear-gradient(160deg, #0d140f, #08100a);
     border: 3px solid var(--phosphor-dim); border-radius: 8px;
     padding: 0; text-align: center; cursor: pointer; transition: all 0.25s;
     position: relative; overflow: hidden; box-shadow: 0 0 0 1px #0a100c;
@@ -137,29 +137,29 @@
   }
 
   .cartridge-image {
-    width: 100%; height: 160px; object-fit: cover; display: block;
+    width: 100%; height: 150px; object-fit: cover; display: block;
     border-bottom: 2px solid var(--phosphor-dim);
   }
 
   .cartridge-fallback {
-    width: 100%; height: 160px;
+    width: 100%; height: 150px;
     background: linear-gradient(160deg, #0a120e, #061008);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     border-bottom: 2px solid var(--phosphor-dim); gap: 8px;
   }
-  .cartridge-fallback .icon { font-size: 52px; filter: drop-shadow(0 0 10px var(--phosphor)); }
-  .cartridge-fallback .label { font-size: 13px; letter-spacing: 2px; color: var(--phosphor-dim); }
+  .cartridge-fallback .icon { font-size: 48px; filter: drop-shadow(0 0 10px var(--phosphor)); }
+  .cartridge-fallback .label { font-size: 12px; letter-spacing: 2px; color: var(--phosphor-dim); }
 
-  .cartridge-info { padding: 16px 14px 18px; }
+  .cartridge-info { padding: 14px 12px 16px; }
   .cart-name {
-    font-size: 18px; letter-spacing: 2px; margin-bottom: 6px;
+    font-size: 16px; letter-spacing: 1px; margin-bottom: 5px;
     color: var(--phosphor-bright); text-shadow: 0 0 8px var(--phosphor);
   }
-  .cart-status { font-size: 12px; color: var(--phosphor); letter-spacing: 1px; }
+  .cart-status { font-size: 11px; color: var(--phosphor); letter-spacing: 1px; }
 
   .command-line {
-    margin-top: 20px; border-top: 1px solid var(--phosphor-dim);
-    padding-top: 14px; font-size: 14px; display: flex; align-items: center; gap: 8px;
+    margin-top: 18px; border-top: 1px solid var(--phosphor-dim);
+    padding-top: 12px; font-size: 14px; display: flex; align-items: center; gap: 8px;
   }
   .prompt { color: var(--phosphor-bright); }
   .cursor {
@@ -224,14 +224,12 @@
     white-space: pre-wrap;
   }
 
-  .weather-close {
-    margin-top: 24px;
-  }
+  .weather-close { margin-top: 24px; }
 
-  @media (max-width: 700px) {
+  @media (max-width: 800px) {
     .header h1 { font-size: 20px; }
-    .cartridge { width: 220px; }
-    .cartridge-image, .cartridge-fallback { height: 140px; }
+    .cartridge { width: 200px; }
+    .cartridge-image, .cartridge-fallback { height: 130px; }
   }
 </style>
 </head>
@@ -265,7 +263,7 @@
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
             
             <div class="slots">
-              <!-- DELTA OPS -->
+              <!-- 1. DELTA OPS -->
               <div class="cartridge" onclick="launchGame('DELTA OPS', 'https://deltaopsishere.oneapp.dev/')">
                 <img class="cartridge-image" 
                   src="data:image/jpeg;base64,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"
@@ -276,7 +274,7 @@
                 </div>
               </div>
 
-              <!-- APACHE DOWN -->
+              <!-- 2. APACHE DOWN -->
               <div class="cartridge" onclick="launchGame('APACHE DOWN', 'https://helicoptesim.oneapp.dev/')">
                 <div class="cartridge-fallback">
                   <div class="icon">🚁</div>
@@ -284,6 +282,18 @@
                 </div>
                 <div class="cartridge-info">
                   <div class="cart-name">APACHE DOWN</div>
+                  <div class="cart-status">READY • CLICK TO DEPLOY</div>
+                </div>
+              </div>
+
+              <!-- 3. PENGUIN CLICKER -->
+              <div class="cartridge" onclick="launchGame('PENGUIN CLICKER', 'https://clickdapenguin.oneapp.dev/')">
+                <div class="cartridge-fallback">
+                  <div class="icon">🐧</div>
+                  <div class="label">IDLE / CLICKER</div>
+                </div>
+                <div class="cartridge-info">
+                  <div class="cart-name">PENGUIN CLICKER</div>
                   <div class="cart-status">READY • CLICK TO DEPLOY</div>
                 </div>
               </div>
@@ -370,7 +380,7 @@
     document.getElementById('main-interface').style.display = 'flex';
   }
 
-  // Launch game
+  // Launch any game
   function launchGame(name, url) {
     document.getElementById('cmd-text').textContent = ` deploying ${name}...`;
     setTimeout(() => {
@@ -379,7 +389,7 @@
     }, 400);
   }
 
-  // ========== WEATHER SCAN ==========
+  // Weather Scan
   function startWeatherScan() {
     const overlay = document.getElementById('weather-overlay');
     const content = document.getElementById('weather-content');
@@ -398,7 +408,6 @@
         content.textContent = `Location acquired: ${lat.toFixed(4)}, ${lon.toFixed(4)}\nQuerying meteorological satellites...`;
 
         try {
-          // Open-Meteo API (no key required, accurate)
           const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=5`;
           
           const res = await fetch(url);
@@ -408,27 +417,13 @@
           const daily = data.daily;
 
           const weatherCodes = {
-            0: "Clear sky",
-            1: "Mainly clear",
-            2: "Partly cloudy",
-            3: "Overcast",
-            45: "Fog",
-            48: "Depositing rime fog",
-            51: "Light drizzle",
-            53: "Moderate drizzle",
-            55: "Dense drizzle",
-            61: "Slight rain",
-            63: "Moderate rain",
-            65: "Heavy rain",
-            71: "Slight snow",
-            73: "Moderate snow",
-            75: "Heavy snow",
-            80: "Slight rain showers",
-            81: "Moderate rain showers",
-            82: "Violent rain showers",
-            95: "Thunderstorm",
-            96: "Thunderstorm with slight hail",
-            99: "Thunderstorm with heavy hail"
+            0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+            45: "Fog", 48: "Depositing rime fog",
+            51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle",
+            61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
+            71: "Slight snow", 73: "Moderate snow", 75: "Heavy snow",
+            80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers",
+            95: "Thunderstorm", 96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail"
           };
 
           let report = `CURRENT CONDITIONS\n`;
