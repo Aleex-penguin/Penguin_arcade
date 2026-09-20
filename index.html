@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALEEX’S Penguin Arcade // FIELD TERMINAL</title>
+<title>ALEEX’S PENGUIN ARCADE // FIELD TERMINAL MK-7</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -11,13 +11,16 @@
     --phosphor: #33ff66;
     --phosphor-dim: #1a9933;
     --phosphor-bright: #99ffbb;
+    --phosphor-glow: rgba(51, 255, 102, 0.45);
     --bg: #020804;
+    --case: #1a1f1c;
+    --bezel: #121814;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #0a0c0b;
+    background: #070908;
     color: var(--phosphor);
     font-family: 'Share Tech Mono', 'Courier New', monospace;
     height: 100vh;
@@ -28,219 +31,457 @@
     user-select: none;
   }
 
+  /* ========== TERMINAL CASE ========== */
   .terminal-case {
     width: 96vw;
-    max-width: 1100px;
-    height: 92vh;
-    background: linear-gradient(145deg, #1c211e, #121614);
-    border: 8px solid #2a322e;
-    border-radius: 12px;
-    box-shadow: 0 0 0 4px #0a0c0b, inset 0 0 30px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.7);
+    max-width: 1120px;
+    height: 93vh;
+    background: linear-gradient(160deg, #222826 0%, #141a16 40%, #0e1210 100%);
+    border: 10px solid #2c3530;
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 5px #080a09,
+      inset 0 0 40px rgba(0,0,0,0.85),
+      0 25px 60px rgba(0,0,0,0.75),
+      0 0 80px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
   }
 
+  /* subtle case texture */
+  .terminal-case::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 4px;
+  }
+
+  /* ========== STATUS BAR ========== */
   .status-bar {
-    height: 38px;
-    background: #151a17;
-    border-bottom: 2px solid #2a322e;
+    height: 40px;
+    background: linear-gradient(180deg, #1a211d, #121714);
+    border-bottom: 2px solid #2a332e;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 18px;
-    font-size: 13px;
-    letter-spacing: 1px;
+    font-size: 12px;
+    letter-spacing: 1.2px;
     color: var(--phosphor-dim);
+    position: relative;
+    z-index: 5;
   }
 
-  .status-left, .status-right { display: flex; gap: 18px; align-items: center; }
+  .status-left, .status-right {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
 
   .led {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: #333; box-shadow: inset 0 0 3px #000;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #2a2f2c;
+    box-shadow: inset 0 0 3px #000;
   }
-  .led.on { background: var(--phosphor); box-shadow: 0 0 8px var(--phosphor); }
+  .led.on {
+    background: var(--phosphor);
+    box-shadow: 0 0 10px var(--phosphor), 0 0 4px var(--phosphor);
+  }
+  .led.warn {
+    background: #ffcc33;
+    box-shadow: 0 0 8px #ffcc33;
+  }
 
+  /* ========== CRT BEZEL ========== */
   .crt-bezel {
-    flex: 1; margin: 12px; background: #0a0c0b;
-    border: 14px solid #1a221e; border-radius: 18px;
-    position: relative; overflow: hidden;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 0 0 3px #0d120f;
+    flex: 1;
+    margin: 14px;
+    background: #0a0e0b;
+    border: 16px solid #1a221e;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 50px rgba(0,0,0,0.95),
+      0 0 0 4px #0d120f,
+      inset 0 0 0 1px #2a3530;
+  }
+
+  /* slight physical curvature feel */
+  .crt-bezel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.35);
+    pointer-events: none;
+    z-index: 20;
   }
 
   .crt-screen {
-    width: 100%; height: 100%; background: var(--bg);
-    position: relative; overflow: hidden; display: flex; flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    filter: brightness(var(--brightness, 1)) contrast(var(--contrast, 1.05));
+    transition: filter 0.25s;
   }
 
+  /* heavy scanlines */
   .crt-screen::before {
-    content: ""; position: absolute; inset: 0;
-    background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.25) 2px, rgba(0,0,0,0.25) 4px);
-    pointer-events: none; z-index: 10;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 1px,
+      rgba(0,0,0,0.28) 1px,
+      rgba(0,0,0,0.28) 3px
+    );
+    pointer-events: none;
+    z-index: 12;
   }
 
+  /* vignette + phosphor bloom */
   .crt-screen::after {
-    content: ""; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
-    pointer-events: none; z-index: 11;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%),
+      radial-gradient(ellipse at 50% 20%, rgba(51,255,102,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 13;
+  }
+
+  /* subtle noise overlay */
+  .noise {
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 14;
+    opacity: 0.6;
   }
 
   @keyframes flicker {
     0%, 100% { opacity: 1; }
-    92% { opacity: 0.98; }
-    94% { opacity: 0.94; }
-    96% { opacity: 0.99; }
+    91% { opacity: 0.97; }
+    93% { opacity: 0.92; }
+    95% { opacity: 0.98; }
+    97% { opacity: 0.94; }
   }
 
   .crt-content {
-    flex: 1; padding: 20px 24px; position: relative; z-index: 5;
-    overflow-y: auto; animation: flicker 4s infinite;
+    flex: 1;
+    padding: 18px 22px;
+    position: relative;
+    z-index: 5;
+    overflow-y: auto;
+    animation: flicker 5.5s infinite;
   }
 
-  #boot-screen { font-size: 15px; line-height: 1.5; white-space: pre-wrap; }
-
-  .boot-line { opacity: 0; animation: bootFade 0.3s forwards; }
+  /* ========== BOOT ========== */
+  #boot-screen {
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .boot-line {
+    opacity: 0;
+    animation: bootFade 0.25s forwards;
+  }
   @keyframes bootFade { to { opacity: 1; } }
 
-  #main-interface { display: none; height: 100%; flex-direction: column; }
+  /* ========== MAIN INTERFACE ========== */
+  #main-interface {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+  }
 
   .header {
-    text-align: center; margin-bottom: 18px;
-    border-bottom: 1px solid var(--phosphor-dim); padding-bottom: 12px;
+    text-align: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding-bottom: 12px;
   }
   .header h1 {
-    font-size: 26px; letter-spacing: 3px;
-    text-shadow: 0 0 12px var(--phosphor); color: var(--phosphor-bright);
+    font-size: 24px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 14px var(--phosphor), 0 0 4px var(--phosphor);
+    color: var(--phosphor-bright);
   }
-  .header .subtitle { font-size: 12px; color: var(--phosphor-dim); margin-top: 4px; }
+  .header .subtitle {
+    font-size: 11px;
+    color: var(--phosphor-dim);
+    margin-top: 5px;
+    letter-spacing: 1.5px;
+  }
+  .header .unit-id {
+    font-size: 10px;
+    color: var(--phosphor-dim);
+    margin-top: 3px;
+    opacity: 0.7;
+  }
 
-  .cartridge-bay { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+  .cartridge-bay {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
   .bay-label {
-    font-size: 13px; letter-spacing: 2px; color: var(--phosphor-dim);
-    border-left: 3px solid var(--phosphor); padding-left: 10px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--phosphor-dim);
+    border-left: 3px solid var(--phosphor);
+    padding-left: 10px;
   }
 
-  .slots { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .slots {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 4px 0;
+  }
 
+  /* ========== CARTRIDGES ========== */
   .cartridge {
-    width: 220px; background: linear-gradient(160deg, #0d140f, #08100a);
-    border: 3px solid var(--phosphor-dim); border-radius: 8px;
-    padding: 0; text-align: center; cursor: pointer; transition: all 0.25s;
-    position: relative; overflow: hidden;
+    width: 210px;
+    background: linear-gradient(165deg, #0e1611 0%, #08100b 100%);
+    border: 2px solid var(--phosphor-dim);
+    border-radius: 6px;
+    padding: 0;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
   .cartridge:hover {
     border-color: var(--phosphor);
-    box-shadow: 0 0 25px rgba(51, 255, 102, 0.35);
-    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 0 28px var(--phosphor-glow), 0 6px 16px rgba(0,0,0,0.6);
+    transform: translateY(-4px) scale(1.025);
+  }
+  .cartridge:active {
+    transform: translateY(-1px) scale(0.99);
   }
 
-  .cartridge-image {
-    width: 100%; height: 140px; object-fit: cover; display: block;
+  /* edge connector look */
+  .cartridge::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      #1a2a1e 0px,
+      #1a2a1e 4px,
+      #0a120e 4px,
+      #0a120e 8px
+    );
+    opacity: 0.7;
+  }
+
+  .cartridge-art {
+    width: 100%;
+    height: 128px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     border-bottom: 2px solid var(--phosphor-dim);
+    gap: 4px;
+    position: relative;
+    background: linear-gradient(180deg, #0c1510, #060e0a);
+  }
+  .cartridge-art .icon {
+    font-size: 44px;
+    filter: drop-shadow(0 0 10px var(--phosphor));
+    line-height: 1;
+  }
+  .cartridge-art .genre {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--phosphor-dim);
+  }
+  .cartridge-art .serial {
+    position: absolute;
+    bottom: 4px;
+    right: 6px;
+    font-size: 8px;
+    color: var(--phosphor-dim);
+    opacity: 0.6;
   }
 
-  .cartridge-fallback {
-    width: 100%; height: 140px;
-    background: linear-gradient(160deg, #0a120e, #061008);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-bottom: 2px solid var(--phosphor-dim); gap: 6px;
+  .cartridge-info {
+    padding: 11px 10px 13px;
   }
-  .cartridge-fallback .icon { font-size: 42px; filter: drop-shadow(0 0 8px var(--phosphor)); }
-  .cartridge-fallback .label { font-size: 11px; letter-spacing: 1px; color: var(--phosphor-dim); }
-
-  .cartridge-info { padding: 12px 10px 14px; }
   .cart-name {
-    font-size: 15px; letter-spacing: 1px; margin-bottom: 4px;
-    color: var(--phosphor-bright); text-shadow: 0 0 8px var(--phosphor);
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    margin-bottom: 3px;
+    color: var(--phosphor-bright);
+    text-shadow: 0 0 8px var(--phosphor);
   }
-  .cart-status { font-size: 11px; color: var(--phosphor); letter-spacing: 1px; }
+  .cart-status {
+    font-size: 10px;
+    color: var(--phosphor);
+    letter-spacing: 1px;
+  }
+  .cart-cond {
+    font-size: 9px;
+    color: var(--phosphor-dim);
+    margin-top: 3px;
+    opacity: 0.75;
+  }
 
+  /* ========== COMMAND LINE ========== */
   .command-line {
-    margin-top: 14px; border-top: 1px solid var(--phosphor-dim);
-    padding-top: 10px; font-size: 13px; display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+    border-top: 1px solid var(--phosphor-dim);
+    padding-top: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .prompt { color: var(--phosphor-bright); }
   .cursor {
-    display: inline-block; width: 9px; height: 15px; background: var(--phosphor);
-    animation: blink 1s step-end infinite;
+    display: inline-block;
+    width: 9px;
+    height: 15px;
+    background: var(--phosphor);
+    animation: blink 1.05s step-end infinite;
   }
   @keyframes blink { 50% { opacity: 0; } }
 
+  /* ========== CONTROLS ========== */
   .controls {
-    height: 64px; background: #151a17; border-top: 3px solid #2a322e;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+    height: 68px;
+    background: linear-gradient(180deg, #161c18, #101512);
+    border-top: 3px solid #2a332e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    position: relative;
+    z-index: 5;
   }
 
   .btn {
-    background: #1e2622; border: 2px solid #3a443e; color: var(--phosphor-dim);
-    font-family: inherit; font-size: 12px; padding: 7px 14px; border-radius: 4px;
-    cursor: pointer; letter-spacing: 1px; transition: all 0.15s;
+    background: #1c2420;
+    border: 2px solid #3a453f;
+    color: var(--phosphor-dim);
+    font-family: inherit;
+    font-size: 11px;
+    padding: 7px 13px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 1.2px;
+    transition: all 0.15s;
   }
   .btn:hover {
-    border-color: var(--phosphor); color: var(--phosphor);
-    box-shadow: 0 0 10px rgba(51, 255, 102, 0.3);
+    border-color: var(--phosphor);
+    color: var(--phosphor);
+    box-shadow: 0 0 12px rgba(51,255,102,0.28);
   }
   .btn:active { transform: scale(0.96); }
+  .btn.active {
+    border-color: var(--phosphor);
+    color: var(--phosphor-bright);
+    box-shadow: 0 0 10px rgba(51,255,102,0.3);
+  }
 
   .power-btn {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #3a443e, #1a201c);
-    border: 3px solid #2a322e; cursor: pointer; position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #3e4a44, #1a221e);
+    border: 3px solid #2c3530;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
   }
   .power-btn::after {
-    content: ""; position: absolute; top: 50%; left: 50%;
-    width: 12px; height: 12px; border: 2px solid var(--phosphor-dim);
-    border-radius: 50%; transform: translate(-50%, -50%);
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    border: 2px solid var(--phosphor-dim);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s;
   }
-  .power-btn.on::after { border-color: var(--phosphor); box-shadow: 0 0 8px var(--phosphor); }
+  .power-btn.on::after {
+    border-color: var(--phosphor);
+    box-shadow: 0 0 10px var(--phosphor);
+  }
+  .power-btn:hover { border-color: #4a564f; }
 
   /* ========== WEATHER OVERLAY ========== */
   #weather-overlay {
     display: none;
     position: absolute;
     inset: 0;
-    background: rgba(2, 8, 4, 0.95);
+    background: rgba(2, 8, 4, 0.97);
     z-index: 50;
-    padding: 16px 20px;
+    padding: 14px 18px;
     overflow-y: auto;
     flex-direction: column;
   }
   #weather-overlay.active { display: flex; }
 
   .wx-header {
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 2px;
     color: var(--phosphor-bright);
     text-shadow: 0 0 8px var(--phosphor);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-
   .wx-location {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--phosphor-dim);
     margin-bottom: 12px;
+    letter-spacing: 0.5px;
   }
 
   .wx-tabs {
     display: flex;
     gap: 4px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     border-bottom: 1px solid var(--phosphor-dim);
     padding-bottom: 6px;
+    flex-wrap: wrap;
   }
-
   .wx-tab {
-    background: #0d140f;
+    background: #0c1410;
     border: 1px solid var(--phosphor-dim);
     color: var(--phosphor-dim);
     font-family: inherit;
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 11px;
+    padding: 5px 11px;
     cursor: pointer;
     letter-spacing: 1px;
     transition: all 0.15s;
@@ -250,195 +491,240 @@
     background: #122018;
     border-color: var(--phosphor);
     color: var(--phosphor-bright);
-    box-shadow: 0 0 10px rgba(51,255,102,0.25);
+    box-shadow: 0 0 10px rgba(51,255,102,0.22);
   }
 
   .wx-panel { display: none; flex: 1; }
   .wx-panel.active { display: block; }
 
-  /* Current panel */
   .current-big {
-    font-size: 56px;
+    font-size: 52px;
     color: var(--phosphor-bright);
-    text-shadow: 0 0 15px var(--phosphor);
+    text-shadow: 0 0 16px var(--phosphor);
     line-height: 1;
-    margin: 10px 0 6px;
+    margin: 8px 0 4px;
   }
-  .current-desc { font-size: 16px; margin-bottom: 16px; }
+  .current-desc {
+    font-size: 15px;
+    margin-bottom: 14px;
+    color: var(--phosphor);
+  }
+
   .current-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
   }
   .current-card {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 10px 12px;
+    padding: 9px 11px;
   }
-  .current-card .label { font-size: 11px; color: var(--phosphor-dim); margin-bottom: 3px; }
-  .current-card .value { font-size: 16px; color: var(--phosphor-bright); }
+  .current-card .label {
+    font-size: 10px;
+    color: var(--phosphor-dim);
+    margin-bottom: 2px;
+    letter-spacing: 0.8px;
+  }
+  .current-card .value {
+    font-size: 15px;
+    color: var(--phosphor-bright);
+  }
 
-  /* Hourly cards */
   .hourly-scroll {
     display: flex;
-    gap: 8px;
+    gap: 7px;
     overflow-x: auto;
-    padding-bottom: 10px;
-    margin-bottom: 14px;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
   }
   .hourly-card {
-    min-width: 80px;
+    min-width: 74px;
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 8px 6px;
+    padding: 7px 5px;
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
   }
-  .hourly-card .time { color: var(--phosphor-dim); margin-bottom: 4px; }
-  .hourly-card .temp { font-size: 16px; color: var(--phosphor-bright); margin: 4px 0; }
-  .hourly-card .pop { font-size: 11px; color: var(--phosphor); }
+  .hourly-card .time { color: var(--phosphor-dim); margin-bottom: 3px; }
+  .hourly-card .temp { font-size: 15px; color: var(--phosphor-bright); margin: 3px 0; }
+  .hourly-card .pop { font-size: 10px; color: var(--phosphor); }
 
-  /* Simple bar chart */
   .chart-container {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 12px;
-    margin-top: 8px;
+    padding: 11px;
+    margin-top: 6px;
   }
-  .chart-title { font-size: 12px; color: var(--phosphor-dim); margin-bottom: 8px; }
+  .chart-title {
+    font-size: 11px;
+    color: var(--phosphor-dim);
+    margin-bottom: 7px;
+    letter-spacing: 0.8px;
+  }
   .bar-row {
     display: flex;
     align-items: flex-end;
-    height: 90px;
-    gap: 3px;
+    height: 85px;
+    gap: 2px;
   }
   .bar {
     flex: 1;
     background: var(--phosphor-dim);
-    min-width: 4px;
+    min-width: 3px;
     transition: height 0.3s;
   }
   .bar.temp { background: var(--phosphor); }
 
-  /* 5-day cards */
   .daily-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 8px;
-    margin-bottom: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    gap: 7px;
+    margin-bottom: 12px;
   }
   .daily-card {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 10px 6px;
+    padding: 9px 5px;
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
   }
-  .daily-card .date { color: var(--phosphor-dim); margin-bottom: 4px; }
-  .daily-card .temps { font-size: 14px; color: var(--phosphor-bright); margin: 4px 0; }
-  .daily-card .pop { font-size: 11px; }
+  .daily-card .date { color: var(--phosphor-dim); margin-bottom: 3px; }
+  .daily-card .temps { font-size: 13px; color: var(--phosphor-bright); margin: 3px 0; }
+  .daily-card .pop { font-size: 10px; }
 
-  /* Radar simulation */
   .radar-box {
     background: #020804;
     border: 1px solid var(--phosphor-dim);
-    height: 160px;
+    height: 150px;
     position: relative;
     overflow: hidden;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .radar-sweep {
     position: absolute;
-    top: 50%; left: 50%;
-    width: 140px; height: 140px;
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(51,255,102,0.4) 30deg, transparent 60deg);
+    top: 50%;
+    left: 50%;
+    width: 130px;
+    height: 130px;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(51,255,102,0.35) 25deg, transparent 55deg);
     border-radius: 50%;
     transform-origin: center;
-    animation: radarSpin 4s linear infinite;
+    animation: radarSpin 3.8s linear infinite;
   }
-  @keyframes radarSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes radarSpin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
   .radar-label {
     position: absolute;
-    top: 8px; left: 10px;
-    font-size: 12px;
+    top: 7px;
+    left: 9px;
+    font-size: 11px;
     color: var(--phosphor);
   }
+  .radar-grid {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at center, transparent 30%, rgba(51,255,102,0.06) 31%, transparent 32%),
+      radial-gradient(circle at center, transparent 55%, rgba(51,255,102,0.05) 56%, transparent 57%);
+  }
 
-  .wx-close {
-    margin-top: 16px;
-    align-self: flex-start;
+  .wx-close { margin-top: 14px; align-self: flex-start; }
+
+  /* power-off state */
+  .crt-screen.powered-off {
+    filter: brightness(0.05) contrast(1);
+  }
+  .crt-screen.powered-off .crt-content {
+    opacity: 0;
+    pointer-events: none;
   }
 
   @media (max-width: 700px) {
-    .header h1 { font-size: 18px; }
-    .cartridge { width: 180px; }
-    .cartridge-image, .cartridge-fallback { height: 120px; }
-    .current-big { font-size: 42px; }
+    .header h1 { font-size: 17px; letter-spacing: 2px; }
+    .cartridge { width: 165px; }
+    .cartridge-art { height: 110px; }
+    .cartridge-art .icon { font-size: 36px; }
+    .current-big { font-size: 40px; }
+    .status-bar { font-size: 10px; gap: 8px; }
   }
 </style>
 </head>
 <body>
-
 <div class="terminal-case">
+  <!-- STATUS BAR -->
   <div class="status-bar">
     <div class="status-left">
-      <div class="led on"></div>
+      <div class="led on" id="sys-led"></div>
       <span>SYS: ONLINE</span>
-      <span>PWR: 98%</span>
+      <span id="pwr-status">PWR: 97%</span>
+      <span id="temp-status">TEMP: 42°C</span>
     </div>
     <div class="status-right">
       <span id="clock">00:00:00</span>
       <span>FIELD UNIT // MK-7</span>
+      <span style="opacity:0.6">S/N 87-A4F2</span>
     </div>
   </div>
 
+  <!-- CRT -->
   <div class="crt-bezel">
-    <div class="crt-screen">
+    <div class="crt-screen" id="crt">
+      <div class="noise"></div>
       <div class="crt-content">
         <div id="boot-screen"></div>
 
         <div id="main-interface">
           <div class="header">
             <h1>ALEEX’S PENGUIN ARCADE</h1>
-            <div class="subtitle">MILITARY FIELD TERMINAL • CARTRIDGE SYSTEM v2.4</div>
+            <div class="subtitle">MILITARY FIELD TERMINAL • CARTRIDGE SYSTEM v2.4.1</div>
+            <div class="unit-id">UNIT ID: PA-MK7-1987 // AUTHORIZED PERSONNEL ONLY</div>
           </div>
 
           <div class="cartridge-bay">
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
-            
+
             <div class="slots">
               <!-- DELTA OPS -->
               <div class="cartridge" onclick="launchGame('DELTA OPS', 'https://deltaopsishere.oneapp.dev/')">
-                <img class="cartridge-image" 
-                  src="data:image/jpeg;base64,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"
-                  alt="DELTA OPS">
+                <div class="cartridge-art">
+                  <div class="icon">⚔️</div>
+                  <div class="genre">TACTICAL OPS</div>
+                  <div class="serial">ROM-Δ-041</div>
+                </div>
                 <div class="cartridge-info">
                   <div class="cart-name">DELTA OPS</div>
                   <div class="cart-status">READY • CLICK TO DEPLOY</div>
+                  <div class="cart-cond">CONDITION: SERVICEABLE</div>
                 </div>
               </div>
 
               <!-- APACHE DOWN -->
               <div class="cartridge" onclick="launchGame('APACHE DOWN', 'https://helicoptesim.oneapp.dev/')">
-                <div class="cartridge-fallback">
+                <div class="cartridge-art">
                   <div class="icon">🚁</div>
-                  <div class="label">HELICOPTER SIM</div>
+                  <div class="genre">HELICOPTER SIM</div>
+                  <div class="serial">ROM-AH-112</div>
                 </div>
                 <div class="cartridge-info">
                   <div class="cart-name">APACHE DOWN</div>
                   <div class="cart-status">READY • CLICK TO DEPLOY</div>
+                  <div class="cart-cond">CONDITION: SERVICEABLE</div>
                 </div>
               </div>
 
               <!-- PENGUIN CLICKER -->
               <div class="cartridge" onclick="launchGame('PENGUIN CLICKER', 'https://clickdapenguin.oneapp.dev/')">
-                <div class="cartridge-fallback">
+                <div class="cartridge-art">
                   <div class="icon">🐧</div>
-                  <div class="label">IDLE / CLICKER</div>
+                  <div class="genre">IDLE / CLICKER</div>
+                  <div class="serial">ROM-PG-007</div>
                 </div>
                 <div class="cartridge-info">
                   <div class="cart-name">PENGUIN CLICKER</div>
                   <div class="cart-status">READY • CLICK TO DEPLOY</div>
+                  <div class="cart-cond">CONDITION: SERVICEABLE</div>
                 </div>
               </div>
             </div>
@@ -451,7 +737,7 @@
           </div>
         </div>
 
-        <!-- ========== WEATHER OVERLAY ========== -->
+        <!-- WEATHER OVERLAY -->
         <div id="weather-overlay">
           <div class="wx-header">
             <span>METEOROLOGICAL SCAN // FIELD REPORT</span>
@@ -466,22 +752,15 @@
             <button class="wx-tab" onclick="switchTab('radar')">PRECIP / RADAR</button>
           </div>
 
-          <!-- CURRENT -->
           <div id="panel-current" class="wx-panel active">
             <div id="current-content">Loading current conditions...</div>
           </div>
-
-          <!-- HOURLY -->
           <div id="panel-hourly" class="wx-panel">
             <div id="hourly-content">Loading hourly data...</div>
           </div>
-
-          <!-- 5-DAY -->
           <div id="panel-daily" class="wx-panel">
             <div id="daily-content">Loading 5-day outlook...</div>
           </div>
-
-          <!-- PRECIP / RADAR -->
           <div id="panel-radar" class="wx-panel">
             <div id="radar-content">Loading precipitation data...</div>
           </div>
@@ -490,24 +769,27 @@
     </div>
   </div>
 
+  <!-- CONTROLS -->
   <div class="controls">
-    <div style="display:flex;gap:10px;">
+    <div style="display:flex;gap:9px;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
       <button class="btn" onclick="startWeatherScan()">WEATHER SCAN</button>
     </div>
-    <div class="power-btn on" title="Power"></div>
-    <div style="display:flex;gap:10px;">
-      <button class="btn">BRIGHTNESS</button>
-      <button class="btn">CONTRAST</button>
+
+    <div class="power-btn on" id="power-btn" title="Power" onclick="togglePower()"></div>
+
+    <div style="display:flex;gap:9px;">
+      <button class="btn" id="btn-bright" onclick="adjustBrightness()">BRIGHTNESS</button>
+      <button class="btn" id="btn-contrast" onclick="adjustContrast()">CONTRAST</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Clock
+  // ========== CLOCK & STATUS ==========
   function updateClock() {
     const now = new Date();
-    document.getElementById('clock').textContent = 
+    document.getElementById('clock').textContent =
       String(now.getHours()).padStart(2,'0') + ':' +
       String(now.getMinutes()).padStart(2,'0') + ':' +
       String(now.getSeconds()).padStart(2,'0');
@@ -515,27 +797,39 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Boot
+  // simulate slow battery drain & temperature fluctuation
+  let pwr = 97;
+  setInterval(() => {
+    if (Math.random() > 0.85) pwr = Math.max(91, pwr - 0.1);
+    document.getElementById('pwr-status').textContent = `PWR: ${pwr.toFixed(0)}%`;
+    const temp = 41 + Math.floor(Math.random() * 4);
+    document.getElementById('temp-status').textContent = `TEMP: ${temp}°C`;
+  }, 8000);
+
+  // ========== BOOT SEQUENCE ==========
   const bootLines = [
     "ALEEX FIELD COMPUTER SYSTEMS — MK-7 TERMINAL",
     "Copyright (c) 1987-2025 Penguin Dynamics Corp.",
+    "Firmware: PA-MK7/2.4.1-STABLE  //  Build 8741",
     "------------------------------------------------",
     "",
-    "POST: Memory check .................. [OK] 640K",
-    "POST: Video adapter ................. [OK] P1 Phosphor",
-    "POST: Input devices ................. [OK]",
-    "POST: Cartridge interface ........... [OK]",
-    "POST: Power systems ................. [OK] 98%",
+    "[00:00.12] POST: Memory check .................. [OK] 640K + 384K EMS",
+    "[00:00.34] POST: Video adapter ................. [OK] P1 Phosphor CRT",
+    "[00:00.51] POST: Input devices ................. [OK] KB + JOY",
+    "[00:00.73] POST: Cartridge interface ........... [OK] 3-slot bay",
+    "[00:00.89] POST: Power systems ................. [OK] 97% capacity",
+    "[00:01.05] POST: Thermal sensors ............... [OK] 42°C nominal",
     "",
-    "Loading kernel ...................... [OK]",
-    "Mounting secure volumes ............. [OK]",
-    "Initializing arcade subsystem ....... [OK]",
-    "Calibrating phosphor display ........ [OK]",
+    "[00:01.28] Loading kernel ...................... [OK]",
+    "[00:01.49] Mounting secure volumes ............. [OK]",
+    "[00:01.67] Initializing arcade subsystem ....... [OK]",
+    "[00:01.88] Calibrating phosphor display ........ [OK]",
+    "[00:02.05] Loading cartridge drivers ........... [OK]",
     "",
-    "SYSTEM READY",
+    "SYSTEM READY — ALL SUBSYSTEMS NOMINAL",
     "",
     "Welcome to ALEEX’S PENGUIN ARCADE",
-    "Insert cartridge to begin..."
+    "Insert cartridge to begin mission..."
   ];
 
   async function runBoot() {
@@ -546,19 +840,60 @@
       line.textContent = bootLines[i] || ' ';
       bootEl.appendChild(line);
       bootEl.parentElement.scrollTop = bootEl.parentElement.scrollHeight;
-      await new Promise(r => setTimeout(r, i < 4 ? 100 : 70));
+      await new Promise(r => setTimeout(r, i < 5 ? 90 : 55));
     }
-    await new Promise(r => setTimeout(r, 700));
+    await new Promise(r => setTimeout(r, 650));
     bootEl.style.display = 'none';
     document.getElementById('main-interface').style.display = 'flex';
   }
 
+  // ========== GAME LAUNCH ==========
   function launchGame(name, url) {
     document.getElementById('cmd-text').textContent = ` deploying ${name}...`;
     setTimeout(() => {
       window.open(url, '_blank');
       document.getElementById('cmd-text').textContent = ` ${name} deployed — standby_`;
-    }, 350);
+    }, 380);
+  }
+
+  // ========== POWER / BRIGHTNESS / CONTRAST ==========
+  let powered = true;
+  let brightness = 1;
+  let contrast = 1.05;
+  const levels = [0.65, 0.8, 1, 1.15];
+  let bIdx = 2;
+  let cIdx = 2;
+
+  function togglePower() {
+    powered = !powered;
+    const crt = document.getElementById('crt');
+    const btn = document.getElementById('power-btn');
+    const led = document.getElementById('sys-led');
+
+    if (powered) {
+      crt.classList.remove('powered-off');
+      btn.classList.add('on');
+      led.classList.add('on');
+      document.getElementById('cmd-text').textContent = ' system restored_';
+    } else {
+      crt.classList.add('powered-off');
+      btn.classList.remove('on');
+      led.classList.remove('on');
+    }
+  }
+
+  function adjustBrightness() {
+    bIdx = (bIdx + 1) % levels.length;
+    brightness = levels[bIdx];
+    document.getElementById('crt').style.setProperty('--brightness', brightness);
+    document.getElementById('btn-bright').classList.toggle('active', bIdx !== 2);
+  }
+
+  function adjustContrast() {
+    cIdx = (cIdx + 1) % levels.length;
+    contrast = levels[cIdx] + 0.05;
+    document.getElementById('crt').style.setProperty('--contrast', contrast);
+    document.getElementById('btn-contrast').classList.toggle('active', cIdx !== 2);
   }
 
   // ========== WEATHER SYSTEM ==========
@@ -567,7 +902,7 @@
 
   const weatherCodes = {
     0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-    45: "Fog", 48: "Rime fog",
+    45: "Fog", 48: "Depositing rime fog",
     51: "Light drizzle", 53: "Moderate drizzle", 55: "Dense drizzle",
     61: "Slight rain", 63: "Moderate rain", 65: "Heavy rain",
     71: "Slight snow", 73: "Moderate snow", 75: "Heavy snow",
@@ -579,51 +914,53 @@
     currentTab = tab;
     document.querySelectorAll('.wx-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.wx-panel').forEach(p => p.classList.remove('active'));
-    
     event.target.classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
-    
     if (weatherData) renderTab(tab);
   }
 
   function startWeatherScan() {
+    if (!powered) return;
     const overlay = document.getElementById('weather-overlay');
     overlay.classList.add('active');
     document.getElementById('wx-location').textContent = "Requesting geolocation clearance...";
 
     if (!navigator.geolocation) {
-      document.getElementById('wx-location').textContent = "ERROR: Geolocation not supported.";
+      document.getElementById('wx-location').textContent = "ERROR: Geolocation subsystem offline.";
       return;
     }
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
-      document.getElementById('wx-location').textContent = `Location: ${lat.toFixed(4)}°, ${lon.toFixed(4)}° // Querying satellites...`;
+      document.getElementById('wx-location').textContent =
+        `Location locked: ${lat.toFixed(4)}°, ${lon.toFixed(4)}° // Querying meteorological satellites...`;
 
       try {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,cloud_cover,uv_index&hourly=temperature_2m,precipitation_probability,weather_code,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset&timezone=auto&forecast_days=6`;
-        
         const res = await fetch(url);
         weatherData = await res.json();
-        
-        // Try to get a place name
+
         try {
           const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
           const geo = await geoRes.json();
           const place = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Field Location";
           const region = geo.address?.state || geo.address?.country || "";
-          document.getElementById('wx-location').textContent = `${place}${region ? ", " + region : ""}  //  ${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
+          document.getElementById('wx-location').textContent =
+            `${place}${region ? ", " + region : ""}  //  ${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
         } catch {
-          document.getElementById('wx-location').textContent = `Field Location  //  ${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
+          document.getElementById('wx-location').textContent =
+            `Field Location  //  ${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
         }
 
         renderTab('current');
       } catch (err) {
-        document.getElementById('wx-location').textContent = "ERROR: Failed to retrieve meteorological data.";
+        document.getElementById('wx-location').textContent =
+          "ERROR: Failed to retrieve meteorological data. Check uplink.";
       }
     }, (err) => {
-      document.getElementById('wx-location').textContent = `ERROR: Location access denied (code ${err.code}). Enable location services.`;
+      document.getElementById('wx-location').textContent =
+        `ERROR: Location access denied (code ${err.code}). Enable location services.`;
     }, { enableHighAccuracy: true, timeout: 12000 });
   }
 
@@ -652,7 +989,6 @@
     if (tab === 'hourly') {
       const h = weatherData.hourly;
       let cards = '';
-      // next 24 hours
       for (let i = 0; i < 24; i++) {
         const time = h.time[i].slice(11,16);
         const temp = Math.round(h.temperature_2m[i]);
@@ -664,18 +1000,15 @@
             <div class="pop">${pop}%</div>
           </div>`;
       }
-
-      // simple temp bars
       let bars = '';
       const temps = h.temperature_2m.slice(0,24);
       const minT = Math.min(...temps);
       const maxT = Math.max(...temps);
       const range = maxT - minT || 1;
       for (let i = 0; i < 24; i++) {
-        const height = ((temps[i] - minT) / range) * 80 + 10;
+        const height = ((temps[i] - minT) / range) * 75 + 8;
         bars += `<div class="bar temp" style="height:${height}px" title="${Math.round(temps[i])}°"></div>`;
       }
-
       document.getElementById('hourly-content').innerHTML = `
         <div class="hourly-scroll">${cards}</div>
         <div class="chart-container">
@@ -689,7 +1022,7 @@
       const d = weatherData.daily;
       let cards = '';
       for (let i = 0; i < 6; i++) {
-        const date = d.time[i].slice(5); // MM-DD
+        const date = d.time[i].slice(5);
         const max = Math.round(d.temperature_2m_max[i]);
         const min = Math.round(d.temperature_2m_min[i]);
         const pop = d.precipitation_probability_max[i];
@@ -697,13 +1030,11 @@
         cards += `
           <div class="daily-card">
             <div class="date">${date}</div>
-            <div style="font-size:11px;margin:3px 0;">${code}</div>
+            <div style="font-size:10px;margin:2px 0;opacity:0.85">${code}</div>
             <div class="temps">${max}° / ${min}°</div>
             <div class="pop">${pop}% precip</div>
           </div>`;
       }
-
-      // high/low simple visualization
       let highBars = '', lowBars = '';
       const highs = d.temperature_2m_max.slice(0,6);
       const lows = d.temperature_2m_min.slice(0,6);
@@ -711,20 +1042,18 @@
       const minAll = Math.min(...all);
       const maxAll = Math.max(...all);
       const range = maxAll - minAll || 1;
-
       for (let i = 0; i < 6; i++) {
-        const hH = ((highs[i] - minAll) / range) * 70 + 10;
-        const lH = ((lows[i] - minAll) / range) * 70 + 10;
+        const hH = ((highs[i] - minAll) / range) * 65 + 8;
+        const lH = ((lows[i] - minAll) / range) * 65 + 8;
         highBars += `<div class="bar" style="height:${hH}px;background:var(--phosphor)"></div>`;
         lowBars += `<div class="bar" style="height:${lH}px;background:var(--phosphor-dim)"></div>`;
       }
-
       document.getElementById('daily-content').innerHTML = `
         <div class="daily-grid">${cards}</div>
         <div class="chart-container">
-          <div class="chart-title">HIGH (bright) / LOW (dim) — 6 DAY</div>
+          <div class="chart-title">HIGH (bright) / LOW (dim) — 6 DAY OUTLOOK</div>
           <div class="bar-row">${highBars}</div>
-          <div class="bar-row" style="margin-top:4px">${lowBars}</div>
+          <div class="bar-row" style="margin-top:3px">${lowBars}</div>
         </div>
       `;
     }
@@ -734,14 +1063,13 @@
       let precipBars = '';
       const precips = h.precipitation.slice(0, 24);
       const maxP = Math.max(...precips, 0.1);
-
       for (let i = 0; i < 24; i++) {
-        const height = (precips[i] / maxP) * 80;
+        const height = (precips[i] / maxP) * 75;
         precipBars += `<div class="bar" style="height:${Math.max(height,2)}px;background:#1a9944" title="${precips[i].toFixed(1)} mm"></div>`;
       }
-
       document.getElementById('radar-content').innerHTML = `
         <div class="radar-box">
+          <div class="radar-grid"></div>
           <div class="radar-label">RADAR: ACTIVE (SIMULATED NWS FEED)</div>
           <div class="radar-sweep"></div>
         </div>
@@ -749,8 +1077,8 @@
           <div class="chart-title">PRECIPITATION AMOUNT (mm) — NEXT 24H</div>
           <div class="bar-row">${precipBars}</div>
         </div>
-        <div style="margin-top:12px;font-size:12px;color:var(--phosphor-dim)">
-          Note: Radar is a local simulation. Real precipitation values from Open-Meteo.
+        <div style="margin-top:11px;font-size:11px;color:var(--phosphor-dim)">
+          NOTE: Radar display is a local simulation. Precipitation values sourced from Open-Meteo.
         </div>
       `;
     }
