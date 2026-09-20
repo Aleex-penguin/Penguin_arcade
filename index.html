@@ -31,7 +31,6 @@
     user-select: none;
   }
 
-  /* ========== TERMINAL CASE ========== */
   .terminal-case {
     width: 96vw;
     max-width: 1120px;
@@ -50,7 +49,6 @@
     overflow: hidden;
   }
 
-  /* subtle case texture */
   .terminal-case::before {
     content: "";
     position: absolute;
@@ -61,7 +59,6 @@
     border-radius: 4px;
   }
 
-  /* ========== STATUS BAR ========== */
   .status-bar {
     height: 40px;
     background: linear-gradient(180deg, #1a211d, #121714);
@@ -94,12 +91,7 @@
     background: var(--phosphor);
     box-shadow: 0 0 10px var(--phosphor), 0 0 4px var(--phosphor);
   }
-  .led.warn {
-    background: #ffcc33;
-    box-shadow: 0 0 8px #ffcc33;
-  }
 
-  /* ========== CRT BEZEL ========== */
   .crt-bezel {
     flex: 1;
     margin: 14px;
@@ -114,7 +106,6 @@
       inset 0 0 0 1px #2a3530;
   }
 
-  /* slight physical curvature feel */
   .crt-bezel::after {
     content: "";
     position: absolute;
@@ -137,7 +128,6 @@
     transition: filter 0.25s;
   }
 
-  /* heavy scanlines */
   .crt-screen::before {
     content: "";
     position: absolute;
@@ -153,7 +143,6 @@
     z-index: 12;
   }
 
-  /* vignette + phosphor bloom */
   .crt-screen::after {
     content: "";
     position: absolute;
@@ -165,7 +154,6 @@
     z-index: 13;
   }
 
-  /* subtle noise overlay */
   .noise {
     position: absolute;
     inset: 0;
@@ -192,7 +180,6 @@
     animation: flicker 5.5s infinite;
   }
 
-  /* ========== BOOT ========== */
   #boot-screen {
     font-size: 14px;
     line-height: 1.55;
@@ -204,7 +191,6 @@
   }
   @keyframes bootFade { to { opacity: 1; } }
 
-  /* ========== MAIN INTERFACE ========== */
   #main-interface {
     display: none;
     height: 100%;
@@ -258,7 +244,6 @@
     padding: 4px 0;
   }
 
-  /* ========== CARTRIDGES ========== */
   .cartridge {
     width: 210px;
     background: linear-gradient(165deg, #0e1611 0%, #08100b 100%);
@@ -281,7 +266,6 @@
     transform: translateY(-1px) scale(0.99);
   }
 
-  /* edge connector look */
   .cartridge::before {
     content: "";
     position: absolute;
@@ -352,7 +336,6 @@
     opacity: 0.75;
   }
 
-  /* ========== COMMAND LINE ========== */
   .command-line {
     margin-top: 12px;
     border-top: 1px solid var(--phosphor-dim);
@@ -372,7 +355,6 @@
   }
   @keyframes blink { 50% { opacity: 0; } }
 
-  /* ========== CONTROLS ========== */
   .controls {
     height: 68px;
     background: linear-gradient(180deg, #161c18, #101512);
@@ -436,6 +418,80 @@
     box-shadow: 0 0 10px var(--phosphor);
   }
   .power-btn:hover { border-color: #4a564f; }
+
+  /* ========== GAME LOADER OVERLAY ========== */
+  #game-loader {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: #020804;
+    z-index: 60;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  #game-loader.active {
+    display: flex;
+  }
+
+  .loader-image-wrap {
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    border: 2px solid var(--phosphor-dim);
+    box-shadow: 0 0 30px rgba(51,255,102,0.25), inset 0 0 40px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .loader-image-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: contrast(1.05) brightness(0.95);
+  }
+
+  .loader-status {
+    margin-top: 22px;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+  }
+  .loader-title {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--phosphor-bright);
+    text-shadow: 0 0 10px var(--phosphor);
+    margin-bottom: 8px;
+  }
+  .loader-subtitle {
+    font-size: 12px;
+    color: var(--phosphor-dim);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: #0a120e;
+    border: 1px solid var(--phosphor-dim);
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--phosphor-dim), var(--phosphor));
+    box-shadow: 0 0 12px var(--phosphor);
+    transition: width 0.15s linear;
+  }
+
+  .loader-percent {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--phosphor);
+    letter-spacing: 1px;
+  }
 
   /* ========== WEATHER OVERLAY ========== */
   #weather-overlay {
@@ -630,9 +686,6 @@
       radial-gradient(circle at center, transparent 55%, rgba(51,255,102,0.05) 56%, transparent 57%);
   }
 
-  .wx-close { margin-top: 14px; align-self: flex-start; }
-
-  /* power-off state */
   .crt-screen.powered-off {
     filter: brightness(0.05) contrast(1);
   }
@@ -648,12 +701,12 @@
     .cartridge-art .icon { font-size: 36px; }
     .current-big { font-size: 40px; }
     .status-bar { font-size: 10px; gap: 8px; }
+    .loader-image-wrap { max-width: 95%; }
   }
 </style>
 </head>
 <body>
 <div class="terminal-case">
-  <!-- STATUS BAR -->
   <div class="status-bar">
     <div class="status-left">
       <div class="led on" id="sys-led"></div>
@@ -668,7 +721,6 @@
     </div>
   </div>
 
-  <!-- CRT -->
   <div class="crt-bezel">
     <div class="crt-screen" id="crt">
       <div class="noise"></div>
@@ -686,7 +738,6 @@
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
 
             <div class="slots">
-              <!-- DELTA OPS -->
               <div class="cartridge" onclick="launchGame('DELTA OPS', 'https://deltaopsishere.oneapp.dev/')">
                 <div class="cartridge-art">
                   <div class="icon">⚔️</div>
@@ -700,7 +751,6 @@
                 </div>
               </div>
 
-              <!-- APACHE DOWN -->
               <div class="cartridge" onclick="launchGame('APACHE DOWN', 'https://helicoptesim.oneapp.dev/')">
                 <div class="cartridge-art">
                   <div class="icon">🚁</div>
@@ -714,7 +764,6 @@
                 </div>
               </div>
 
-              <!-- PENGUIN CLICKER -->
               <div class="cartridge" onclick="launchGame('PENGUIN CLICKER', 'https://clickdapenguin.oneapp.dev/')">
                 <div class="cartridge-art">
                   <div class="icon">🐧</div>
@@ -734,6 +783,21 @@
             <span class="prompt">ROOT@PENGUIN:~$</span>
             <span id="cmd-text"> awaiting cartridge insertion_</span>
             <span class="cursor"></span>
+          </div>
+        </div>
+
+        <!-- GAME LOADER -->
+        <div id="game-loader">
+          <div class="loader-image-wrap">
+            <img id="loader-img" alt="ALEEX’S PENGUIN ARCADE" src="data:image/jpeg;base64,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">
+          </div>
+          <div class="loader-status">
+            <div class="loader-title" id="loader-title">INITIALIZING CARTRIDGE</div>
+            <div class="loader-subtitle" id="loader-sub">Mounting ROM image...</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="loader-percent" id="loader-percent">0%</div>
           </div>
         </div>
 
@@ -769,7 +833,6 @@
     </div>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls">
     <div style="display:flex;gap:9px;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
@@ -797,7 +860,6 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // simulate slow battery drain & temperature fluctuation
   let pwr = 97;
   setInterval(() => {
     if (Math.random() > 0.85) pwr = Math.max(91, pwr - 0.1);
@@ -847,13 +909,50 @@
     document.getElementById('main-interface').style.display = 'flex';
   }
 
-  // ========== GAME LAUNCH ==========
-  function launchGame(name, url) {
+  // ========== GAME LAUNCH WITH LOADING SCREEN ==========
+  async function launchGame(name, url) {
+    if (!powered) return;
+
+    const loader = document.getElementById('game-loader');
+    const fill = document.getElementById('progress-fill');
+    const percent = document.getElementById('loader-percent');
+    const title = document.getElementById('loader-title');
+    const sub = document.getElementById('loader-sub');
+
     document.getElementById('cmd-text').textContent = ` deploying ${name}...`;
-    setTimeout(() => {
-      window.open(url, '_blank');
-      document.getElementById('cmd-text').textContent = ` ${name} deployed — standby_`;
-    }, 380);
+
+    // Show loader
+    loader.classList.add('active');
+    fill.style.width = '0%';
+    percent.textContent = '0%';
+    title.textContent = `LOADING ${name}`;
+    sub.textContent = 'Mounting ROM image...';
+
+    // Animate progress over ~3 seconds
+    const duration = 3200;
+    const steps = 40;
+    const stepTime = duration / steps;
+
+    for (let i = 1; i <= steps; i++) {
+      await new Promise(r => setTimeout(r, stepTime));
+      const p = Math.round((i / steps) * 100);
+      fill.style.width = p + '%';
+      percent.textContent = p + '%';
+
+      if (p < 30) sub.textContent = 'Mounting ROM image...';
+      else if (p < 55) sub.textContent = 'Verifying cartridge checksum...';
+      else if (p < 80) sub.textContent = 'Allocating system resources...';
+      else if (p < 95) sub.textContent = 'Establishing secure uplink...';
+      else sub.textContent = 'Launch sequence complete.';
+    }
+
+    // Open game
+    window.open(url, '_blank');
+    document.getElementById('cmd-text').textContent = ` ${name} deployed — standby_`;
+
+    // Brief hold then hide
+    await new Promise(r => setTimeout(r, 400));
+    loader.classList.remove('active');
   }
 
   // ========== POWER / BRIGHTNESS / CONTRAST ==========
