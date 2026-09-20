@@ -12,8 +12,6 @@
     --phosphor-dim: #1a9933;
     --phosphor-bright: #99ffbb;
     --bg: #020804;
-    --bezel: #1a1f1c;
-    --metal: #2a302c;
   }
 
   * {
@@ -34,7 +32,6 @@
     user-select: none;
   }
 
-  /* Outer rugged case */
   .terminal-case {
     width: 96vw;
     max-width: 1100px;
@@ -52,7 +49,6 @@
     overflow: hidden;
   }
 
-  /* Top status bar */
   .status-bar {
     height: 38px;
     background: #151a17;
@@ -85,7 +81,6 @@
     box-shadow: 0 0 8px var(--phosphor);
   }
 
-  /* Main CRT screen */
   .crt-bezel {
     flex: 1;
     margin: 12px;
@@ -109,7 +104,6 @@
     flex-direction: column;
   }
 
-  /* Scanlines + phosphor glow */
   .crt-screen::before {
     content: "";
     position: absolute;
@@ -138,7 +132,6 @@
     z-index: 11;
   }
 
-  /* Subtle screen flicker */
   @keyframes flicker {
     0%, 100% { opacity: 1; }
     92% { opacity: 0.98; }
@@ -155,7 +148,6 @@
     animation: flicker 4s infinite;
   }
 
-  /* Boot sequence */
   #boot-screen {
     font-size: 15px;
     line-height: 1.5;
@@ -171,7 +163,6 @@
     to { opacity: 1; }
   }
 
-  /* Main interface (hidden until boot finishes) */
   #main-interface {
     display: none;
     height: 100%;
@@ -180,9 +171,9 @@
 
   .header {
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 22px;
     border-bottom: 1px solid var(--phosphor-dim);
-    padding-bottom: 12px;
+    padding-bottom: 14px;
   }
 
   .header h1 {
@@ -198,12 +189,12 @@
     margin-top: 4px;
   }
 
-  /* Cartridge Bay */
   .cartridge-bay {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
+    align-items: center;
   }
 
   .bay-label {
@@ -212,79 +203,60 @@
     color: var(--phosphor-dim);
     border-left: 3px solid var(--phosphor);
     padding-left: 10px;
+    align-self: flex-start;
   }
 
-  .slots {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-  }
-
+  /* Single large cartridge */
   .cartridge {
+    width: 280px;
     background: linear-gradient(160deg, #0d140f, #08100a);
-    border: 2px solid var(--phosphor-dim);
-    border-radius: 6px;
-    padding: 16px 12px;
+    border: 3px solid var(--phosphor-dim);
+    border-radius: 8px;
+    padding: 0;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s;
     position: relative;
     overflow: hidden;
-  }
-
-  .cartridge::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--phosphor-dim);
+    box-shadow: 0 0 0 1px #0a100c;
   }
 
   .cartridge:hover {
     border-color: var(--phosphor);
-    box-shadow: 0 0 18px rgba(51, 255, 102, 0.25);
-    transform: translateY(-3px);
+    box-shadow: 0 0 28px rgba(51, 255, 102, 0.35);
+    transform: translateY(-4px) scale(1.02);
   }
 
-  .cartridge.active {
-    border-color: var(--phosphor-bright);
-    box-shadow: 0 0 25px rgba(51, 255, 102, 0.4);
-    background: linear-gradient(160deg, #122018, #0a1810);
+  .cartridge-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 2px solid var(--phosphor-dim);
   }
 
-  .cartridge.active::before {
-    background: var(--phosphor);
-    box-shadow: 0 0 10px var(--phosphor);
-  }
-
-  .cart-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 0 6px var(--phosphor));
+  .cartridge-info {
+    padding: 16px 14px 18px;
   }
 
   .cart-name {
-    font-size: 14px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    color: var(--phosphor-bright);
+    text-shadow: 0 0 8px var(--phosphor);
   }
 
   .cart-status {
-    font-size: 11px;
-    color: var(--phosphor-dim);
-  }
-
-  .cartridge.active .cart-status {
+    font-size: 12px;
     color: var(--phosphor);
+    letter-spacing: 1px;
   }
 
-  /* Bottom command line */
   .command-line {
-    margin-top: 18px;
+    margin-top: 20px;
     border-top: 1px solid var(--phosphor-dim);
-    padding-top: 12px;
+    padding-top: 14px;
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -307,7 +279,6 @@
     50% { opacity: 0; }
   }
 
-  /* Bottom physical controls */
   .controls {
     height: 70px;
     background: #151a17;
@@ -368,33 +339,10 @@
     box-shadow: 0 0 8px var(--phosphor);
   }
 
-  /* Game viewport (when a cartridge is inserted) */
-  #game-viewport {
-    display: none;
-    flex: 1;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 20px;
-  }
-
-  .game-title {
-    font-size: 32px;
-    text-shadow: 0 0 15px var(--phosphor);
-  }
-
-  .game-desc {
-    max-width: 500px;
-    line-height: 1.6;
-    color: var(--phosphor-dim);
-  }
-
-  /* Responsive */
   @media (max-width: 700px) {
     .header h1 { font-size: 20px; }
-    .slots { grid-template-columns: 1fr 1fr; }
-    .status-bar { font-size: 11px; }
+    .cartridge { width: 240px; }
+    .cartridge-image { height: 150px; }
   }
 </style>
 </head>
@@ -404,7 +352,7 @@
   <!-- Top status bar -->
   <div class="status-bar">
     <div class="status-left">
-      <div class="led on" id="power-led"></div>
+      <div class="led on"></div>
       <span>SYS: ONLINE</span>
       <span>PWR: 98%</span>
     </div>
@@ -431,8 +379,17 @@
           <div class="cartridge-bay">
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
             
-            <div class="slots" id="slots">
-              <!-- Cartridges will be injected here -->
+            <!-- SINGLE CARTRIDGE: DELTA OPS -->
+            <div class="cartridge" onclick="launchDeltaOps()">
+              <img 
+                class="cartridge-image" 
+                src="data:image/webp;base64,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"
+                alt="DELTA OPS"
+              >
+              <div class="cartridge-info">
+                <div class="cart-name">DELTA OPS</div>
+                <div class="cart-status">READY • CLICK TO DEPLOY</div>
+              </div>
             </div>
           </div>
 
@@ -442,13 +399,6 @@
             <span class="cursor"></span>
           </div>
         </div>
-
-        <!-- GAME VIEWPORT -->
-        <div id="game-viewport">
-          <div class="game-title" id="gv-title"></div>
-          <div class="game-desc" id="gv-desc"></div>
-          <button class="btn" onclick="ejectCartridge()">[ EJECT CARTRIDGE ]</button>
-        </div>
       </div>
     </div>
   </div>
@@ -457,9 +407,8 @@
   <div class="controls">
     <div style="display:flex;gap:12px;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
-      <button class="btn" onclick="ejectCartridge()">EJECT</button>
     </div>
-    <div class="power-btn on" id="power-btn" title="Power"></div>
+    <div class="power-btn on" title="Power"></div>
     <div style="display:flex;gap:12px;">
       <button class="btn">BRIGHTNESS</button>
       <button class="btn">CONTRAST</button>
@@ -468,18 +417,18 @@
 </div>
 
 <script>
-  // ========== CLOCK ==========
+  // Clock
   function updateClock() {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2,'0');
-    const m = String(now.getMinutes()).padStart(2,'0');
-    const s = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    document.getElementById('clock').textContent = 
+      String(now.getHours()).padStart(2,'0') + ':' +
+      String(now.getMinutes()).padStart(2,'0') + ':' +
+      String(now.getSeconds()).padStart(2,'0');
   }
   setInterval(updateClock, 1000);
   updateClock();
 
-  // ========== BOOT SEQUENCE ==========
+  // Boot sequence
   const bootLines = [
     "ALEEX FIELD COMPUTER SYSTEMS — MK-7 TERMINAL",
     "Copyright (c) 1987-2025 Penguin Dynamics Corp.",
@@ -507,111 +456,25 @@
     for (let i = 0; i < bootLines.length; i++) {
       const line = document.createElement('div');
       line.className = 'boot-line';
-      line.style.animationDelay = '0s';
       line.textContent = bootLines[i] || ' ';
       bootEl.appendChild(line);
-      // scroll to bottom
       bootEl.parentElement.scrollTop = bootEl.parentElement.scrollHeight;
-      await new Promise(r => setTimeout(r, i < 4 ? 120 : 80));
+      await new Promise(r => setTimeout(r, i < 4 ? 110 : 75));
     }
-    await new Promise(r => setTimeout(r, 900));
+    await new Promise(r => setTimeout(r, 800));
     bootEl.style.display = 'none';
     document.getElementById('main-interface').style.display = 'flex';
-    renderCartridges();
   }
 
-  // ========== CARTRIDGES ==========
-  const games = [
-    {
-      id: 'penguinfight',
-      name: 'PENGUIN FIGHTER',
-      icon: '🐧',
-      status: 'READY',
-      desc: 'Classic side-scrolling combat. Control the elite penguin special forces unit against the enemy empire. High-score mode enabled.'
-    },
-    {
-      id: 'icetrench',
-      name: 'ICE TRENCH',
-      icon: '❄️',
-      status: 'READY',
-      desc: 'Tactical trench warfare simulator set in the frozen south. Dig, fortify, and hold the line against wave attacks.'
-    },
-    {
-      id: 'deepops',
-      name: 'DEEP OPS',
-      icon: '🎖️',
-      status: 'READY',
-      desc: 'Stealth infiltration mission. Navigate dark corridors, avoid detection, and extract the target. Hardcore difficulty.'
-    },
-    {
-      id: 'radarscan',
-      name: 'RADAR SWEEP',
-      icon: '📡',
-      status: 'READY',
-      desc: 'Real-time strategy. Manage radar coverage, allocate interceptors, and defend the colony from aerial threats.'
-    },
-    {
-      id: 'supplyrun',
-      name: 'SUPPLY RUN',
-      icon: '📦',
-      status: 'READY',
-      desc: 'Logistics puzzle. Route supply convoys across hostile terrain while managing fuel, ammo, and morale.'
-    },
-    {
-      id: 'empty1',
-      name: 'EMPTY SLOT',
-      icon: '⬛',
-      status: 'NO CART',
-      desc: 'No cartridge detected. Insert a game cartridge into this bay.'
-    }
-  ];
-
-  let activeCart = null;
-
-  function renderCartridges() {
-    const container = document.getElementById('slots');
-    container.innerHTML = '';
-    games.forEach(game => {
-      const div = document.createElement('div');
-      div.className = 'cartridge' + (activeCart === game.id ? ' active' : '');
-      div.innerHTML = `
-        <div class="cart-icon">${game.icon}</div>
-        <div class="cart-name">${game.name}</div>
-        <div class="cart-status">${game.status}</div>
-      `;
-      div.onclick = () => insertCartridge(game);
-      container.appendChild(div);
-    });
+  // Launch DELTA OPS
+  function launchDeltaOps() {
+    document.getElementById('cmd-text').textContent = ' deploying DELTA OPS...';
+    setTimeout(() => {
+      window.open('https://deltaopsishere.oneapp.dev/', '_blank');
+      document.getElementById('cmd-text').textContent = ' DELTA OPS deployed — standby_';
+    }, 400);
   }
 
-  function insertCartridge(game) {
-    if (game.status === 'NO CART') {
-      document.getElementById('cmd-text').textContent = ' ERROR: No cartridge present in selected slot_';
-      return;
-    }
-
-    activeCart = game.id;
-    renderCartridges();
-
-    // Switch to game view
-    document.getElementById('main-interface').style.display = 'none';
-    const gv = document.getElementById('game-viewport');
-    gv.style.display = 'flex';
-    document.getElementById('gv-title').textContent = game.name;
-    document.getElementById('gv-desc').textContent = game.desc + '\n\n[ GAME MODULE LOADED — PRESS EJECT TO RETURN ]';
-
-    document.getElementById('cmd-text').textContent = ` loaded ${game.name.toLowerCase()}_`;
-  }
-
-  function ejectCartridge() {
-    activeCart = null;
-    document.getElementById('game-viewport').style.display = 'none';
-    document.getElementById('main-interface').style.display = 'flex';
-    renderCartridges();
-    document.getElementById('cmd-text').textContent = ' cartridge ejected — system idle_';
-  }
-
-  // Start boot
   window.onload = runBoot;
 </script>
 </body>
