@@ -17,6 +17,22 @@
     --bezel: #121814;
   }
 
+  /* Amber theme */
+  body.theme-amber {
+    --phosphor: #ffb000;
+    --phosphor-dim: #996600;
+    --phosphor-bright: #ffd866;
+    --phosphor-glow: rgba(255, 176, 0, 0.45);
+  }
+
+  /* Blue theme */
+  body.theme-blue {
+    --phosphor: #33ccff;
+    --phosphor-dim: #1a6a99;
+    --phosphor-bright: #99e6ff;
+    --phosphor-glow: rgba(51, 204, 255, 0.45);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -34,8 +50,8 @@
   /* ========== TERMINAL CASE ========== */
   .terminal-case {
     width: 96vw;
-    max-width: 1120px;
-    height: 93vh;
+    max-width: 1140px;
+    height: 94vh;
     background: linear-gradient(160deg, #222826 0%, #141a16 40%, #0e1210 100%);
     border: 10px solid #2c3530;
     border-radius: 14px;
@@ -50,7 +66,6 @@
     overflow: hidden;
   }
 
-  /* subtle case texture */
   .terminal-case::before {
     content: "";
     position: absolute;
@@ -79,7 +94,7 @@
 
   .status-left, .status-right {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     align-items: center;
   }
 
@@ -89,20 +104,32 @@
     border-radius: 50%;
     background: #2a2f2c;
     box-shadow: inset 0 0 3px #000;
+    transition: all 0.2s;
   }
+
   .led.on {
     background: var(--phosphor);
     box-shadow: 0 0 10px var(--phosphor), 0 0 4px var(--phosphor);
   }
+
   .led.warn {
     background: #ffcc33;
     box-shadow: 0 0 8px #ffcc33;
   }
 
+  .led.activity {
+    animation: ledPulse 0.6s ease-in-out;
+  }
+
+  @keyframes ledPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
   /* ========== CRT BEZEL ========== */
   .crt-bezel {
     flex: 1;
-    margin: 14px;
+    margin: 12px;
     background: #0a0e0b;
     border: 16px solid #1a221e;
     border-radius: 22px;
@@ -114,13 +141,12 @@
       inset 0 0 0 1px #2a3530;
   }
 
-  /* slight physical curvature feel */
   .crt-bezel::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 6px;
-    box-shadow: inset 0 0 80px rgba(0,0,0,0.35);
+    box-shadow: inset 0 0 90px rgba(0,0,0,0.4);
     pointer-events: none;
     z-index: 20;
   }
@@ -135,6 +161,8 @@
     flex-direction: column;
     filter: brightness(var(--brightness, 1)) contrast(var(--contrast, 1.05));
     transition: filter 0.25s;
+    /* subtle CRT curvature */
+    border-radius: 8px;
   }
 
   /* heavy scanlines */
@@ -146,8 +174,8 @@
       to bottom,
       transparent 0px,
       transparent 1px,
-      rgba(0,0,0,0.28) 1px,
-      rgba(0,0,0,0.28) 3px
+      rgba(0,0,0,0.32) 1px,
+      rgba(0,0,0,0.32) 3px
     );
     pointer-events: none;
     z-index: 12;
@@ -159,49 +187,55 @@
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%),
-      radial-gradient(ellipse at 50% 20%, rgba(51,255,102,0.03) 0%, transparent 60%);
+      radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.7) 100%),
+      radial-gradient(ellipse at 50% 15%, rgba(51,255,102,0.04) 0%, transparent 55%);
     pointer-events: none;
     z-index: 13;
   }
 
-  /* subtle noise overlay */
   .noise {
     position: absolute;
     inset: 0;
     background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 14;
-    opacity: 0.6;
+    opacity: 0.55;
   }
 
   @keyframes flicker {
     0%, 100% { opacity: 1; }
-    91% { opacity: 0.97; }
-    93% { opacity: 0.92; }
-    95% { opacity: 0.98; }
-    97% { opacity: 0.94; }
+    92% { opacity: 0.97; }
+    94% { opacity: 0.91; }
+    96% { opacity: 0.98; }
+    98% { opacity: 0.94; }
   }
 
   .crt-content {
     flex: 1;
-    padding: 18px 22px;
+    padding: 16px 20px;
     position: relative;
     z-index: 5;
     overflow-y: auto;
-    animation: flicker 5.5s infinite;
+    animation: flicker 6s infinite;
+    scrollbar-width: thin;
+    scrollbar-color: var(--phosphor-dim) transparent;
   }
+
+  .crt-content::-webkit-scrollbar { width: 6px; }
+  .crt-content::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
 
   /* ========== BOOT ========== */
   #boot-screen {
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.55;
     white-space: pre-wrap;
   }
+
   .boot-line {
     opacity: 0;
-    animation: bootFade 0.25s forwards;
+    animation: bootFade 0.22s forwards;
   }
+
   @keyframes bootFade { to { opacity: 1; } }
 
   /* ========== MAIN INTERFACE ========== */
@@ -213,22 +247,25 @@
 
   .header {
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     border-bottom: 1px solid var(--phosphor-dim);
-    padding-bottom: 12px;
+    padding-bottom: 10px;
   }
+
   .header h1 {
-    font-size: 24px;
-    letter-spacing: 4px;
+    font-size: 23px;
+    letter-spacing: 3.5px;
     text-shadow: 0 0 14px var(--phosphor), 0 0 4px var(--phosphor);
     color: var(--phosphor-bright);
   }
+
   .header .subtitle {
     font-size: 11px;
     color: var(--phosphor-dim);
-    margin-top: 5px;
-    letter-spacing: 1.5px;
+    margin-top: 4px;
+    letter-spacing: 1.4px;
   }
+
   .header .unit-id {
     font-size: 10px;
     color: var(--phosphor-dim);
@@ -240,8 +277,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
+
   .bay-label {
     font-size: 12px;
     letter-spacing: 2px;
@@ -252,7 +290,7 @@
 
   .slots {
     display: flex;
-    gap: 18px;
+    gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
     padding: 4px 0;
@@ -260,7 +298,7 @@
 
   /* ========== CARTRIDGES ========== */
   .cartridge {
-    width: 210px;
+    width: 205px;
     background: linear-gradient(165deg, #0e1611 0%, #08100b 100%);
     border: 2px solid var(--phosphor-dim);
     border-radius: 6px;
@@ -272,16 +310,27 @@
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
+
   .cartridge:hover {
     border-color: var(--phosphor);
     box-shadow: 0 0 28px var(--phosphor-glow), 0 6px 16px rgba(0,0,0,0.6);
-    transform: translateY(-4px) scale(1.025);
-  }
-  .cartridge:active {
-    transform: translateY(-1px) scale(0.99);
+    transform: translateY(-5px) scale(1.03);
   }
 
-  /* edge connector look */
+  .cartridge:active {
+    transform: translateY(-1px) scale(0.985);
+  }
+
+  .cartridge.inserting {
+    animation: insertCart 0.45s ease-out;
+  }
+
+  @keyframes insertCart {
+    0% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(12px) scale(0.96); }
+    100% { transform: translateY(0) scale(1); }
+  }
+
   .cartridge::before {
     content: "";
     position: absolute;
@@ -301,26 +350,29 @@
 
   .cartridge-art {
     width: 100%;
-    height: 128px;
+    height: 122px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     border-bottom: 2px solid var(--phosphor-dim);
-    gap: 4px;
+    gap: 3px;
     position: relative;
     background: linear-gradient(180deg, #0c1510, #060e0a);
   }
+
   .cartridge-art .icon {
-    font-size: 44px;
+    font-size: 42px;
     filter: drop-shadow(0 0 10px var(--phosphor));
     line-height: 1;
   }
+
   .cartridge-art .genre {
     font-size: 10px;
     letter-spacing: 1.5px;
     color: var(--phosphor-dim);
   }
+
   .cartridge-art .serial {
     position: absolute;
     bottom: 4px;
@@ -331,20 +383,23 @@
   }
 
   .cartridge-info {
-    padding: 11px 10px 13px;
+    padding: 10px 10px 12px;
   }
+
   .cart-name {
-    font-size: 14px;
-    letter-spacing: 1.5px;
+    font-size: 13.5px;
+    letter-spacing: 1.4px;
     margin-bottom: 3px;
     color: var(--phosphor-bright);
     text-shadow: 0 0 8px var(--phosphor);
   }
+
   .cart-status {
     font-size: 10px;
     color: var(--phosphor);
     letter-spacing: 1px;
   }
+
   .cart-cond {
     font-size: 9px;
     color: var(--phosphor-dim);
@@ -354,33 +409,49 @@
 
   /* ========== COMMAND LINE ========== */
   .command-line {
-    margin-top: 12px;
+    margin-top: 10px;
     border-top: 1px solid var(--phosphor-dim);
-    padding-top: 10px;
+    padding-top: 9px;
     font-size: 13px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    min-height: 28px;
   }
-  .prompt { color: var(--phosphor-bright); }
+
+  .prompt { color: var(--phosphor-bright); flex-shrink: 0; }
+
+  #cmd-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--phosphor);
+    font-family: inherit;
+    font-size: 13px;
+    flex: 1;
+    caret-color: var(--phosphor);
+  }
+
   .cursor {
     display: inline-block;
     width: 9px;
     height: 15px;
     background: var(--phosphor);
     animation: blink 1.05s step-end infinite;
+    flex-shrink: 0;
   }
+
   @keyframes blink { 50% { opacity: 0; } }
 
   /* ========== CONTROLS ========== */
   .controls {
-    height: 68px;
+    height: 66px;
     background: linear-gradient(180deg, #161c18, #101512);
     border-top: 3px solid #2a332e;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 18px;
+    padding: 0 16px;
     position: relative;
     z-index: 5;
   }
@@ -391,18 +462,21 @@
     color: var(--phosphor-dim);
     font-family: inherit;
     font-size: 11px;
-    padding: 7px 13px;
+    padding: 6px 11px;
     border-radius: 3px;
     cursor: pointer;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.1px;
     transition: all 0.15s;
   }
+
   .btn:hover {
     border-color: var(--phosphor);
     color: var(--phosphor);
     box-shadow: 0 0 12px rgba(51,255,102,0.28);
   }
+
   .btn:active { transform: scale(0.96); }
+
   .btn.active {
     border-color: var(--phosphor);
     color: var(--phosphor-bright);
@@ -419,6 +493,7 @@
     position: relative;
     transition: all 0.2s;
   }
+
   .power-btn::after {
     content: "";
     position: absolute;
@@ -431,14 +506,16 @@
     transform: translate(-50%, -50%);
     transition: all 0.2s;
   }
+
   .power-btn.on::after {
     border-color: var(--phosphor);
     box-shadow: 0 0 10px var(--phosphor);
   }
+
   .power-btn:hover { border-color: #4a564f; }
 
-  /* ========== WEATHER OVERLAY ========== */
-  #weather-overlay {
+  /* ========== OVERLAYS ========== */
+  .overlay {
     display: none;
     position: absolute;
     inset: 0;
@@ -448,18 +525,20 @@
     overflow-y: auto;
     flex-direction: column;
   }
-  #weather-overlay.active { display: flex; }
 
-  .wx-header {
+  .overlay.active { display: flex; }
+
+  .overlay-header {
     font-size: 15px;
     letter-spacing: 2px;
     color: var(--phosphor-bright);
     text-shadow: 0 0 8px var(--phosphor);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+
   .wx-location {
     font-size: 12px;
     color: var(--phosphor-dim);
@@ -475,6 +554,7 @@
     padding-bottom: 6px;
     flex-wrap: wrap;
   }
+
   .wx-tab {
     background: #0c1410;
     border: 1px solid var(--phosphor-dim);
@@ -486,7 +566,9 @@
     letter-spacing: 1px;
     transition: all 0.15s;
   }
+
   .wx-tab:hover { border-color: var(--phosphor); color: var(--phosphor); }
+
   .wx-tab.active {
     background: #122018;
     border-color: var(--phosphor);
@@ -498,123 +580,138 @@
   .wx-panel.active { display: block; }
 
   .current-big {
-    font-size: 52px;
+    font-size: 50px;
     color: var(--phosphor-bright);
     text-shadow: 0 0 16px var(--phosphor);
     line-height: 1;
-    margin: 8px 0 4px;
+    margin: 6px 0 3px;
   }
+
   .current-desc {
     font-size: 15px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     color: var(--phosphor);
   }
 
   .current-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
     gap: 8px;
   }
+
   .current-card {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 9px 11px;
+    padding: 8px 10px;
   }
+
   .current-card .label {
     font-size: 10px;
     color: var(--phosphor-dim);
     margin-bottom: 2px;
     letter-spacing: 0.8px;
   }
+
   .current-card .value {
-    font-size: 15px;
+    font-size: 14.5px;
     color: var(--phosphor-bright);
   }
 
   .hourly-scroll {
     display: flex;
-    gap: 7px;
+    gap: 6px;
     overflow-x: auto;
     padding-bottom: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
+
   .hourly-card {
-    min-width: 74px;
+    min-width: 70px;
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 7px 5px;
+    padding: 7px 4px;
     text-align: center;
     font-size: 11px;
   }
-  .hourly-card .time { color: var(--phosphor-dim); margin-bottom: 3px; }
-  .hourly-card .temp { font-size: 15px; color: var(--phosphor-bright); margin: 3px 0; }
+
+  .hourly-card .time { color: var(--phosphor-dim); margin-bottom: 2px; }
+  .hourly-card .temp { font-size: 14px; color: var(--phosphor-bright); margin: 2px 0; }
   .hourly-card .pop { font-size: 10px; color: var(--phosphor); }
 
   .chart-container {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 11px;
+    padding: 10px;
     margin-top: 6px;
   }
+
   .chart-title {
     font-size: 11px;
     color: var(--phosphor-dim);
-    margin-bottom: 7px;
+    margin-bottom: 6px;
     letter-spacing: 0.8px;
   }
+
   .bar-row {
     display: flex;
     align-items: flex-end;
-    height: 85px;
+    height: 80px;
     gap: 2px;
   }
+
   .bar {
     flex: 1;
     background: var(--phosphor-dim);
     min-width: 3px;
     transition: height 0.3s;
   }
+
   .bar.temp { background: var(--phosphor); }
 
   .daily-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 7px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
+
   .daily-card {
     background: #0a120e;
     border: 1px solid var(--phosphor-dim);
-    padding: 9px 5px;
+    padding: 8px 4px;
     text-align: center;
     font-size: 11px;
   }
-  .daily-card .date { color: var(--phosphor-dim); margin-bottom: 3px; }
-  .daily-card .temps { font-size: 13px; color: var(--phosphor-bright); margin: 3px 0; }
+
+  .daily-card .date { color: var(--phosphor-dim); margin-bottom: 2px; }
+  .daily-card .temps { font-size: 13px; color: var(--phosphor-bright); margin: 2px 0; }
   .daily-card .pop { font-size: 10px; }
 
   .radar-box {
     background: #020804;
     border: 1px solid var(--phosphor-dim);
-    height: 150px;
+    height: 145px;
     position: relative;
     overflow: hidden;
     margin-bottom: 10px;
   }
+
   .radar-sweep {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 130px;
-    height: 130px;
+    width: 125px;
+    height: 125px;
     background: conic-gradient(from 0deg, transparent 0deg, rgba(51,255,102,0.35) 25deg, transparent 55deg);
     border-radius: 50%;
     transform-origin: center;
-    animation: radarSpin 3.8s linear infinite;
+    animation: radarSpin 3.6s linear infinite;
   }
+
   @keyframes radarSpin {
     to { transform: translate(-50%, -50%) rotate(360deg); }
   }
+
   .radar-label {
     position: absolute;
     top: 7px;
@@ -622,6 +719,7 @@
     font-size: 11px;
     color: var(--phosphor);
   }
+
   .radar-grid {
     position: absolute;
     inset: 0;
@@ -630,24 +728,58 @@
       radial-gradient(circle at center, transparent 55%, rgba(51,255,102,0.05) 56%, transparent 57%);
   }
 
-  .wx-close { margin-top: 14px; align-self: flex-start; }
-
-  /* power-off state */
-  .crt-screen.powered-off {
-    filter: brightness(0.05) contrast(1);
+  /* Diagnostics */
+  .diag-log {
+    font-size: 12.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    color: var(--phosphor);
   }
+
+  /* Help */
+  .help-content {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--phosphor);
+  }
+
+  .help-content kbd {
+    background: #0c1410;
+    border: 1px solid var(--phosphor-dim);
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-size: 12px;
+  }
+
+  /* Power-off */
+  .crt-screen.powered-off {
+    filter: brightness(0.04) contrast(1);
+  }
+
   .crt-screen.powered-off .crt-content {
     opacity: 0;
     pointer-events: none;
   }
 
-  @media (max-width: 700px) {
-    .header h1 { font-size: 17px; letter-spacing: 2px; }
-    .cartridge { width: 165px; }
-    .cartridge-art { height: 110px; }
-    .cartridge-art .icon { font-size: 36px; }
-    .current-big { font-size: 40px; }
-    .status-bar { font-size: 10px; gap: 8px; }
+  /* Fullscreen hint */
+  .fs-hint {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 10px;
+    color: var(--phosphor-dim);
+    opacity: 0.5;
+    z-index: 30;
+  }
+
+  @media (max-width: 720px) {
+    .header h1 { font-size: 16px; letter-spacing: 2px; }
+    .cartridge { width: 155px; }
+    .cartridge-art { height: 105px; }
+    .cartridge-art .icon { font-size: 34px; }
+    .current-big { font-size: 38px; }
+    .status-bar { font-size: 10px; }
+    .controls { flex-wrap: wrap; height: auto; padding: 8px; gap: 6px; }
   }
 </style>
 </head>
@@ -657,9 +789,10 @@
   <div class="status-bar">
     <div class="status-left">
       <div class="led on" id="sys-led"></div>
-      <span>SYS: ONLINE</span>
+      <span id="sys-status">SYS: ONLINE</span>
       <span id="pwr-status">PWR: 97%</span>
       <span id="temp-status">TEMP: 42°C</span>
+      <div class="led" id="disk-led" title="Disk Activity"></div>
     </div>
     <div class="status-right">
       <span id="clock">00:00:00</span>
@@ -672,22 +805,20 @@
   <div class="crt-bezel">
     <div class="crt-screen" id="crt">
       <div class="noise"></div>
-      <div class="crt-content">
+      <div class="crt-content" id="crt-content">
         <div id="boot-screen"></div>
 
         <div id="main-interface">
           <div class="header">
             <h1>ALEEX’S PENGUIN ARCADE</h1>
-            <div class="subtitle">MILITARY FIELD TERMINAL • CARTRIDGE SYSTEM v2.4.1</div>
+            <div class="subtitle">MILITARY FIELD TERMINAL • CARTRIDGE SYSTEM v2.5.0</div>
             <div class="unit-id">UNIT ID: PA-MK7-1987 // AUTHORIZED PERSONNEL ONLY</div>
           </div>
 
           <div class="cartridge-bay">
             <div class="bay-label">CARTRIDGE BAY — SELECT UNIT TO INSERT</div>
-
             <div class="slots">
-              <!-- DELTA OPS -->
-              <div class="cartridge" onclick="launchGame('DELTA OPS', 'https://deltaopsishere.oneapp.dev/')">
+              <div class="cartridge" data-name="DELTA OPS" data-url="https://deltaopsishere.oneapp.dev/" onclick="launchGame(this)">
                 <div class="cartridge-art">
                   <div class="icon">⚔️</div>
                   <div class="genre">TACTICAL OPS</div>
@@ -700,8 +831,7 @@
                 </div>
               </div>
 
-              <!-- APACHE DOWN -->
-              <div class="cartridge" onclick="launchGame('APACHE DOWN', 'https://helicoptesim.oneapp.dev/')">
+              <div class="cartridge" data-name="APACHE DOWN" data-url="https://helicoptesim.oneapp.dev/" onclick="launchGame(this)">
                 <div class="cartridge-art">
                   <div class="icon">🚁</div>
                   <div class="genre">HELICOPTER SIM</div>
@@ -714,8 +844,7 @@
                 </div>
               </div>
 
-              <!-- PENGUIN CLICKER -->
-              <div class="cartridge" onclick="launchGame('PENGUIN CLICKER', 'https://clickdapenguin.oneapp.dev/')">
+              <div class="cartridge" data-name="PENGUIN CLICKER" data-url="https://clickdapenguin.oneapp.dev/" onclick="launchGame(this)">
                 <div class="cartridge-art">
                   <div class="icon">🐧</div>
                   <div class="genre">IDLE / CLICKER</div>
@@ -732,26 +861,24 @@
 
           <div class="command-line">
             <span class="prompt">ROOT@PENGUIN:~$</span>
-            <span id="cmd-text"> awaiting cartridge insertion_</span>
-            <span class="cursor"></span>
+            <input type="text" id="cmd-input" autocomplete="off" spellcheck="false" placeholder="type 'help' for commands">
+            <span class="cursor" id="cmd-cursor"></span>
           </div>
         </div>
 
         <!-- WEATHER OVERLAY -->
-        <div id="weather-overlay">
-          <div class="wx-header">
+        <div id="weather-overlay" class="overlay">
+          <div class="overlay-header">
             <span>METEOROLOGICAL SCAN // FIELD REPORT</span>
-            <button class="btn" onclick="closeWeather()" style="padding:4px 10px;font-size:11px;">[ CLOSE ]</button>
+            <button class="btn" onclick="closeOverlay('weather-overlay')">[ CLOSE ]</button>
           </div>
           <div class="wx-location" id="wx-location">Acquiring location...</div>
-
           <div class="wx-tabs">
-            <button class="wx-tab active" onclick="switchTab('current')">CURRENT</button>
-            <button class="wx-tab" onclick="switchTab('hourly')">HOURLY</button>
-            <button class="wx-tab" onclick="switchTab('daily')">5-DAY</button>
-            <button class="wx-tab" onclick="switchTab('radar')">PRECIP / RADAR</button>
+            <button class="wx-tab active" data-tab="current" onclick="switchTab('current')">CURRENT</button>
+            <button class="wx-tab" data-tab="hourly" onclick="switchTab('hourly')">HOURLY</button>
+            <button class="wx-tab" data-tab="daily" onclick="switchTab('daily')">5-DAY</button>
+            <button class="wx-tab" data-tab="radar" onclick="switchTab('radar')">PRECIP / RADAR</button>
           </div>
-
           <div id="panel-current" class="wx-panel active">
             <div id="current-content">Loading current conditions...</div>
           </div>
@@ -765,27 +892,94 @@
             <div id="radar-content">Loading precipitation data...</div>
           </div>
         </div>
+
+        <!-- DIAGNOSTICS OVERLAY -->
+        <div id="diag-overlay" class="overlay">
+          <div class="overlay-header">
+            <span>SYSTEM DIAGNOSTICS // LOG DUMP</span>
+            <button class="btn" onclick="closeOverlay('diag-overlay')">[ CLOSE ]</button>
+          </div>
+          <div class="diag-log" id="diag-log"></div>
+        </div>
+
+        <!-- HELP OVERLAY -->
+        <div id="help-overlay" class="overlay">
+          <div class="overlay-header">
+            <span>FIELD TERMINAL // HELP & COMMANDS</span>
+            <button class="btn" onclick="closeOverlay('help-overlay')">[ CLOSE ]</button>
+          </div>
+          <div class="help-content">
+            <p><strong>KEYBOARD SHORTCUTS</strong></p>
+            <p><kbd>W</kbd> Weather Scan &nbsp; <kbd>D</kbd> Diagnostics &nbsp; <kbd>H</kbd> Help<br>
+               <kbd>P</kbd> Power Toggle &nbsp; <kbd>F</kbd> Fullscreen &nbsp; <kbd>T</kbd> Theme Cycle<br>
+               <kbd>M</kbd> Mute Toggle &nbsp; <kbd>Esc</kbd> Close Overlay</p>
+            <br>
+            <p><strong>TERMINAL COMMANDS</strong></p>
+            <p>
+              help .............. show this screen<br>
+              weather ........... open weather scan<br>
+              diag / diagnostics  system diagnostics<br>
+              theme [green|amber|blue]  change phosphor<br>
+              brightness / contrast  cycle display settings<br>
+              clear ............. clear command history<br>
+              reboot ............ soft reboot<br>
+              power ............. toggle power<br>
+              about ............. system information
+            </p>
+            <br>
+            <p style="opacity:0.7">Cartridge slots are hot-swappable. Click any cartridge to deploy.</p>
+          </div>
+        </div>
       </div>
+      <div class="fs-hint">F11 or F for fullscreen</div>
     </div>
   </div>
 
   <!-- CONTROLS -->
   <div class="controls">
-    <div style="display:flex;gap:9px;">
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
-      <button class="btn" onclick="startWeatherScan()">WEATHER SCAN</button>
+      <button class="btn" onclick="startWeatherScan()">WEATHER</button>
+      <button class="btn" onclick="openDiagnostics()">DIAG</button>
+      <button class="btn" onclick="openHelp()">HELP</button>
     </div>
-
     <div class="power-btn on" id="power-btn" title="Power" onclick="togglePower()"></div>
-
-    <div style="display:flex;gap:9px;">
-      <button class="btn" id="btn-bright" onclick="adjustBrightness()">BRIGHTNESS</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <button class="btn" id="btn-theme" onclick="cycleTheme()">THEME</button>
+      <button class="btn" id="btn-bright" onclick="adjustBrightness()">BRIGHT</button>
       <button class="btn" id="btn-contrast" onclick="adjustContrast()">CONTRAST</button>
+      <button class="btn" id="btn-mute" onclick="toggleMute()">🔊</button>
     </div>
   </div>
 </div>
 
 <script>
+  // ========== AUDIO ==========
+  let muted = false;
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function beep(freq = 440, duration = 0.08, type = 'square', vol = 0.08) {
+    if (muted || !powered) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function toggleMute() {
+    muted = !muted;
+    document.getElementById('btn-mute').textContent = muted ? '🔇' : '🔊';
+    beep(muted ? 200 : 600, 0.06);
+  }
+
   // ========== CLOCK & STATUS ==========
   function updateClock() {
     const now = new Date();
@@ -797,39 +991,45 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // simulate slow battery drain & temperature fluctuation
   let pwr = 97;
   setInterval(() => {
-    if (Math.random() > 0.85) pwr = Math.max(91, pwr - 0.1);
+    if (Math.random() > 0.82) pwr = Math.max(89, pwr - 0.15);
     document.getElementById('pwr-status').textContent = `PWR: ${pwr.toFixed(0)}%`;
-    const temp = 41 + Math.floor(Math.random() * 4);
+    const temp = 40 + Math.floor(Math.random() * 5);
     document.getElementById('temp-status').textContent = `TEMP: ${temp}°C`;
-  }, 8000);
+    // occasional disk activity
+    if (Math.random() > 0.7) {
+      const led = document.getElementById('disk-led');
+      led.classList.add('on', 'activity');
+      setTimeout(() => led.classList.remove('on', 'activity'), 180);
+    }
+  }, 7000);
 
   // ========== BOOT SEQUENCE ==========
   const bootLines = [
     "ALEEX FIELD COMPUTER SYSTEMS — MK-7 TERMINAL",
     "Copyright (c) 1987-2025 Penguin Dynamics Corp.",
-    "Firmware: PA-MK7/2.4.1-STABLE  //  Build 8741",
+    "Firmware: PA-MK7/2.5.0-STABLE  //  Build 9127",
     "------------------------------------------------",
     "",
-    "[00:00.12] POST: Memory check .................. [OK] 640K + 384K EMS",
-    "[00:00.34] POST: Video adapter ................. [OK] P1 Phosphor CRT",
-    "[00:00.51] POST: Input devices ................. [OK] KB + JOY",
-    "[00:00.73] POST: Cartridge interface ........... [OK] 3-slot bay",
-    "[00:00.89] POST: Power systems ................. [OK] 97% capacity",
-    "[00:01.05] POST: Thermal sensors ............... [OK] 42°C nominal",
+    "[00:00.11] POST: Memory check .................. [OK] 640K + 384K EMS",
+    "[00:00.33] POST: Video adapter ................. [OK] P1 Phosphor CRT",
+    "[00:00.49] POST: Input devices ................. [OK] KB + JOY",
+    "[00:00.71] POST: Cartridge interface ........... [OK] 3-slot bay",
+    "[00:00.88] POST: Power systems ................. [OK] 97% capacity",
+    "[00:01.04] POST: Thermal sensors ............... [OK] 42°C nominal",
+    "[00:01.22] POST: Audio subsystem ............... [OK]",
     "",
-    "[00:01.28] Loading kernel ...................... [OK]",
-    "[00:01.49] Mounting secure volumes ............. [OK]",
-    "[00:01.67] Initializing arcade subsystem ....... [OK]",
-    "[00:01.88] Calibrating phosphor display ........ [OK]",
-    "[00:02.05] Loading cartridge drivers ........... [OK]",
+    "[00:01.41] Loading kernel ...................... [OK]",
+    "[00:01.63] Mounting secure volumes ............. [OK]",
+    "[00:01.82] Initializing arcade subsystem ....... [OK]",
+    "[00:02.01] Calibrating phosphor display ........ [OK]",
+    "[00:02.19] Loading cartridge drivers ........... [OK]",
     "",
     "SYSTEM READY — ALL SUBSYSTEMS NOMINAL",
     "",
     "Welcome to ALEEX’S PENGUIN ARCADE",
-    "Insert cartridge to begin mission..."
+    "Type 'help' or insert cartridge to begin..."
   ];
 
   async function runBoot() {
@@ -840,66 +1040,145 @@
       line.textContent = bootLines[i] || ' ';
       bootEl.appendChild(line);
       bootEl.parentElement.scrollTop = bootEl.parentElement.scrollHeight;
-      await new Promise(r => setTimeout(r, i < 5 ? 90 : 55));
+      beep(180 + Math.random()*40, 0.025, 'square', 0.03);
+      await new Promise(r => setTimeout(r, i < 5 ? 85 : 48));
     }
-    await new Promise(r => setTimeout(r, 650));
+    await new Promise(r => setTimeout(r, 600));
     bootEl.style.display = 'none';
     document.getElementById('main-interface').style.display = 'flex';
+    document.getElementById('cmd-input').focus();
+    beep(520, 0.12, 'square', 0.06);
   }
 
   // ========== GAME LAUNCH ==========
-  function launchGame(name, url) {
-    document.getElementById('cmd-text').textContent = ` deploying ${name}...`;
+  function launchGame(el) {
+    if (!powered) return;
+    const name = el.dataset.name;
+    const url = el.dataset.url;
+    el.classList.add('inserting');
+    beep(320, 0.08);
+    setTimeout(() => el.classList.remove('inserting'), 450);
+
+    document.getElementById('cmd-input').value = '';
+    document.getElementById('cmd-input').placeholder = `deploying ${name}...`;
+    beep(480, 0.1);
+
     setTimeout(() => {
       window.open(url, '_blank');
-      document.getElementById('cmd-text').textContent = ` ${name} deployed — standby_`;
-    }, 380);
+      document.getElementById('cmd-input').placeholder = `${name} deployed — standby`;
+      beep(660, 0.12);
+      setTimeout(() => {
+        document.getElementById('cmd-input').placeholder = "type 'help' for commands";
+      }, 2500);
+    }, 420);
   }
 
-  // ========== POWER / BRIGHTNESS / CONTRAST ==========
+  // ========== POWER / DISPLAY ==========
   let powered = true;
   let brightness = 1;
   let contrast = 1.05;
   const levels = [0.65, 0.8, 1, 1.15];
   let bIdx = 2;
   let cIdx = 2;
+  const themes = ['', 'theme-amber', 'theme-blue'];
+  let themeIdx = 0;
 
   function togglePower() {
     powered = !powered;
     const crt = document.getElementById('crt');
     const btn = document.getElementById('power-btn');
     const led = document.getElementById('sys-led');
+    const status = document.getElementById('sys-status');
 
     if (powered) {
       crt.classList.remove('powered-off');
       btn.classList.add('on');
       led.classList.add('on');
-      document.getElementById('cmd-text').textContent = ' system restored_';
+      status.textContent = 'SYS: ONLINE';
+      document.getElementById('cmd-input').placeholder = 'system restored_';
+      beep(440, 0.1);
     } else {
       crt.classList.add('powered-off');
       btn.classList.remove('on');
       led.classList.remove('on');
+      status.textContent = 'SYS: OFFLINE';
+      beep(180, 0.15);
     }
   }
 
   function adjustBrightness() {
+    if (!powered) return;
     bIdx = (bIdx + 1) % levels.length;
     brightness = levels[bIdx];
     document.getElementById('crt').style.setProperty('--brightness', brightness);
     document.getElementById('btn-bright').classList.toggle('active', bIdx !== 2);
+    beep(300 + bIdx * 80, 0.05);
   }
 
   function adjustContrast() {
+    if (!powered) return;
     cIdx = (cIdx + 1) % levels.length;
     contrast = levels[cIdx] + 0.05;
     document.getElementById('crt').style.setProperty('--contrast', contrast);
     document.getElementById('btn-contrast').classList.toggle('active', cIdx !== 2);
+    beep(300 + cIdx * 80, 0.05);
   }
 
-  // ========== WEATHER SYSTEM ==========
-  let weatherData = null;
-  let currentTab = 'current';
+  function cycleTheme() {
+    if (!powered) return;
+    document.body.classList.remove(...themes.filter(t => t));
+    themeIdx = (themeIdx + 1) % themes.length;
+    if (themes[themeIdx]) document.body.classList.add(themes[themeIdx]);
+    document.getElementById('btn-theme').classList.toggle('active', themeIdx !== 0);
+    beep(400 + themeIdx * 120, 0.07);
+  }
 
+  // ========== OVERLAYS ==========
+  function closeOverlay(id) {
+    document.getElementById(id).classList.remove('active');
+    document.getElementById('cmd-input').focus();
+  }
+
+  function openHelp() {
+    if (!powered) return;
+    closeAllOverlays();
+    document.getElementById('help-overlay').classList.add('active');
+    beep(380, 0.06);
+  }
+
+  function openDiagnostics() {
+    if (!powered) return;
+    closeAllOverlays();
+    const log = document.getElementById('diag-log');
+    const now = new Date().toISOString().slice(0,19).replace('T',' ');
+    log.textContent = `DIAGNOSTIC DUMP — ${now}
+----------------------------------------
+UNIT:          PA-MK7-1987
+FIRMWARE:      2.5.0-STABLE (Build 9127)
+UPTIME:        ${Math.floor(performance.now()/1000)}s
+POWER:         ${pwr.toFixed(1)}%
+THERMAL:       NOMINAL
+CARTRIDGE BAY: 3/3 SERVICEABLE
+MEMORY:        640K BASE + 384K EMS
+DISPLAY:       P1 PHOSPHOR CRT
+AUDIO:         ${muted ? 'MUTED' : 'ACTIVE'}
+NETWORK:       UPLINK READY
+GEOSERVICES:   AVAILABLE
+----------------------------------------
+[OK] All primary systems nominal.
+[OK] No critical faults detected.
+[OK] Ready for field operations.
+`;
+    document.getElementById('diag-overlay').classList.add('active');
+    beep(300, 0.08);
+  }
+
+  function closeAllOverlays() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+  }
+
+  // ========== WEATHER ==========
+  let weatherData = null;
   const weatherCodes = {
     0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
     45: "Fog", 48: "Depositing rime fog",
@@ -911,19 +1190,21 @@
   };
 
   function switchTab(tab) {
-    currentTab = tab;
     document.querySelectorAll('.wx-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.wx-panel').forEach(p => p.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelector(`.wx-tab[data-tab="${tab}"]`).classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
     if (weatherData) renderTab(tab);
+    beep(260, 0.04);
   }
 
   function startWeatherScan() {
     if (!powered) return;
+    closeAllOverlays();
     const overlay = document.getElementById('weather-overlay');
     overlay.classList.add('active');
     document.getElementById('wx-location').textContent = "Requesting geolocation clearance...";
+    beep(350, 0.07);
 
     if (!navigator.geolocation) {
       document.getElementById('wx-location').textContent = "ERROR: Geolocation subsystem offline.";
@@ -934,7 +1215,7 @@
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
       document.getElementById('wx-location').textContent =
-        `Location locked: ${lat.toFixed(4)}°, ${lon.toFixed(4)}° // Querying meteorological satellites...`;
+        `Location locked: ${lat.toFixed(4)}°, ${lon.toFixed(4)}° // Querying satellites...`;
 
       try {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,cloud_cover,uv_index&hourly=temperature_2m,precipitation_probability,weather_code,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset&timezone=auto&forecast_days=6`;
@@ -952,8 +1233,8 @@
           document.getElementById('wx-location').textContent =
             `Field Location  //  ${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
         }
-
         renderTab('current');
+        beep(520, 0.1);
       } catch (err) {
         document.getElementById('wx-location').textContent =
           "ERROR: Failed to retrieve meteorological data. Check uplink.";
@@ -966,7 +1247,6 @@
 
   function renderTab(tab) {
     if (!weatherData) return;
-
     if (tab === 'current') {
       const c = weatherData.current;
       const d = weatherData.daily;
@@ -985,7 +1265,6 @@
         </div>
       `;
     }
-
     if (tab === 'hourly') {
       const h = weatherData.hourly;
       let cards = '';
@@ -993,12 +1272,7 @@
         const time = h.time[i].slice(11,16);
         const temp = Math.round(h.temperature_2m[i]);
         const pop = h.precipitation_probability[i];
-        cards += `
-          <div class="hourly-card">
-            <div class="time">${time}</div>
-            <div class="temp">${temp}°</div>
-            <div class="pop">${pop}%</div>
-          </div>`;
+        cards += `<div class="hourly-card"><div class="time">${time}</div><div class="temp">${temp}°</div><div class="pop">${pop}%</div></div>`;
       }
       let bars = '';
       const temps = h.temperature_2m.slice(0,24);
@@ -1006,7 +1280,7 @@
       const maxT = Math.max(...temps);
       const range = maxT - minT || 1;
       for (let i = 0; i < 24; i++) {
-        const height = ((temps[i] - minT) / range) * 75 + 8;
+        const height = ((temps[i] - minT) / range) * 70 + 8;
         bars += `<div class="bar temp" style="height:${height}px" title="${Math.round(temps[i])}°"></div>`;
       }
       document.getElementById('hourly-content').innerHTML = `
@@ -1014,10 +1288,8 @@
         <div class="chart-container">
           <div class="chart-title">24-HOUR TEMPERATURE TREND (°C)</div>
           <div class="bar-row">${bars}</div>
-        </div>
-      `;
+        </div>`;
     }
-
     if (tab === 'daily') {
       const d = weatherData.daily;
       let cards = '';
@@ -1027,45 +1299,20 @@
         const min = Math.round(d.temperature_2m_min[i]);
         const pop = d.precipitation_probability_max[i];
         const code = weatherCodes[d.weather_code[i]] || "—";
-        cards += `
-          <div class="daily-card">
-            <div class="date">${date}</div>
-            <div style="font-size:10px;margin:2px 0;opacity:0.85">${code}</div>
-            <div class="temps">${max}° / ${min}°</div>
-            <div class="pop">${pop}% precip</div>
-          </div>`;
+        cards += `<div class="daily-card"><div class="date">${date}</div>
+          <div style="font-size:10px;margin:2px 0;opacity:0.85">${code}</div>
+          <div class="temps">${max}° / ${min}°</div><div class="pop">${pop}% precip</div></div>`;
       }
-      let highBars = '', lowBars = '';
-      const highs = d.temperature_2m_max.slice(0,6);
-      const lows = d.temperature_2m_min.slice(0,6);
-      const all = [...highs, ...lows];
-      const minAll = Math.min(...all);
-      const maxAll = Math.max(...all);
-      const range = maxAll - minAll || 1;
-      for (let i = 0; i < 6; i++) {
-        const hH = ((highs[i] - minAll) / range) * 65 + 8;
-        const lH = ((lows[i] - minAll) / range) * 65 + 8;
-        highBars += `<div class="bar" style="height:${hH}px;background:var(--phosphor)"></div>`;
-        lowBars += `<div class="bar" style="height:${lH}px;background:var(--phosphor-dim)"></div>`;
-      }
-      document.getElementById('daily-content').innerHTML = `
-        <div class="daily-grid">${cards}</div>
-        <div class="chart-container">
-          <div class="chart-title">HIGH (bright) / LOW (dim) — 6 DAY OUTLOOK</div>
-          <div class="bar-row">${highBars}</div>
-          <div class="bar-row" style="margin-top:3px">${lowBars}</div>
-        </div>
-      `;
+      document.getElementById('daily-content').innerHTML = `<div class="daily-grid">${cards}</div>`;
     }
-
     if (tab === 'radar') {
       const h = weatherData.hourly;
       let precipBars = '';
       const precips = h.precipitation.slice(0, 24);
       const maxP = Math.max(...precips, 0.1);
       for (let i = 0; i < 24; i++) {
-        const height = (precips[i] / maxP) * 75;
-        precipBars += `<div class="bar" style="height:${Math.max(height,2)}px;background:#1a9944" title="${precips[i].toFixed(1)} mm"></div>`;
+        const height = (precips[i] / maxP) * 70;
+        precipBars += `<div class="bar" style="height:${Math.max(height,2)}px;background:var(--phosphor-dim)" title="${precips[i].toFixed(1)} mm"></div>`;
       }
       document.getElementById('radar-content').innerHTML = `
         <div class="radar-box">
@@ -1077,18 +1324,129 @@
           <div class="chart-title">PRECIPITATION AMOUNT (mm) — NEXT 24H</div>
           <div class="bar-row">${precipBars}</div>
         </div>
-        <div style="margin-top:11px;font-size:11px;color:var(--phosphor-dim)">
-          NOTE: Radar display is a local simulation. Precipitation values sourced from Open-Meteo.
-        </div>
-      `;
+        <div style="margin-top:10px;font-size:11px;color:var(--phosphor-dim)">
+          NOTE: Radar is a local simulation. Data sourced from Open-Meteo.
+        </div>`;
     }
   }
 
-  function closeWeather() {
-    document.getElementById('weather-overlay').classList.remove('active');
+  // ========== COMMAND LINE ==========
+  const cmdInput = document.getElementById('cmd-input');
+
+  cmdInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const cmd = cmdInput.value.trim().toLowerCase();
+      cmdInput.value = '';
+      if (!cmd) return;
+      handleCommand(cmd);
+    }
+  });
+
+  function handleCommand(cmd) {
+    const parts = cmd.split(/\s+/);
+    const base = parts[0];
+
+    switch (base) {
+      case 'help':
+      case '?':
+        openHelp();
+        break;
+      case 'weather':
+      case 'wx':
+        startWeatherScan();
+        break;
+      case 'diag':
+      case 'diagnostics':
+      case 'status':
+        openDiagnostics();
+        break;
+      case 'theme':
+        if (parts[1] === 'amber') { themeIdx = 0; cycleTheme(); }
+        else if (parts[1] === 'blue') { themeIdx = 1; cycleTheme(); }
+        else if (parts[1] === 'green') { themeIdx = 2; cycleTheme(); }
+        else cycleTheme();
+        break;
+      case 'brightness':
+      case 'bright':
+        adjustBrightness();
+        break;
+      case 'contrast':
+        adjustContrast();
+        break;
+      case 'mute':
+        toggleMute();
+        break;
+      case 'power':
+        togglePower();
+        break;
+      case 'reboot':
+      case 'restart':
+        location.reload();
+        break;
+      case 'clear':
+        cmdInput.placeholder = "command history cleared_";
+        setTimeout(() => cmdInput.placeholder = "type 'help' for commands", 1800);
+        break;
+      case 'about':
+        openDiagnostics();
+        break;
+      case 'fullscreen':
+      case 'fs':
+        toggleFullscreen();
+        break;
+      default:
+        cmdInput.placeholder = `unknown command: ${base} — type 'help'`;
+        beep(140, 0.12);
+        setTimeout(() => cmdInput.placeholder = "type 'help' for commands", 2200);
+    }
   }
 
-  window.onload = runBoot;
+  // ========== KEYBOARD SHORTCUTS ==========
+  document.addEventListener('keydown', (e) => {
+    if (e.target === cmdInput && e.key !== 'Escape') return;
+
+    if (e.key === 'Escape') {
+      closeAllOverlays();
+      return;
+    }
+
+    if (!powered && e.key.toLowerCase() !== 'p') return;
+
+    switch (e.key.toLowerCase()) {
+      case 'w': startWeatherScan(); break;
+      case 'd': openDiagnostics(); break;
+      case 'h': openHelp(); break;
+      case 'p': togglePower(); break;
+      case 't': cycleTheme(); break;
+      case 'm': toggleMute(); break;
+      case 'f': toggleFullscreen(); break;
+    }
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+    beep(400, 0.06);
+  }
+
+  // Focus command line when clicking content
+  document.getElementById('crt-content').addEventListener('click', (e) => {
+    if (!e.target.closest('button') && !e.target.closest('.cartridge') && !e.target.closest('.overlay')) {
+      cmdInput.focus();
+    }
+  });
+
+  // Start
+  window.onload = () => {
+    runBoot();
+    // Resume audio context on first interaction
+    document.body.addEventListener('click', () => {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }, { once: true });
+  };
 </script>
 </body>
 </html>
