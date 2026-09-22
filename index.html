@@ -17,7 +17,6 @@
     --bezel: #121814;
   }
 
-  /* Amber theme */
   body.theme-amber {
     --phosphor: #ffb000;
     --phosphor-dim: #996600;
@@ -25,7 +24,6 @@
     --phosphor-glow: rgba(255, 176, 0, 0.45);
   }
 
-  /* Blue theme */
   body.theme-blue {
     --phosphor: #33ccff;
     --phosphor-dim: #1a6a99;
@@ -47,7 +45,6 @@
     user-select: none;
   }
 
-  /* ========== TERMINAL CASE ========== */
   .terminal-case {
     width: 96vw;
     max-width: 1140px;
@@ -76,7 +73,6 @@
     border-radius: 4px;
   }
 
-  /* ========== STATUS BAR ========== */
   .status-bar {
     height: 40px;
     background: linear-gradient(180deg, #1a211d, #121714);
@@ -112,11 +108,6 @@
     box-shadow: 0 0 10px var(--phosphor), 0 0 4px var(--phosphor);
   }
 
-  .led.warn {
-    background: #ffcc33;
-    box-shadow: 0 0 8px #ffcc33;
-  }
-
   .led.activity {
     animation: ledPulse 0.6s ease-in-out;
   }
@@ -126,7 +117,6 @@
     50% { opacity: 0.3; }
   }
 
-  /* ========== CRT BEZEL ========== */
   .crt-bezel {
     flex: 1;
     margin: 12px;
@@ -161,11 +151,9 @@
     flex-direction: column;
     filter: brightness(var(--brightness, 1)) contrast(var(--contrast, 1.05));
     transition: filter 0.25s;
-    /* subtle CRT curvature */
     border-radius: 8px;
   }
 
-  /* heavy scanlines */
   .crt-screen::before {
     content: "";
     position: absolute;
@@ -181,7 +169,6 @@
     z-index: 12;
   }
 
-  /* vignette + phosphor bloom */
   .crt-screen::after {
     content: "";
     position: absolute;
@@ -224,7 +211,6 @@
   .crt-content::-webkit-scrollbar { width: 6px; }
   .crt-content::-webkit-scrollbar-thumb { background: var(--phosphor-dim); border-radius: 3px; }
 
-  /* ========== BOOT ========== */
   #boot-screen {
     font-size: 13.5px;
     line-height: 1.55;
@@ -238,7 +224,6 @@
 
   @keyframes bootFade { to { opacity: 1; } }
 
-  /* ========== MAIN INTERFACE ========== */
   #main-interface {
     display: none;
     height: 100%;
@@ -296,7 +281,6 @@
     padding: 4px 0;
   }
 
-  /* ========== CARTRIDGES ========== */
   .cartridge {
     width: 205px;
     background: linear-gradient(165deg, #0e1611 0%, #08100b 100%);
@@ -407,7 +391,6 @@
     opacity: 0.75;
   }
 
-  /* ========== COMMAND LINE ========== */
   .command-line {
     margin-top: 10px;
     border-top: 1px solid var(--phosphor-dim);
@@ -443,7 +426,6 @@
 
   @keyframes blink { 50% { opacity: 0; } }
 
-  /* ========== CONTROLS ========== */
   .controls {
     height: 66px;
     background: linear-gradient(180deg, #161c18, #101512);
@@ -514,7 +496,6 @@
 
   .power-btn:hover { border-color: #4a564f; }
 
-  /* ========== OVERLAYS ========== */
   .overlay {
     display: none;
     position: absolute;
@@ -652,21 +633,32 @@
     letter-spacing: 0.8px;
   }
 
-  .bar-row {
-    display: flex;
-    align-items: flex-end;
-    height: 80px;
-    gap: 2px;
+  /* Line graph styles */
+  .line-chart {
+    width: 100%;
+    height: 110px;
+    display: block;
   }
 
-  .bar {
-    flex: 1;
-    background: var(--phosphor-dim);
-    min-width: 3px;
-    transition: height 0.3s;
+  .line-chart polyline {
+    fill: none;
+    stroke: var(--phosphor);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
   }
 
-  .bar.temp { background: var(--phosphor); }
+  .line-chart .grid-line {
+    stroke: var(--phosphor-dim);
+    stroke-width: 0.5;
+    opacity: 0.4;
+  }
+
+  .line-chart .axis-label {
+    fill: var(--phosphor-dim);
+    font-size: 9px;
+    font-family: 'Share Tech Mono', monospace;
+  }
 
   .daily-grid {
     display: grid;
@@ -728,7 +720,6 @@
       radial-gradient(circle at center, transparent 55%, rgba(51,255,102,0.05) 56%, transparent 57%);
   }
 
-  /* Diagnostics */
   .diag-log {
     font-size: 12.5px;
     line-height: 1.5;
@@ -736,7 +727,6 @@
     color: var(--phosphor);
   }
 
-  /* Help */
   .help-content {
     font-size: 13px;
     line-height: 1.6;
@@ -751,7 +741,6 @@
     font-size: 12px;
   }
 
-  /* Power-off */
   .crt-screen.powered-off {
     filter: brightness(0.04) contrast(1);
   }
@@ -761,7 +750,6 @@
     pointer-events: none;
   }
 
-  /* Fullscreen hint */
   .fs-hint {
     position: absolute;
     bottom: 8px;
@@ -785,7 +773,6 @@
 </head>
 <body>
 <div class="terminal-case">
-  <!-- STATUS BAR -->
   <div class="status-bar">
     <div class="status-left">
       <div class="led on" id="sys-led"></div>
@@ -801,7 +788,6 @@
     </div>
   </div>
 
-  <!-- CRT -->
   <div class="crt-bezel">
     <div class="crt-screen" id="crt">
       <div class="noise"></div>
@@ -935,7 +921,6 @@
     </div>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls">
     <div style="display:flex;gap:7px;flex-wrap:wrap;">
       <button class="btn" onclick="location.reload()">REBOOT</button>
@@ -997,7 +982,6 @@
     document.getElementById('pwr-status').textContent = `PWR: ${pwr.toFixed(0)}%`;
     const temp = 40 + Math.floor(Math.random() * 5);
     document.getElementById('temp-status').textContent = `TEMP: ${temp}°C`;
-    // occasional disk activity
     if (Math.random() > 0.7) {
       const led = document.getElementById('disk-led');
       led.classList.add('on', 'activity');
@@ -1218,7 +1202,8 @@ GEOSERVICES:   AVAILABLE
         `Location locked: ${lat.toFixed(4)}°, ${lon.toFixed(4)}° // Querying satellites...`;
 
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,cloud_cover,uv_index&hourly=temperature_2m,precipitation_probability,weather_code,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset&timezone=auto&forecast_days=6`;
+        // Request Fahrenheit
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure,cloud_cover,uv_index&hourly=temperature_2m,precipitation_probability,weather_code,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset&timezone=auto&forecast_days=6&temperature_unit=fahrenheit`;
         const res = await fetch(url);
         weatherData = await res.json();
 
@@ -1245,14 +1230,54 @@ GEOSERVICES:   AVAILABLE
     }, { enableHighAccuracy: true, timeout: 12000 });
   }
 
+  // Helper: create SVG line chart
+  function createLineChart(values, width = 500, height = 100, color = 'var(--phosphor)') {
+    if (!values || values.length === 0) return '';
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min || 1;
+    const padding = 8;
+    const chartW = width - padding * 2;
+    const chartH = height - padding * 2;
+
+    let points = values.map((v, i) => {
+      const x = padding + (i / (values.length - 1)) * chartW;
+      const y = padding + chartH - ((v - min) / range) * chartH;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+
+    // Optional fill area under the line
+    const firstX = padding;
+    const lastX = padding + chartW;
+    const bottomY = height - padding;
+    const areaPoints = `${firstX},${bottomY} ${points} ${lastX},${bottomY}`;
+
+    return `
+      <svg class="line-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+        <!-- subtle horizontal grid -->
+        <line class="grid-line" x1="${padding}" y1="${padding}" x2="${width-padding}" y2="${padding}"/>
+        <line class="grid-line" x1="${padding}" y1="${height/2}" x2="${width-padding}" y2="${height/2}"/>
+        <line class="grid-line" x1="${padding}" y1="${height-padding}" x2="${width-padding}" y2="${height-padding}"/>
+        
+        <!-- area fill -->
+        <polygon points="${areaPoints}" fill="${color}" opacity="0.12"/>
+        
+        <!-- main line -->
+        <polyline points="${points}" stroke="${color}"/>
+      </svg>
+    `;
+  }
+
   function renderTab(tab) {
     if (!weatherData) return;
+
     if (tab === 'current') {
       const c = weatherData.current;
       const d = weatherData.daily;
       document.getElementById('current-content').innerHTML = `
-        <div class="current-big">${Math.round(c.temperature_2m)}°C</div>
-        <div class="current-desc">${weatherCodes[c.weather_code] || "Unknown"} • Feels like ${Math.round(c.apparent_temperature)}°C</div>
+        <div class="current-big">${Math.round(c.temperature_2m)}°F</div>
+        <div class="current-desc">${weatherCodes[c.weather_code] || "Unknown"} • Feels like ${Math.round(c.apparent_temperature)}°F</div>
         <div class="current-grid">
           <div class="current-card"><div class="label">HUMIDITY</div><div class="value">${c.relative_humidity_2m}%</div></div>
           <div class="current-card"><div class="label">WIND</div><div class="value">${c.wind_speed_10m} km/h</div></div>
@@ -1265,6 +1290,7 @@ GEOSERVICES:   AVAILABLE
         </div>
       `;
     }
+
     if (tab === 'hourly') {
       const h = weatherData.hourly;
       let cards = '';
@@ -1274,22 +1300,18 @@ GEOSERVICES:   AVAILABLE
         const pop = h.precipitation_probability[i];
         cards += `<div class="hourly-card"><div class="time">${time}</div><div class="temp">${temp}°</div><div class="pop">${pop}%</div></div>`;
       }
-      let bars = '';
-      const temps = h.temperature_2m.slice(0,24);
-      const minT = Math.min(...temps);
-      const maxT = Math.max(...temps);
-      const range = maxT - minT || 1;
-      for (let i = 0; i < 24; i++) {
-        const height = ((temps[i] - minT) / range) * 70 + 8;
-        bars += `<div class="bar temp" style="height:${height}px" title="${Math.round(temps[i])}°"></div>`;
-      }
+
+      const temps = h.temperature_2m.slice(0, 24);
+      const chart = createLineChart(temps, 520, 110);
+
       document.getElementById('hourly-content').innerHTML = `
         <div class="hourly-scroll">${cards}</div>
         <div class="chart-container">
-          <div class="chart-title">24-HOUR TEMPERATURE TREND (°C)</div>
-          <div class="bar-row">${bars}</div>
+          <div class="chart-title">24-HOUR TEMPERATURE TREND (°F)</div>
+          ${chart}
         </div>`;
     }
+
     if (tab === 'daily') {
       const d = weatherData.daily;
       let cards = '';
@@ -1303,17 +1325,24 @@ GEOSERVICES:   AVAILABLE
           <div style="font-size:10px;margin:2px 0;opacity:0.85">${code}</div>
           <div class="temps">${max}° / ${min}°</div><div class="pop">${pop}% precip</div></div>`;
       }
-      document.getElementById('daily-content').innerHTML = `<div class="daily-grid">${cards}</div>`;
+
+      // Simple dual line for high/low
+      const highs = d.temperature_2m_max.slice(0, 6);
+      const lows  = d.temperature_2m_min.slice(0, 6);
+
+      document.getElementById('daily-content').innerHTML = `
+        <div class="daily-grid">${cards}</div>
+        <div class="chart-container">
+          <div class="chart-title">HIGH / LOW TEMPERATURE (°F) — 6 DAY</div>
+          ${createLineChart(highs, 520, 90)}
+          <div style="margin-top:6px">${createLineChart(lows, 520, 70, 'var(--phosphor-dim)')}</div>
+        </div>`;
     }
+
     if (tab === 'radar') {
       const h = weatherData.hourly;
-      let precipBars = '';
       const precips = h.precipitation.slice(0, 24);
-      const maxP = Math.max(...precips, 0.1);
-      for (let i = 0; i < 24; i++) {
-        const height = (precips[i] / maxP) * 70;
-        precipBars += `<div class="bar" style="height:${Math.max(height,2)}px;background:var(--phosphor-dim)" title="${precips[i].toFixed(1)} mm"></div>`;
-      }
+
       document.getElementById('radar-content').innerHTML = `
         <div class="radar-box">
           <div class="radar-grid"></div>
@@ -1322,7 +1351,7 @@ GEOSERVICES:   AVAILABLE
         </div>
         <div class="chart-container">
           <div class="chart-title">PRECIPITATION AMOUNT (mm) — NEXT 24H</div>
-          <div class="bar-row">${precipBars}</div>
+          ${createLineChart(precips, 520, 100, 'var(--phosphor-dim)')}
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--phosphor-dim)">
           NOTE: Radar is a local simulation. Data sourced from Open-Meteo.
@@ -1432,17 +1461,14 @@ GEOSERVICES:   AVAILABLE
     beep(400, 0.06);
   }
 
-  // Focus command line when clicking content
   document.getElementById('crt-content').addEventListener('click', (e) => {
     if (!e.target.closest('button') && !e.target.closest('.cartridge') && !e.target.closest('.overlay')) {
       cmdInput.focus();
     }
   });
 
-  // Start
   window.onload = () => {
     runBoot();
-    // Resume audio context on first interaction
     document.body.addEventListener('click', () => {
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }, { once: true });
