@@ -88,7 +88,8 @@ const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const GAMES=[
  {n:"DELTA OPS",u:"https://deltaopsishere.oneapp.dev/",i:"🎯",g:"Tactical ops",s:"ROM-Δ-041",d:"Squad-level tactical operations. Plan the approach, breach, and extract."},
  {n:"APACHE DOWN",u:"https://helicoptesim.oneapp.dev/",i:"🚁",g:"Helicopter sim",s:"ROM-AH-112",d:"Fly a gunship through hostile airspace. Keep the rotors turning."},
- {n:"PENGUIN CLICKER",u:"https://clickdapenguin.oneapp.dev/",i:"🐧",g:"Idle / clicker",s:"ROM-PG-007",d:"Click the penguin. Buy upgrades. Build an unstoppable colony."}
+ {n:"PENGUIN CLICKER",u:"https://clickdapenguin.oneapp.dev/",i:"🐧",g:"Idle / clicker",s:"ROM-PG-007",d:"Click the penguin. Buy upgrades. Build an unstoppable colony."},
+ {n:"ABYSSAL STATION: BELOW ZERO",u:"Abyssal_station_below_zero.html",i:"🌊",g:"Underwater survival",s:"ROM-BZ-201",d:"PLACEHOLDER DESCRIPTION."}
 ];
 let ac,muted=false,sel=0,skip=false,booted=false;
 function beep(f=440,d=.07,t='square',v=.04){if(muted||!ac)return;try{const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
