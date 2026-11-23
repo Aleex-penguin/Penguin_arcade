@@ -245,9 +245,9 @@ const BY=-26,base=new T.Group();base.position.set(BASE.x,BY,BASE.z);scene.add(ba
  const mast=M(new T.CylinderGeometry(.38,.52,27,10),0x8a9aa8);mast.position.set(0,14.2,6.1);base.add(mast);
  baseBeacon=new T.Mesh(new T.SphereGeometry(.75,10,8),new T.MeshBasicMaterial({color:0xff4a3a}));baseBeacon.position.set(0,28,6.1);base.add(baseBeacon);
  for(let i=0;i<3;i++){const a=i/3*TAU+.5,l=M(new T.CylinderGeometry(.52,.52,.42,10),0xdff6ff,{emissive:0x9fe8ff,emissiveIntensity:0.6});l.position.set(Math.cos(a)*8.2,.95,Math.sin(a)*8.2);base.add(l);}
- const pl=new T.PointLight(0xc8f4ff,2.6,62,1.4);pl.position.set(0,7.5,0);base.add(pl);
- const pl2=new T.PointLight(0x90d8f0,1.15,40);pl2.position.set(0,3,-2);base.add(pl2);
- const pl3=new T.PointLight(0xa0e8ff,.55,28);pl3.position.set(0,2,5);base.add(pl3);
+ const pl=new T.PointLight(0xc8f4ff,.85,48,1.8);pl.position.set(0,7.5,0);base.add(pl);
+ const pl2=new T.PointLight(0x90d8f0,.4,32);pl2.position.set(0,3,-2);base.add(pl2);
+ const pl3=new T.PointLight(0xa0e8ff,.22,22);pl3.position.set(0,2,5);base.add(pl3);
 }
 
 const relic=new T.Group();relic.position.set(RELIC.x,-112,RELIC.z);scene.add(relic);
@@ -518,7 +518,7 @@ function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w
 /* objectives */
 const nodeNear=ks=>{let b=null,bd=1e9;for(const n of nodes){if(n.cool>0||!ks.includes(n.k))continue;const d=Math.hypot(n.x-P.pos.x,n.z-P.pos.z);if(d<bd){bd=d;b=n;}}return b;};
 const OB=[
- {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'MARA: …Signal. Rook? I am MARA — Maintenance and Reactive Automation. My last clean log is Pelagia-9. After that: noise. Someone wiped this instance at Station Nivalis — deeper than Voss’s deletions. The drop pod you found is not yours. Ice overhead means no air. Find a gap. Someone is covering this up. We need proof that still remembers.'},
+ {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'MARA: Rook? This is MARA. I lost your signal earlier. Rook is that a Drop Pod? I don’t have any memory logged of a Drop Pod out here. Adding info to Databank…'},
  {t:'Salvage',x:'Collect 6 Scrap Metal, 4 Frost Quartz and 2 Copper Ore. [E]',ok:()=>inv.scrap>=6&&inv.quartz>=4&&inv.copper>=2,mark:()=>nodeNear(['scrap','quartz','copper']),say:'MARA: Surface camps and underwater modules both left caches. Other foreign pods along the ice are torn apart by something. Salvage what you can. Metal, quartz, copper — stay alive while we map the cover-up.'},
  {t:'Station Nivalis',x:'Swim south to Station Nivalis and enter the dome.',pos:BASE,ok:()=>nearBase(),say:'MARA: Habitat dome, 100 m south, 26 m down. Nivalis was never one station — it was a whole community. Research shacks and modules on the glacier, habitats under the ice and on the surface, deeper pods toward the basin. I can see the architecture. I cannot see why my memory stops the day the lights went out.'},
  {t:'Warm Up',x:'Use the Fabricator [E] to build the Cold-Weather Suit.',pos:BASE,ok:()=>gear.warm,say:'MARA: Build the cold-weather suit. Surface labs are colder than the water. Crews lived up there for months. Their last entry is one word: worse. Dispatch is already nervous that you are still here.'},
@@ -663,10 +663,10 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
  {let best=1e9,vx=0,vy=0,vz=0;for(const v of vents){const d=Math.hypot(P.pos.x-v.x,P.pos.y-v.y,P.pos.z-v.z);if(d<best){best=d;vx=v.x;vy=v.y;vz=v.z;}}
   if(best<22&&!above){fillWarm.position.set(vx,vy,vz);fillWarm.intensity=lerp(1.8,0,best/22);}else fillWarm.intensity=0;}
  if(window.hab&&window.hab.dry){
-  scene.background=C_IN;scene.fog.color.copy(C_IN);scene.fog.density=.0045;
-  amb.intensity=1.05;hemi.intensity=.9;sun.intensity=0;skyFill.intensity=0;
+  scene.background=C_IN;scene.fog.color.copy(C_IN);scene.fog.density=.006;
+  amb.intensity=.48;hemi.intensity=.42;sun.intensity=0;skyFill.intensity=0;
   fillDeep.intensity=0;fillWarm.intensity=0;lamp.visible=false;lamp.intensity=0;
-  renderer.toneMappingExposure=1.08;
+  renderer.toneMappingExposure=.85;
  }
  sky.position.copy(cam.position);sky.visible=cy>-8;water.position.set(cam.position.x,0,cam.position.z);
  // water undulation — quality-gated
@@ -772,12 +772,14 @@ const jct=(g,both)=>{const nt=48,nr=10;
  build((t,sg,k)=>{const c=Math.cos(t),s=Math.sin(t),xc=1.5*Math.abs(c),x=sg*(xc+(2.5-xc)*k);return [x,1.5*s,1.5*c,x/5+.5];},both?[1,-1]:[1]);};
 /* walkable floor for an L corridor */
 const elbowFloor=(g,C)=>{bx(g,C,2.1,.2,1,trim,0,-1.2,-2,1);bx(g,C,1,.2,2.1,trim,2,-1.2,0,1);bx(g,C,1.4,.2,1.4,trim,1,-1.2,-1,1);};
-/* Subnautica-style ladder: black rails, yellow rungs, grab loop on top */
-const ladder=(g,x,z,y0,y1,ry)=>{const L=new T.Group(),h=y1-y0,blk=new PH({color:0x1e2226,shininess:30}),yel=new PH({color:0xf0b400,shininess:80,emissive:0x3a2a00});
- L.position.set(x,(y0+y1)/2,z);L.rotation.y=ry||0;(g.userData.lads=g.userData.lads||[]).push({x,z,y0,y1});
+/* Subnautica-style ladder: black rails, yellow rungs, grab loop — rails are solid colliders */
+const ladder=(g,C,x,z,y0,y1,ry)=>{const L=new T.Group(),h=y1-y0,mid=(y0+y1)/2,blk=new PH({color:0x1e2226,shininess:30}),yel=new PH({color:0xf0b400,shininess:80,emissive:0x3a2a00});
+ L.position.set(x,mid,z);L.rotation.y=ry||0;(g.userData.lads=g.userData.lads||[]).push({x,z,y0,y1,ry:ry||0});
  for(const s of[-1,1])add(L,new T.CylinderGeometry(.045,.045,h,8),blk,s*.32,0,0);
  for(let y=-h/2+.35;y<h/2-.1;y+=.5)add(L,new T.CylinderGeometry(.04,.04,.64,8).rotateZ(pi/2),yel,0,y,0);
- add(L,new T.TorusGeometry(.32,.045,6,14,pi),yel,0,h/2,0);g.add(L);};
+ add(L,new T.TorusGeometry(.32,.045,6,14,pi),yel,0,h/2,0);g.add(L);L.userData.isLad=1;
+ /* collision comes from entry.lads in collide() so alignment can move solids with the mesh */
+};
 /* floor / ceiling slab with an optional square hole in the middle */
 const slab=(g,C,SX,SZ,y,th,hs,m)=>{if(!hs){bx(g,C,SX,th,SZ,m,0,y,0,1);return}const a=(SZ-hs)/2,b=(SX-hs)/2;
  for(const s of[-1,1]){bx(g,C,SX,th,a,m,0,y,s*(hs/2+a/2),1);bx(g,C,b,th,hs,m,s*(hs/2+b/2),y,0,1);}};
@@ -796,7 +798,7 @@ const walls=(g,C,SX,SZ,yb,yt,sill,win2)=>{
 const room=(g,C,SX,SZ,o)=>{o=o||{};const y0=FY,yt=y0+RH;
  slab(g,C,SX,SZ,y0,.4,o.pool?3.4:3,FLR);slab(g,C,SX,SZ,yt,.35,3,CEI);
  if(!o.pool)cover(g,C,5,y0);cover(g,C,4,yt);
- walls(g,C,SX,SZ,y0,yt,0,o.win);ladder(g,0,1.2,y0+.2,yt-.2);g.userData.lad=g.children[g.children.length-1];
+ walls(g,C,SX,SZ,y0,yt,0,o.win);ladder(g,C,0,1.2,y0+.2,yt-.2);g.userData.lad=g.children[g.children.length-1];
  {const hx=SX/2,hz=SZ/2;for(const s of[-1,1]){C.push(['i',0,0,s*(hz-WT/2),3,3,WT+.2],['i',s*(hx-WT/2),0,0,WT+.2,3,3]);}C.push(['i',0,yt,0,3,.7,3],['i',0,y0,0,3,.7,3]);}
  details(g,SX,SZ,y0,yt);
  C.push(['i',0,(y0+yt)/2,0,SX-.6,RH-.4,SZ-.6]);
@@ -881,7 +883,7 @@ const D=[
 ['Vertical Connector',5,3,{scrap:2,copper:1},(g,C)=>{
   add(g,new T.CylinderGeometry(1.5,1.5,5,24,1,true),tubeM);
   for(const y of[-2.5,-1.25,0,1.25,2.5])ring(g,1.5,0,y,0,pi/2);
-  ladder(g,0,-1.38,-2.4,2.4);
+  ladder(g,C,0,-1.38,-2.4,2.4);
   bx(g,null,.12,4.4,.04,glow,0,0,1.42);
   add(g,new T.TorusGeometry(.5,.06,8,20),trim,1.52,.3,0).rotation.y=pi/2;
   add(g,new T.CircleGeometry(.45,20),glass,1.53,.3,0).rotation.y=pi/2;
@@ -929,7 +931,7 @@ const D=[
   [[-.5,1,6],[-1.5,1,5.4],[-2.5,1,3.4]].forEach(q=>{C.push(['b',0,y0,q[0],q[2],.4,q[1]],['b',0,yt,q[0],q[2],.35,q[1]]);});
   C.push(['c',0,yc,0,'y',RH/2,R,1]);
 }],
-['Ladder',3.6,0,{scrap:1},(g,C)=>{ladder(g,0,0,-1.5,2.1);
+['Ladder',3.6,0,{scrap:1},(g,C)=>{ladder(g,C,0,0,-1.5,2.1);
 }]];
 
 let building=false,sel=0,rot=0,free=false,ghost=null,ghostOK=false,sig='';
@@ -1004,6 +1006,15 @@ function pushBox(p,v,b){const r=RP;
  let k=0;for(let i=1;i<6;i++)if(pen[i]<pen[k])k=i;
  if(window.hab&&window.hab.walk&&k!==2&&k!==3){const up2=b.y1+r-p.y;if(up2>0&&up2<.6){p.y=b.y1+r+.001;if(v.y<0)v.y=0;grd=1;return;}}
  const ax=['x','x','y','y','z','z'][k],sg=k%2?1:-1;p[ax]+=sg*pen[k];if(v[ax]*sg<0)v[ax]=0;if(k===3)grd=1;}
+function pushLad(p,v,l){
+ const r=.09;
+ for(const side of[-1,1]){
+  const cx=l.x+side*.32,cz=l.z;
+  pushBox(p,v,{x0:cx-r,x1:cx+r,y0:l.y0,y1:l.y1,z0:cz-r,z1:cz+r});
+ }
+ /* thin back plate — cannot walk straight through */
+ pushBox(p,v,{x0:l.x-.28,x1:l.x+.28,y0:l.y0,y1:l.y1,z0:l.z+.12,z1:l.z+.28});
+}
 function collide(p,v){grd=0;
  for(let it=0;it<2;it++){
   for(const q of placed){
@@ -1012,6 +1023,7 @@ function collide(p,v){grd=0;
    for(const c of q.col){
     if(c.t==='b'){if(c.cv!==undefined&&q.used.has(c.cv))continue;pushBox(p,v,c);}
     else if(c.t!=='i'){const e=tube(p,c);if(e&&e.c>bc){bc=e.c;best=e;}}}
+   if(q.lads)for(const l of q.lads)pushLad(p,v,l);
    if(best&&bc<0&&bc>-2*RP){
     const inside=best.d<best.R,tg=inside?best.R-RP:best.R+RP,n=best.n,sc=best.sc;if(inside&&n[1]<-.5)grd=1;
     p.set(best.a[0]+n[0]*tg*sc[0],best.a[1]+n[1]*tg*sc[1],best.a[2]+n[2]*tg*sc[2]);
@@ -1056,6 +1068,31 @@ function relink(){
  for(const q of placed)if(FH.has(q.i))(SOCK[q.i]||[]).forEach((s,si)=>{if(q.used.has(si)||q.m.userData.cov[si])return;const w=sockWorld(q,si),key='f'+[w.p.x,w.p.y,w.p.z].map(v=>Math.round(v*4)).join()+'|'+w.d;keep.add(key);if(!hmap.has(key))addHatch(key,w.p,w.d,RD.has(q.i));});
  for(let i=hatches.length-1;i>=0;i--){const h=hatches[i];if(!keep.has(h.key)){scene.remove(h.g);hmap.delete(h.key);hatches.splice(i,1);}}
  for(const q of placed){const cov=q.m.userData.cov;for(const si in cov)cov[si].visible=!q.used.has(+si);if(q.m.userData.lad)q.m.userData.lad.visible=!!q.shaftLad;}
+ alignLadders();
+}
+/* snap vertical-connector / ladder pieces to any nearby ladder so rails line up */
+function alignLadders(){
+ for(const q of placed){
+  if(!q.lads||!q.lads.length)continue;
+  if(q.i!==7&&q.i!==18)continue; /* vertical connector + standalone ladder */
+  for(const l of q.lads){
+   let best=null,bd=1.35;
+   for(const o of placed){
+    if(o===q||!o.lads)continue;
+    for(const ol of o.lads){
+     const dy=Math.abs((l.y0+l.y1)*.5-(ol.y0+ol.y1)*.5);
+     const d=Math.hypot(l.x-ol.x,l.z-ol.z);
+     if(d<bd&&dy<7){bd=d;best=ol;}
+    }
+   }
+   if(!best)continue;
+   const dx=best.x-l.x,dz=best.z-l.z;
+   l.x=best.x;l.z=best.z;
+   /* move visual ladder mesh + rebake solid rail boxes */
+   q.m.traverse(ch=>{if(ch.userData&&ch.userData.isLad){ch.position.x+=dx;ch.position.z+=dz;}});
+   q.col=bake(q);
+  }
+ }
 }
 
 /* ---------- hatch walk-through animation ---------- */
@@ -1190,7 +1227,7 @@ cv.addEventListener('mousedown',e=>{
   }
 },true);
 
-const LPL=[0,1,2,3].map(()=>{const l=new T.PointLight(0xdff6ff,0,9,1.6);scene.add(l);return l;});
+const LPL=[0,1,2,3].map(()=>{const l=new T.PointLight(0xb8dce8,0,8,2);scene.add(l);return l;});
 const LROOM=new Set([8,9,10,11,12,13,14,16,17]);
 let stepT=0,wasG=false,fallV=0,lpT=0;
 let lt=performance.now(),inH=false;
@@ -1200,7 +1237,7 @@ let lt=performance.now(),inH=false;
   const cp=cam.position;
   if(state==='play'){
   const hb=window.hab;
-  lpT-=dt;if(lpT<=0){lpT=.3;const c=placed.filter(q=>LROOM.has(q.i)||RD.has(q.i)).map(q=>({q,d:q.p.distanceTo(cp)})).sort((a,b)=>a.d-b.d);LPL.forEach((l,i)=>{const e=c[i];if(e&&e.d<30){l.position.set(e.q.p.x,e.q.p.y+(RD.has(e.q.i)?.7:1.3),e.q.p.z);l.intensity=1.2;}else l.intensity=0;});}
+  lpT-=dt;if(lpT<=0){lpT=.3;const c=placed.filter(q=>LROOM.has(q.i)||RD.has(q.i)).map(q=>({q,d:q.p.distanceTo(cp)})).sort((a,b)=>a.d-b.d);LPL.forEach((l,i)=>{const e=c[i];if(e&&e.d<28){l.position.set(e.q.p.x,e.q.p.y+(RD.has(e.q.i)?.55:1.05),e.q.p.z);l.intensity=.32;}else l.intensity=0;});}
   if(droneG)droneG.gain.value=lerp(droneG.gain.value,hb.dry?.012:.045,Math.min(1,dt*2));
   if(!P.dead&&!P.cine&&hb.dry&&!hb.climb){const sp=Math.hypot(P.vel.x,P.vel.z);if(!grd)fallV=Math.min(fallV,P.vel.y);else{if(!wasG&&fallV<-6)blip(70,.16,.1);fallV=0;if(sp>1){stepT-=dt*sp/3.6;if(stepT<=0){stepT=.45;blip(90+Math.random()*35,.07,.05);}}}wasG=grd;}
  }
