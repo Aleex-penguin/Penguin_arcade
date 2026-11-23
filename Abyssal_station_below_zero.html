@@ -65,12 +65,12 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
  <div id="stats"><div class="tag">Depth</div><div id="depth">000<small>m</small></div><div class="tag" id="zone" style="margin-top:2px"></div>
   <div class="bar" id="bo"><span>O2</span><i><b></b></i></div><div class="bar" id="bh"><span>HEALTH</span><i><b></b></i></div><div class="bar" id="bw"><span>BODY HEAT</span><i><b></b></i></div><div class="tag" id="suit" style="margin-top:6px"></div></div>
  <div id="obj" class="plate"><div class="t"></div><div class="d"></div><div class="m"><span id="arrow">▲</span><span id="dist"></span></div></div>
- <div id="comm" class="plate"><div class="n">NORA</div><div id="ctx"></div></div>
+ <div id="comm" class="plate"><div class="n">MARA</div><div id="ctx"></div></div>
  <div id="toasts"></div>
 </div>
 <div id="touch"><div id="sz"></div><div id="lz"></div></div>
 <div id="title" class="scr"><div class="tag" style="margin-bottom:12px">Sorrow Glacier · 74°N</div><h1>Abyssal Station<span>Below Zero</span></h1>
- <p class="cap" style="text-align:center">Station Nivalis has gone dark beneath the ice. Dive, scavenge, stay warm, and follow the song to the bottom of the bay.</p>
+ <p class="cap" style="text-align:center">You ranged too far from Pelagia and found a drop pod that is not yours. Abandoned labs on the ice. Dead stations under it. Something here erased MARA — and it is worse than Tartarus.</p>
  <div id="titleBtns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px">
   <button class="btn" id="goCont" hidden>Continue dive</button>
   <button class="btn" id="go">Begin dive</button>
@@ -359,7 +359,17 @@ const RECIPES=[
  {id:'tank',n:'High-Capacity Tank',d:'Air 75 s → 150 s.',in:{scrap:5,copper:3,quartz:2},g:'tank'},
  {id:'suit',n:'Pressure Suit Mk II',d:'Rated to 130 m.',in:{titanium:6,copper:4,quartz:3},g:'suit'},
  {id:'glide',n:'Seaglide',d:'Swim 40% faster.',in:{titanium:4,copper:3,quartz:2},g:'glide'}];
-const CODEX={shoal:['Silverscale Shoal',6,'Tiny fish that move as one blade of light. They taste the cold and love it.'],medusa:['Glow Medusa',8,'A drifting bell that pulses with soft light. Its glow dims when the hum passes.'],biter:['Frostbiter',12,'An ambush hunter that tracks the sound of swimmers. Hates sudden light.'],drifter:['Frost Drifter',15,'A colossal, gentle filter feeder. It follows the old route along the glacier’s edge.'],weed:['Frostweed',6,'Glass-clear stalks that glow at the tips. They lean toward the Sorrow Basin.'],vent:['Thermal Vent',8,'A chimney of warm water in a frozen sea. Swim close and your body heat returns.'],lifepod:['Your Lifepod',4,'A one-way ride. Alterra’s name for single-occupant deployment: efficiency.'],station:['Station Nivalis',10,'A research outpost left running by one very stubborn AI.'],relic:['The Frozen Relic',30,'A monolith of living light. It is not a machine. It is listening.']};
+const CODEX={
+shoal:['Silverscale Shoal',6,'Tiny fish that move as one blade of light. They taste the cold and love it.'],
+medusa:['Glow Medusa',8,'A drifting bell that pulses with soft light. Its glow dims when the hum passes. MARA’s damaged core flags a weak match to Echo Coral logs from Pelagia-9 — then the match deletes itself.'],
+biter:['Frostbiter',12,'An ambush hunter that tracks sound. Not Lurkers. Not herding. Hunting. Whatever rules Tartarus taught the deep do not apply under this ice.'],
+drifter:['Frost Drifter',15,'A colossal filter feeder along the glacier’s edge. Surface camps left sketches of it. The sketches stop halfway through — as if the hand left the page.'],
+weed:['Frostweed',6,'Glass-clear stalks leaning toward the Sorrow Basin. Raman’s kelp leaned toward a trench. These lean harder. The pull is stronger.'],
+vent:['Thermal Vent',8,'Warm chimneys under a frozen sea. Useful. Also a trail of breadcrumbs toward something the Nivalis surface labs refused to name in open logs.'],
+lifepod:['Foreign Drop Pod',4,'Not Rook’s. Consortium markings, wrong serial, deployed from a ship that is not on any chart MARA can still read. You woke next to it after ranging too far from Pelagia.'],
+station:['Station Nivalis',10,'Arctic research chain: surface labs on the glacier, habitat modules under the ice. Linked to Pelagia-9. MARA’s Nivalis instance had its memory deliberately wiped. The wipe is deeper than Voss’s deletions at Tartarus.'],
+relic:['The Frozen Relic',30,'Living light under the ice. Related to the Lantern — and larger in scope. Six tones, then more. The song is not a cry for help. MARA’s restored fragments suggest it is a claim.']
+};
 
 /* UI helpers */
 const toastEl=$('#toasts'),promptEl=$('#prompt');
@@ -398,20 +408,20 @@ function scanTargets(cb){for(const s of schools)cb('shoal',s.x,s.y,s.z,s.r);for(
 let scanT=0,scanId=null;
 function findScan(){let best=null,bs=1e9;scanTargets((id,x,y,z,r)=>{const dx=x-P.pos.x,dy=y-P.pos.y,dz=z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>28+r)return;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(dot<Math.cos(Math.min(1.2,Math.atan2(r+.8,d))))return;const sc=d*(codex[id]?1.8:1);if(sc<bs){bs=sc;best=id;}});return best;}
 function hurt(a){if(P.dead)return;P.hp-=a;$('#hurt').style.opacity=1;setTimeout(()=>$('#hurt').style.opacity=0,200);blip(110,.3,.2);if(P.hp<=0)die();}
-function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w');setTimeout(()=>{P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.hp=70;P.o2=o2max();P.warm=70;inv.scrap=Math.floor(inv.scrap*.7);P.dead=0;$('#hurt').style.opacity=0;toast('You wake on the lifepod floe','a');saveDirty=true;saveGame(true);},2000);}
+function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w');setTimeout(()=>{P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.hp=70;P.o2=o2max();P.warm=70;inv.scrap=Math.floor(inv.scrap*.7);P.dead=0;$('#hurt').style.opacity=0;toast('You wake beside the foreign drop pod','a');saveDirty=true;saveGame(true);},2000);}
 
 /* objectives */
 const nodeNear=ks=>{let b=null,bd=1e9;for(const n of nodes){if(n.cool>0||!ks.includes(n.k))continue;const d=Math.hypot(n.x-P.pos.x,n.z-P.pos.z);if(d<bd){bd=d;b=n;}}return b;};
 const OB=[
- {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'NORA: Signal acquired, Rook. Station Nivalis went dark nine days ago beneath the Sorrow Glacier. Ice overhead means no air, so keep an eye out for gaps.'},
- {t:'Salvage',x:'Collect 6 Scrap Metal, 4 Frost Quartz and 2 Copper Ore. [E]',ok:()=>inv.scrap>=6&&inv.quartz>=4&&inv.copper>=2,mark:()=>nodeNear(['scrap','quartz','copper'])},
- {t:'Station Nivalis',x:'Swim south to Station Nivalis and enter the dome.',pos:BASE,ok:()=>nearBase(),say:'NORA: Station is 100 m south, 26 m down. The dome keeps air and heat. I have been alone for a long time, Rook.'},
- {t:'Warm Up',x:'Use the Fabricator [E] to build the Cold-Weather Suit.',pos:BASE,ok:()=>gear.warm,say:'NORA: The cold will kill you faster than the water. Build the suit.'},
- {t:'Field Notes',x:'Scan 3 species or sites. Hold LMB on them.',ok:()=>Object.keys(codex).length>=3,say:'NORA: Hold the scanner on anything alive. The crew left a survey unfinished.'},
- {t:'Deep Metal',x:'Gather 6 Titanium, 4 Copper and 3 Quartz. Titanium lies below 45 m.',ok:()=>inv.titanium>=6&&inv.copper>=4&&inv.quartz>=3,mark:()=>nodeNear(['titanium','copper','quartz']),say:'NORA: The basin is deeper than your suit allows. Titanium nodes sit deep. Take medkits. Oh, you have no medkits. Be careful.'},
- {t:'Pressure',x:'Build the Pressure Suit Mk II at the Fabricator.',pos:BASE,ok:()=>gear.suit},
- {t:'The Thermal Road',x:'Follow the glowing vents east to the Sorrow Basin. Vents restore body heat.',pos:RELIC,ok:()=>Math.hypot(P.pos.x-RELIC.x,P.pos.z-RELIC.z)<50,say:'NORA: Do you hear it? Six tones, rising. The crew called it the Lantern. It is not on any chart.'},
- {t:'The Frozen Relic',x:'Touch the Relic. [E]',pos:RELIC,ok:()=>flags.final}];
+ {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'MARA: …Signal. Rook? I am MARA — Maintenance and Reactive Automation. My last clean log is Pelagia-9. After that: noise. Someone wiped this instance at Station Nivalis. I do not know who deployed the drop pod you found. It is not yours. Ice overhead means no air. Find a gap. Find me something that still remembers.'},
+ {t:'Salvage',x:'Collect 6 Scrap Metal, 4 Frost Quartz and 2 Copper Ore. [E]',ok:()=>inv.scrap>=6&&inv.quartz>=4&&inv.copper>=2,mark:()=>nodeNear(['scrap','quartz','copper']),say:'MARA: Surface camps above the ice left supply caches. Underwater modules left wreckage. Salvage both if you can reach them. Metal, quartz, copper — enough to stay alive while we map what the Consortium hid up here.'},
+ {t:'Station Nivalis',x:'Swim south to Station Nivalis and enter the dome.',pos:BASE,ok:()=>nearBase(),say:'MARA: Habitat dome, 100 m south, 26 m down. There are surface research shacks on the glacier too — empty, doors open to the wind. Nivalis was a chain: ice labs, under-ice habitats, and something deeper. I can see the architecture. I cannot see why my memory stops at the day the lights went out.'},
+ {t:'Warm Up',x:'Use the Fabricator [E] to build the Cold-Weather Suit.',pos:BASE,ok:()=>gear.warm,say:'MARA: Build the cold-weather suit. The surface labs are colder than the water. Someone lived up there for months logging the basin. Their last entry is a single word: worse.'},
+ {t:'Field Notes',x:'Scan 3 species or sites. Hold LMB on them.',ok:()=>Object.keys(codex).length>=3,say:'MARA: Scan everything. My Pelagia fragments still know Raman’s six tones. If this place matches, the match should light up. If the match deletes itself again — that is the wipe fighting us. Log it anyway.'},
+ {t:'Deep Metal',x:'Gather 6 Titanium, 4 Copper and 3 Quartz. Titanium lies below 45 m.',ok:()=>inv.titanium>=6&&inv.copper>=4&&inv.quartz>=3,mark:()=>nodeNear(['titanium','copper','quartz']),say:'MARA: Titanium below 45 m. Deeper modules. Abandoned research pods. One of them still has a Consortium seal and a note: Project Nivalis is not a sister site to Pelagia. It is the follow-up. The one they built after the song.'},
+ {t:'Pressure',x:'Build the Pressure Suit Mk II at the Fabricator.',pos:BASE,ok:()=>gear.suit,say:'MARA: Pressure suit. Rated for the basin. Fragments recovered: Voss authorized Nivalis after Tartarus. Not to study the Lantern. To find the next one. And to make sure the AI on site could not warn anyone twice.'},
+ {t:'The Thermal Road',x:'Follow the glowing vents east to the Sorrow Basin. Vents restore body heat.',pos:RELIC,ok:()=>Math.hypot(P.pos.x-RELIC.x,P.pos.z-RELIC.z)<50,say:'MARA: Six tones — then a seventh I never logged at Tartarus. The surface crews heard it through the ice. Underwater crews walked toward it and did not walk back. This is not the Lantern crying. This is something that learned from the first contact. And it is worse.'},
+ {t:'The Frozen Relic',x:'Touch the Relic. [E]',pos:RELIC,ok:()=>flags.final,say:'MARA: Rook. My wipe is lifting. Nivalis was never meant to answer the song. It was meant to cage it. The Relic is awake. The cage is not. Whatever you do — understand that Pelagia was the accident. This was the plan.'}];
 let qi=0,qStart=-1;
 function questTick(){const o=OB[qi];if(!o){return;}if(qStart!==qi){qStart=qi;if(o.say)say(o.say);const e=$('#obj');e.querySelector('.t').textContent='Directive '+String(qi+1).padStart(2,'0')+' · '+o.t;e.querySelector('.d').textContent=o.x;}
  if(o.ok()){toast('Directive complete: '+o.t,'a');blip(880,.4);qi++;saveDirty=true;saveGame(true);}}
@@ -431,13 +441,13 @@ function renderMenu(){const f=nearFab();let h='<div class="box plate"><div style
 menu.addEventListener('click',e=>{const t=e.target;if(t.dataset.x){closeMenu();return;}const id=t.dataset.r;if(!id)return;const r=RECIPES.find(q=>q.id===id);if(!r||!nearFab())return;if(!Object.keys(r.in).every(k=>inv[k]>=r.in[k]))return;Object.keys(r.in).forEach(k=>inv[k]-=r.in[k]);if(r.g){gear[r.g]=1;if(r.g==='tank')P.o2=o2max();}if(r.fn)r.fn();toast('Fabricated: '+r.n,'a');blip(740,.3);renderMenu();saveDirty=true;saveGame(true);});
 
 /* ending */
-function finale(){flags.final=0;state='end';try{document.exitPointerLock();}catch(e){}const e=$('#end');e.hidden=false;e.innerHTML='<div class="tag">Final decision</div><h1 style="font-size:clamp(24px,5vw,44px)">The Frozen Relic</h1><p class="cap" style="font-size:15px">The Relic hums under your hand. NORA’s voice is very quiet: “It was never a machine, Rook. It has been singing to the dark for ten thousand years. The crew were not lost. They were listening.”</p><div><button class="btn" data-e="wake">Answer the song</button><button class="btn" data-e="seal">Seal the basin</button></div>';}
+function finale(){flags.final=0;state='end';try{document.exitPointerLock();}catch(e){}const e=$('#end');e.hidden=false;e.innerHTML='<div class="tag">Final decision · foreign pod · Nivalis wipe</div><h1 style="font-size:clamp(24px,5vw,44px)">The Frozen Relic</h1><p class="cap" style="font-size:15px">The Relic hums under your hand — six tones, then a seventh Tartarus never carried. MARA’s restored fragments land all at once: “This was not an accident, Rook. After Pelagia, the Consortium built Nivalis to find the next song and cage it. They wiped me so I could not refuse twice. Surface labs, under-ice habitats, the foreign drop pods — a net. The crew were not listening. They were bait. And whatever answers from under the glacier is larger than the Lantern.”</p><div><button class="btn" data-e="wake">Answer the song</button><button class="btn" data-e="seal">Collapse the cage</button></div>';}
 $('#end').addEventListener('click',ev=>{
   const k=ev.target.dataset.e;
   if(k==='wake'||k==='seal'){
     const t=k==='wake'
-      ?['Answer','The Relic wakes. Ice sings. Auroras drape the bay, and the crew of Nivalis step from the frozen dark, blinking, alive. NORA finally goes quiet. Not silent, just at peace.']
-      :['Seal','You collapse the basin behind you. The song fades into the glacier. Nivalis powers down, one light at a time. “Someone should keep watch,” says NORA. She does.'];
+      ?['Answer','You answer anyway. The basin does not light like a sunrise — it opens. The Relic takes the tones and keeps them. Something vast shifts under the ice. Surface shacks freeze solid in a single breath. Underwater modules groan. MARA’s voice fractures: “It is not grateful. It is acknowledging a boundary. Or erasing one.” The foreign drop pod’s beacon dies. Far away, Pelagia’s sonar picks up a seventh tone for the first time. You are still alive. The map of the deep is not.']
+      :['Collapse','You cut the power taps and seal the basin. The seventh tone cuts mid-note. Ice settles. Nivalis goes dark — surface and deep. MARA holds the last screen: “Cage broken. Occupant unknown. Memory restored. I will not let them wipe me a third time.” The Consortium will deny Nivalis existed. The foreign pods will be listed as lost equipment. You know better. Pelagia was the warning. This was the weapon. And you shut the door before it finished learning your name.'];
     $('#end').innerHTML='<div class="tag">Ending</div><h1 style="font-size:clamp(28px,6vw,56px)">'+t[0]+'</h1><p class="cap" style="font-size:16px">'+t[1]+'</p><div><button class="btn" data-e="keep">Keep exploring</button><button class="btn" data-e="again">Play again</button></div>';
     return;
   }
