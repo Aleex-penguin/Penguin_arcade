@@ -236,6 +236,59 @@ const CRATE={x:BASE.x+38,z:BASE.z+22,taken:0};
 function nearCrate(){return!CRATE.taken&&Math.hypot(P.pos.x-CRATE.x,P.pos.z-CRATE.z)<3.2&&Math.abs(P.pos.y-CRATE.y)<3;}
 function takeCrate(){if(CRATE.taken)return;CRATE.taken=1;flags.crateTaken=1;inv.charges=1;CRATE.m.visible=false;toast('Demolition charges recovered','a');blip(720,.25);say('MARA: Consortium demo charges. Tagged for structural collapse only — not a weapon for the open water. Hold them. If we seal the basin, we will need them.');saveDirty=true;saveGame(true);}
 
+/* Nivalis community sites — surface labs + extra habitats + torn pods */
+const SITES=[];
+(function buildCommunity(){
+  const sites=[
+    {id:'surfA',kind:'surface',name:'Glacier Lab North',x:-55,z:-40,y:0.2,say:'MARA: Surface lab. Journals stop mid-sentence. Last readable line: “the seventh tone is not a request.”',loot:{scrap:2,quartz:1}},
+    {id:'surfB',kind:'surface',name:'Ice Camp East',x:70,z:-20,y:0.2,say:'MARA: Camp stoves cold. Sketches of the Frost Drifter end halfway down the page — as if the hand left.',loot:{scrap:1,copper:1,flare:1}},
+    {id:'surfC',kind:'surface',name:'Relay Shack West',x:-90,z:30,y:0.2,say:'MARA: Comms relay to Dispatch. Outbound only after the wipe. They never meant the AI to call for help.',loot:{copper:2,quartz:1}},
+    {id:'habA',kind:'under',name:'Under-ice Module Beta',x:-40,z:-130,d:18,say:'MARA: Secondary habitat. Pressure seals intact, crew gone. Bunk tags match Pelagia transfer lists.',loot:{scrap:3,titanium:1}},
+    {id:'habB',kind:'under',name:'Shelf Habitat Gamma',x:55,z:-60,d:22,say:'MARA: Another under-ice pod. Containment diagrams on the wall. Nivalis was never research-only.',loot:{quartz:2,copper:2}},
+    {id:'habC',kind:'under',name:'Basin Approach Lab',x:110,z:80,d:55,say:'MARA: Staging lab for the basin. Demo-charge manifests. Your crate was not the only one — just the one still sealed.',loot:{scrap:2,titanium:2}},
+    {id:'podA',kind:'torn',name:'Torn Drop Pod',x:25,z:45,y:0.15,say:'MARA: Foreign pod, same serial family as yours. Hull peeled open from the outside. Something wanted whatever was inside — or whoever.',loot:{scrap:1,flare:1}},
+    {id:'podB',kind:'torn',name:'Crushed Pod',x:-70,z:55,y:0.15,say:'MARA: Another non-Rook pod. Crushed into the ice. Consortium serial. No survivor log.',loot:{copper:1,scrap:1}}
+  ];
+  sites.forEach(s=>{
+    const g=new T.Group();
+    if(s.kind==='surface'||s.kind==='torn'){
+      g.position.set(s.x,s.y,s.z);
+      if(s.kind==='surface'){
+        const body=new T.Mesh(new T.BoxGeometry(4.2,2.2,3.4),new T.MeshPhongMaterial({color:0x5a6870,shininess:25}));body.position.y=1.1;
+        const roof=new T.Mesh(new T.BoxGeometry(4.6,.25,3.8),new T.MeshPhongMaterial({color:0x3a444c}));roof.position.y=2.3;
+        const ant=new T.Mesh(new T.CylinderGeometry(.06,.06,2.2,6),new T.MeshPhongMaterial({color:0x8a9aa8}));ant.position.set(1.5,3.2,0);
+        const light=new T.PointLight(0xffc15a,.35,12);light.position.set(0,2.4,0);
+        g.add(body,roof,ant,light);
+      }else{
+        const pod=new T.Mesh(new T.SphereGeometry(1.6,10,8),new T.MeshPhongMaterial({color:0x8a4030,emissive:0x2a1008,shininess:40}));pod.scale.set(1,.55,1.4);pod.rotation.z=.4;pod.rotation.x=.2;
+        const scrap=new T.Mesh(new T.BoxGeometry(1.2,.3,2.2),new T.MeshPhongMaterial({color:0x6a5040}));scrap.position.set(1.2,0,.3);scrap.rotation.y=.5;
+        g.add(pod,scrap);
+      }
+    }else{
+      const y=-s.d;g.position.set(s.x,y,s.z);
+      const disc=new T.Mesh(new T.CylinderGeometry(4.5,5,1.2,16),new T.MeshPhongMaterial({color:0x4a5a68,shininess:30}));disc.position.y=.5;
+      const dome=new T.Mesh(new T.SphereGeometry(4,16,10,0,Math.PI*2,0,Math.PI/2),new T.MeshPhongMaterial({color:0x7ec8e0,transparent:true,opacity:.2,depthWrite:false,side:T.DoubleSide}));dome.position.y=1;
+      const pl=new T.PointLight(0x88d0f0,.9,28);pl.position.set(0,3,0);
+      g.add(disc,dome,pl);
+      s.y=y+2;
+    }
+    if(s.kind!=='under')s.y=s.y||0.2;
+    scene.add(g);s.m=g;s.visited=0;SITES.push(s);
+  });
+})();
+function nearSite(){let best=null,bd=4.5;for(const s of SITES){const y=s.y!=null?s.y:(s.kind==='under'?-s.d:0.2);const d=Math.hypot(P.pos.x-s.x,P.pos.y-y,P.pos.z-s.z);if(d<bd){bd=d;best=s;}}return best;}
+function visitSite(s){
+  if(!s||s.visited){if(s&&s.visited)toast('Already logged: '+s.name,'a');return;}
+  s.visited=1;flags['site_'+s.id]=1;
+  if(s.loot)Object.keys(s.loot).forEach(k=>{inv[k]=(inv[k]|0)+s.loot[k];});
+  toast('Logged: '+s.name,'a');blip(880,.3);
+  if(s.say)say(s.say);
+  const left=SITES.filter(x=>!x.visited).length;
+  if(flags.collapsed&&left>0)setTimeout(()=>say('MARA: '+left+' community sites still dark on my map. Surface and deep. We have time — Dispatch is not coming.'),1200);
+  if(flags.collapsed&&left===0)setTimeout(()=>say('MARA: Every beacon I could raise is logged. Land stations, under-ice habitats, torn pods. The community is mapped. We survived the weapon. Now we live in its shadow.'),1500);
+  saveDirty=true;saveGame(true);
+}
+
 /* resource nodes */
 const nodes=[],NK={scrap:[0x8f8f98,new T.BoxGeometry(1.45,.42,1.05),0,5,70],copper:[0xc9763a,new T.IcosahedronGeometry(.72,0),0,5,90],quartz:[0x9fefff,new T.OctahedronGeometry(.72,0),1,5,100],titanium:[0xb8c8d8,new T.IcosahedronGeometry(.82,0),0,45,115]};
 {const cnt={scrap:55,copper:42,quartz:55,titanium:36};for(const k in cnt){const [col,geo,em,dmin,dmax]=NK[k];
@@ -338,6 +391,7 @@ function applySave(d){
   }
   if(Array.isArray(d.hab)&&typeof window.__habImport==='function')window.__habImport(d.hab);
   if(typeof CRATE!=='undefined'){CRATE.taken=!!(inv.charges>=1||(d.flags&&d.flags.crateTaken));if(CRATE.m)CRATE.m.visible=!CRATE.taken;}
+  if(typeof SITES!=='undefined')SITES.forEach(s=>{s.visited=!!(d.flags&&d.flags['site_'+s.id]);});
   lastSaveAt=d.t||Date.now();
   return true;
 }
@@ -476,7 +530,7 @@ $('#end').addEventListener('click',ev=>{
 /* start + continue / new dive */
 $('#go').addEventListener('click',()=>startPlay(false));
 $('#goCont').addEventListener('click',()=>{const d=hasSave();if(!d){refreshTitleSaveUI();return;}applySave(d);startPlay(true);});
-$('#goNew').addEventListener('click',()=>{if(!confirm('Erase the current save and start fresh?'))return;clearSave();Object.keys(inv).forEach(k=>inv[k]=k==='flare'?3:0);Object.keys(gear).forEach(k=>gear[k]=0);Object.keys(flags).forEach(k=>delete flags[k]);Object.keys(codex).forEach(k=>delete codex[k]);qi=0;qStart=-1;P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.yaw=0;P.pitch=-.1;P.hp=100;P.o2=75;P.warm=100;P.dead=0;if(typeof CRATE!=='undefined'){CRATE.taken=0;if(CRATE.m)CRATE.m.visible=true;}if(typeof window.__habImport==='function')window.__habImport([]);refreshTitleSaveUI();startPlay(false);});
+$('#goNew').addEventListener('click',()=>{if(!confirm('Erase the current save and start fresh?'))return;clearSave();Object.keys(inv).forEach(k=>inv[k]=k==='flare'?3:0);Object.keys(gear).forEach(k=>gear[k]=0);Object.keys(flags).forEach(k=>delete flags[k]);Object.keys(codex).forEach(k=>delete codex[k]);qi=0;qStart=-1;P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.yaw=0;P.pitch=-.1;P.hp=100;P.o2=75;P.warm=100;P.dead=0;if(typeof CRATE!=='undefined'){CRATE.taken=0;if(CRATE.m)CRATE.m.visible=true;}if(typeof SITES!=='undefined')SITES.forEach(s=>s.visited=0);if(typeof window.__habImport==='function')window.__habImport([]);refreshTitleSaveUI();startPlay(false);});
 refreshTitleSaveUI();
 addEventListener('beforeunload',()=>{if(state==='play'||state==='menu')saveGame(true);});
 addEventListener('visibilitychange',()=>{if(document.hidden&&(state==='play'||state==='menu'))saveGame(true);});
@@ -519,6 +573,7 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
    curNode=null;curInter=null;let bs=1e9;
    if(nearFab()){curInter={l:'Open Fabricator',a:()=>toggleMenu()};}
    if(nearCrate()){curInter={l:'Open supply crate',a:()=>takeCrate()};}
+   {const ns=nearSite();if(ns&&!ns.visited)curInter={l:'Log '+ns.name,a:()=>visitSite(ns)};else if(ns&&ns.visited&&!curInter)curInter={l:ns.name+' (logged)',a:()=>visitSite(ns)};}
    if(Math.hypot(P.pos.x-RELIC.x,P.pos.z-RELIC.z)<16&&P.pos.y<-90&&qi>=OB.length-1)curInter={l:'Touch the Relic',a:()=>{flags.final=1;finale();}};
    if(!curInter&&window.hab)curInter=window.hab.prompt();
    if(!curInter)for(const n of nodes){if(!n.m.visible)continue;const dx=n.x-P.pos.x,dy=n.y-P.pos.y,dz=n.z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>3.6)continue;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(d>1.8&&dot<.7)continue;if(d<bs){bs=d;curNode=n;}}
@@ -608,7 +663,8 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
   bar('#bo',P.o2/o2max(),P.o2<o2max()*.25);bar('#bh',P.hp/100,P.hp<35);bar('#bw',P.warm/100,P.warm<25);
   $('#frost').style.opacity=P.warm<30?(1-P.warm/30)*.92:0;
   $('#suit').textContent='SUIT RATED '+rating()+' m'+(gear.warm?' · INSULATED':'')+' · FLARES '+inv.flare;
-  $('#zone').textContent=(window.hab&&window.hab.dry)?'HABITAT · PRESSURIZED':nearBase()?'STATION NIVALIS':above?'SURFACE · -18°C':P.under?'UNDER THE ICE':dep>85?'SORROW BASIN':'ARCTIC SHELF';
+  {const ns=nearSite();
+  $('#zone').textContent=(window.hab&&window.hab.dry)?'HABITAT · PRESSURIZED':nearBase()?'STATION NIVALIS':ns?(ns.name+(ns.visited?' · LOGGED':' · UNLOGGED').toUpperCase()):above?'SURFACE · -18°C':P.under?'UNDER THE ICE':dep>85?'SORROW BASIN':'ARCTIC SHELF';}
   const mk=objMark();if(mk){const dx=mk.x-P.pos.x,dz=mk.z-P.pos.z;$('#arrow').style.transform='rotate('+(Math.atan2(dx,-dz)+P.yaw)+'rad)';$('#dist').textContent=Math.round(Math.hypot(dx,dz))+' m';}else{$('#dist').textContent='';}
   const pr=curInter?curInter.l:curNode?'Collect '+NAMES[curNode.k]:'';promptEl.innerHTML=pr?'<b>E</b>'+pr:'';promptEl.classList.toggle('on',!!pr);
   $('#cross').classList.toggle('hot',!!pr||scanT>0);const sc=$('#scan');sc.style.opacity=scanT>0?1:0;sc.style.borderTopColor=sc.style.borderRightColor='#ffc15a';sc.style.transform='rotate('+scanT*360+'deg)';}}
