@@ -71,7 +71,12 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
 <div id="touch"><div id="sz"></div><div id="lz"></div></div>
 <div id="title" class="scr"><div class="tag" style="margin-bottom:12px">Sorrow Glacier · 74°N</div><h1>Abyssal Station<span>Below Zero</span></h1>
  <p class="cap" style="text-align:center">Station Nivalis has gone dark beneath the ice. Dive, scavenge, stay warm, and follow the song to the bottom of the bay.</p>
- <button class="btn" id="go">Begin dive</button>
+ <div id="titleBtns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px">
+  <button class="btn" id="goCont" hidden>Continue dive</button>
+  <button class="btn" id="go">Begin dive</button>
+  <button class="btn" id="goNew" hidden>New dive</button>
+ </div>
+ <p class="cap" id="saveMeta" style="text-align:center;margin-top:8px" hidden></p>
  <p class="cap" style="text-align:center">WASD swim · Mouse look · Space/Ctrl rise/dive · Shift boost · E interact · Hold LMB scan · 2 flare · F lamp · Tab menu · B build</p></div>
 <div id="menu" class="scr" hidden></div>
 <div id="end" class="scr" hidden></div>
@@ -279,6 +284,75 @@ const gear={warm:0,tank:0,suit:0,glide:0},flags={},codex={};
 const P={pos:new T.Vector3(SPAWN.x,.4,SPAWN.z),vel:new T.Vector3(),yaw:0,pitch:-.1,hp:100,o2:75,warm:100,under:false,dead:0,cine:0};
 const cd=new T.Vector3(),rt=new T.Vector3();
 const rating=()=>gear.suit?130:50,o2max=()=>gear.tank?150:75,depth=()=>Math.max(0,-P.pos.y);
+
+/* ========== AUTO-SAVE (localStorage) ========== */
+const SAVE_KEY='abyssal_station_bz_v1';
+let saveDirty=false,saveCooldown=0,lastSaveAt=0;
+function collectSave(){
+  const hab=(typeof window.__habExport==='function')?window.__habExport():[];
+  return {
+    v:1,t:Date.now(),
+    inv:Object.assign({},inv),gear:Object.assign({},gear),
+    flags:Object.assign({},flags),codex:Object.assign({},codex),
+    qi:qi,lampOn:lampOn,
+    P:{x:P.pos.x,y:P.pos.y,z:P.pos.z,yaw:P.yaw,pitch:P.pitch,hp:P.hp,o2:P.o2,warm:P.warm},
+    hab:hab
+  };
+}
+function saveGame(silent){
+  if(state!=='play'&&state!=='menu')return false;
+  if(P.dead||P.cine)return false;
+  try{
+    const data=collectSave();
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+    lastSaveAt=Date.now();saveDirty=false;saveCooldown=25;
+    if(!silent)toast('Progress saved','a');
+    return true;
+  }catch(e){if(!silent)toast('Save failed','w');return false;}
+}
+function hasSave(){try{const s=localStorage.getItem(SAVE_KEY);if(!s)return null;const d=JSON.parse(s);return d&&d.v===1?d:null;}catch(e){return null;}}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}lastSaveAt=0;}
+function applySave(d){
+  if(!d||d.v!==1)return false;
+  Object.keys(inv).forEach(k=>{if(d.inv&&d.inv[k]!=null)inv[k]=d.inv[k]|0;});
+  Object.keys(gear).forEach(k=>{gear[k]=d.gear&&d.gear[k]?1:0;});
+  Object.keys(flags).forEach(k=>delete flags[k]);if(d.flags)Object.assign(flags,d.flags);
+  Object.keys(codex).forEach(k=>delete codex[k]);if(d.codex)Object.assign(codex,d.codex);
+  qi=d.qi|0;qStart=-1;
+  if(typeof d.lampOn==='boolean')lampOn=d.lampOn;
+  if(d.P){
+    P.pos.set(d.P.x,d.P.y,d.P.z);P.vel.set(0,0,0);
+    P.yaw=d.P.yaw||0;P.pitch=d.P.pitch||-0.1;
+    P.hp=d.P.hp!=null?d.P.hp:100;P.o2=d.P.o2!=null?d.P.o2:o2max();P.warm=d.P.warm!=null?d.P.warm:100;
+    P.dead=0;P.cine=0;
+  }
+  if(Array.isArray(d.hab)&&typeof window.__habImport==='function')window.__habImport(d.hab);
+  lastSaveAt=d.t||Date.now();
+  return true;
+}
+function formatSaveAge(t){
+  const s=Math.max(0,Math.floor((Date.now()-t)/1000));
+  if(s<60)return 'just now';
+  if(s<3600)return Math.floor(s/60)+' min ago';
+  if(s<86400)return Math.floor(s/3600)+' h ago';
+  return Math.floor(s/86400)+' d ago';
+}
+function refreshTitleSaveUI(){
+  const d=hasSave(),cont=$('#goCont'),nw=$('#goNew'),meta=$('#saveMeta'),go=$('#go');
+  if(d){
+    cont.hidden=false;nw.hidden=false;go.hidden=true;
+    meta.hidden=false;
+    const dep=Math.max(0,Math.round(-(d.P&&d.P.y||0)));
+    meta.textContent='Saved '+formatSaveAge(d.t)+' · depth '+dep+' m · directive '+String((d.qi|0)+1).padStart(2,'0');
+  }else{cont.hidden=true;nw.hidden=true;go.hidden=false;meta.hidden=true;go.textContent='Begin dive';}
+}
+function startPlay(fromSave){
+  audio();$('#title').hidden=true;$('#hud').hidden=false;state='play';
+  if(!fromSave)flags.final=0;
+  saveCooldown=8;saveDirty=true;
+  if(!document.body.classList.contains('touch'))toast('Click the view to capture the mouse','a');
+  if(fromSave)toast('Dive resumed','a');
+}
 const RECIPES=[
  {id:'flare',n:'Flares ×3',d:'Scares predators for a while.',in:{scrap:1,quartz:1},fn:()=>inv.flare+=3},
  {id:'warm',n:'Cold-Weather Suit',d:'Cuts heat loss by 70%.',in:{scrap:6,quartz:4,copper:2},g:'warm'},
@@ -319,12 +393,12 @@ if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
 function throwFlare(){if(state!=='play')return;if(inv.flare<1){toast('No flares','w');return;}inv.flare--;flareM.position.copy(P.pos).addScaledVector(cd,6);flareM.visible=true;flareT=22;blip(900,.4);}
 const nearBase=()=>Math.hypot(P.pos.x-BASE.x,P.pos.z-BASE.z)<11&&P.pos.y>BY-1&&P.pos.y<BY+14;
 const nearFab=()=>Math.hypot(P.pos.x-BASE.x,P.pos.z-BASE.z-(-4))<9&&P.pos.y>BY-1&&P.pos.y<BY+10;
-function takeNode(n){const amt=n.k==='scrap'?1+(Math.random()*2|0):1+(Math.random()*2|0);inv[n.k]+=amt;n.cool=240;n.m.visible=false;toast('+'+amt+' '+NAMES[n.k]);blip(660,.12);}
+function takeNode(n){const amt=n.k==='scrap'?1+(Math.random()*2|0):1+(Math.random()*2|0);inv[n.k]+=amt;n.cool=240;n.m.visible=false;toast('+'+amt+' '+NAMES[n.k]);blip(660,.12);saveDirty=true;}
 function scanTargets(cb){for(const s of schools)cb('shoal',s.x,s.y,s.z,s.r);for(let i=0;i<jl.length;i++)cb('medusa',jl[i].x,jl[i].y,jl[i].z,2);for(const b of biters)cb('biter',b.g.position.x,b.g.position.y,b.g.position.z,3);cb('drifter',drifter.position.x,drifter.position.y,drifter.position.z,10);for(const w of weeds)cb('weed',w.x,w.y,w.z,3);for(const v of vents)cb('vent',v.x,v.y,v.z,3);cb('relic',RELIC.x,-102,RELIC.z,8);cb('station',BASE.x,BY+4,BASE.z,13);cb('lifepod',lifepod.position.x,0,lifepod.position.z,3);}
 let scanT=0,scanId=null;
 function findScan(){let best=null,bs=1e9;scanTargets((id,x,y,z,r)=>{const dx=x-P.pos.x,dy=y-P.pos.y,dz=z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>28+r)return;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(dot<Math.cos(Math.min(1.2,Math.atan2(r+.8,d))))return;const sc=d*(codex[id]?1.8:1);if(sc<bs){bs=sc;best=id;}});return best;}
 function hurt(a){if(P.dead)return;P.hp-=a;$('#hurt').style.opacity=1;setTimeout(()=>$('#hurt').style.opacity=0,200);blip(110,.3,.2);if(P.hp<=0)die();}
-function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w');setTimeout(()=>{P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.hp=70;P.o2=o2max();P.warm=70;inv.scrap=Math.floor(inv.scrap*.7);P.dead=0;$('#hurt').style.opacity=0;toast('You wake on the lifepod floe','a');},2000);}
+function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w');setTimeout(()=>{P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.hp=70;P.o2=o2max();P.warm=70;inv.scrap=Math.floor(inv.scrap*.7);P.dead=0;$('#hurt').style.opacity=0;toast('You wake on the lifepod floe','a');saveDirty=true;saveGame(true);},2000);}
 
 /* objectives */
 const nodeNear=ks=>{let b=null,bd=1e9;for(const n of nodes){if(n.cool>0||!ks.includes(n.k))continue;const d=Math.hypot(n.x-P.pos.x,n.z-P.pos.z);if(d<bd){bd=d;b=n;}}return b;};
@@ -340,7 +414,7 @@ const OB=[
  {t:'The Frozen Relic',x:'Touch the Relic. [E]',pos:RELIC,ok:()=>flags.final}];
 let qi=0,qStart=-1;
 function questTick(){const o=OB[qi];if(!o){return;}if(qStart!==qi){qStart=qi;if(o.say)say(o.say);const e=$('#obj');e.querySelector('.t').textContent='Directive '+String(qi+1).padStart(2,'0')+' · '+o.t;e.querySelector('.d').textContent=o.x;}
- if(o.ok()){toast('Directive complete: '+o.t,'a');blip(880,.4);qi++;}}
+ if(o.ok()){toast('Directive complete: '+o.t,'a');blip(880,.4);qi++;saveDirty=true;saveGame(true);}}
 function objMark(){const o=OB[qi];if(!o)return null;if(o.mark){const n=o.mark();if(n)return n;}return o.pos?{x:o.pos.x,z:o.pos.z}:null;}
 
 /* menu */
@@ -354,7 +428,7 @@ function renderMenu(){const f=nearFab();let h='<div class="box plate"><div style
  h+='<h2>Codex '+Object.keys(codex).length+'/'+Object.keys(CODEX).length+'</h2>';
  for(const k in CODEX){const c=CODEX[k];h+='<div class="row"><div><div>'+(codex[k]?c[0]:'Unknown')+'</div><p>'+(codex[k]?c[2]:'Scan it to learn more.')+'</p></div></div>';}
  menu.innerHTML=h+'</div>';}
-menu.addEventListener('click',e=>{const t=e.target;if(t.dataset.x){closeMenu();return;}const id=t.dataset.r;if(!id)return;const r=RECIPES.find(q=>q.id===id);if(!r||!nearFab())return;if(!Object.keys(r.in).every(k=>inv[k]>=r.in[k]))return;Object.keys(r.in).forEach(k=>inv[k]-=r.in[k]);if(r.g){gear[r.g]=1;if(r.g==='tank')P.o2=o2max();}if(r.fn)r.fn();toast('Fabricated: '+r.n,'a');blip(740,.3);renderMenu();});
+menu.addEventListener('click',e=>{const t=e.target;if(t.dataset.x){closeMenu();return;}const id=t.dataset.r;if(!id)return;const r=RECIPES.find(q=>q.id===id);if(!r||!nearFab())return;if(!Object.keys(r.in).every(k=>inv[k]>=r.in[k]))return;Object.keys(r.in).forEach(k=>inv[k]-=r.in[k]);if(r.g){gear[r.g]=1;if(r.g==='tank')P.o2=o2max();}if(r.fn)r.fn();toast('Fabricated: '+r.n,'a');blip(740,.3);renderMenu();saveDirty=true;saveGame(true);});
 
 /* ending */
 function finale(){flags.final=0;state='end';try{document.exitPointerLock();}catch(e){}const e=$('#end');e.hidden=false;e.innerHTML='<div class="tag">Final decision</div><h1 style="font-size:clamp(24px,5vw,44px)">The Frozen Relic</h1><p class="cap" style="font-size:15px">The Relic hums under your hand. NORA’s voice is very quiet: “It was never a machine, Rook. It has been singing to the dark for ten thousand years. The crew were not lost. They were listening.”</p><div><button class="btn" data-e="wake">Answer the song</button><button class="btn" data-e="seal">Seal the basin</button></div>';}
@@ -371,8 +445,13 @@ $('#end').addEventListener('click',ev=>{
   else if(k==='again')location.reload();
 });
 
-/* start */
-$('#go').addEventListener('click',()=>{audio();$('#title').hidden=true;$('#hud').hidden=false;state='play';flags.final=0;if(!document.body.classList.contains('touch'))toast('Click the view to capture the mouse','a');});
+/* start + continue / new dive */
+$('#go').addEventListener('click',()=>startPlay(false));
+$('#goCont').addEventListener('click',()=>{const d=hasSave();if(!d){refreshTitleSaveUI();return;}applySave(d);startPlay(true);});
+$('#goNew').addEventListener('click',()=>{if(!confirm('Erase the current save and start fresh?'))return;clearSave();Object.keys(inv).forEach(k=>inv[k]=k==='flare'?3:0);Object.keys(gear).forEach(k=>gear[k]=0);Object.keys(flags).forEach(k=>delete flags[k]);Object.keys(codex).forEach(k=>delete codex[k]);qi=0;qStart=-1;P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.yaw=0;P.pitch=-.1;P.hp=100;P.o2=75;P.warm=100;P.dead=0;if(typeof window.__habImport==='function')window.__habImport([]);refreshTitleSaveUI();startPlay(false);});
+refreshTitleSaveUI();
+addEventListener('beforeunload',()=>{if(state==='play'||state==='menu')saveGame(true);});
+addEventListener('visibilitychange',()=>{if(document.hidden&&(state==='play'||state==='menu'))saveGame(true);});
 
 /* main loop */
 function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();}addEventListener('resize',resize);resize();
@@ -418,7 +497,7 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
    hitE=0;
    // scan
    const down=md||tuse,tg=down?findScan():null;
-   if(tg){if(scanId!==tg){scanId=tg;scanT=0;}if(codex[tg]){if(scanT===0)toast('Already catalogued: '+CODEX[tg][0]);scanT=.001;}else{scanT+=dt/1.6;if(scanT>=1){codex[tg]=1;scanT=0;toast('Scanned: '+CODEX[tg][0]+'  (+'+CODEX[tg][1]+' data)','a');blip(1100,.5);}}}else{scanT=0;scanId=null;}
+   if(tg){if(scanId!==tg){scanId=tg;scanT=0;}if(codex[tg]){if(scanT===0)toast('Already catalogued: '+CODEX[tg][0]);scanT=.001;}else{scanT+=dt/1.6;if(scanT>=1){codex[tg]=1;scanT=0;toast('Scanned: '+CODEX[tg][0]+'  (+'+CODEX[tg][1]+' data)','a');blip(1100,.5);saveDirty=true;}}}else{scanT=0;scanId=null;}
    // nodes cooldown/visibility
    for(const n of nodes){if(n.cool>0){n.cool-=dt;if(n.cool<=0){n.cool=0;}}n.m.visible=n.cool<=0&&Math.hypot(n.x-P.pos.x,n.z-P.pos.z)<90;}
    qT-=dt;if(qT<=0){qT=.3;questTick();}
@@ -493,6 +572,8 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
  relic.userData.core.rotation.y=time*.55;relic.userData.core.scale.y=3.3+Math.sin(time*1.9)*.22;baseBeacon.visible=Math.sin(time*3.2)>0;
  renderer.render(scene,cam);
  updComm(dt);
+ // auto-save every ~25s while playing
+ if((state==='play'||state==='menu')&&!P.dead&&!P.cine){saveCooldown-=dt;if(saveCooldown<=0||(saveDirty&&saveCooldown<=18)){saveGame(true);}}
  if(state==='play'||state==='menu'){hudT-=dt;if(hudT<=0){hudT=.08;
   $('#depth').firstChild.textContent=String(Math.round(dep)).padStart(3,'0');
   bar('#bo',P.o2/o2max(),P.o2<o2max()*.25);bar('#bh',P.hp/100,P.hp<35);bar('#bw',P.warm/100,P.warm<25);
@@ -872,8 +953,25 @@ function place(){
   const m=make(sel);m.position.copy(t.p);m.rotation.y=t.rot*pi/2;scene.add(m);
   const entry={i:sel,p:t.p.clone(),rot:t.rot,m,used:new Set()};entry.col=bake(entry);entry.lads=(m.userData.lads||[]).map(l=>{const o=rotOff(l.x,0,l.z,t.rot);return {x:t.p.x+o[0],z:t.p.z+o[2],y0:t.p.y+l.y0,y1:t.p.y+l.y1};});
   placed.push(entry);relink();
-  toast('Built: '+D[sel][0]+(t.snap?' · hatch fitted':''),'a');blip(700,.2);refresh();return true;
+  toast('Built: '+D[sel][0]+(t.snap?' · hatch fitted':''),'a');blip(700,.2);refresh();saveDirty=true;saveGame(true);return true;
 }
+window.__habExport=()=>placed.map(q=>({i:q.i,p:[q.p.x,q.p.y,q.p.z],rot:q.rot}));
+window.__habImport=arr=>{
+  while(placed.length){const q=placed.pop();scene.remove(q.m);}
+  for(const f of fills)scene.remove(f);fills.length=0;
+  for(const h of hatches)scene.remove(h.g);hatches.length=0;hmap.clear();vj.length=0;
+  if(!arr||!arr.length){relink();return;}
+  for(const e of arr){
+    if(e.i==null||e.i<0||e.i>=D.length)continue;
+    const m=make(e.i),p=new T.Vector3(e.p[0],e.p[1],e.p[2]),r=e.rot|0;
+    m.position.copy(p);m.rotation.y=r*pi/2;scene.add(m);
+    const entry={i:e.i,p:p,rot:r,m,used:new Set()};
+    entry.col=bake(entry);
+    entry.lads=(m.userData.lads||[]).map(l=>{const o=rotOff(l.x,0,l.z,r);return {x:p.x+o[0],z:p.z+o[2],y0:p.y+l.y0,y1:p.y+l.y1};});
+    placed.push(entry);
+  }
+  relink();
+};
 /* ACT button: place while building, otherwise (or when nothing can be placed) fall through to hatch / interact */
 function buildTryPlace(){
   if(P.cine)return true;
@@ -891,7 +989,7 @@ function del(){
   if(b<0){toast('Nothing to remove here','w');return;}
   const q=placed.splice(b,1)[0];scene.remove(q.m);relink();
   if(!free)for(const k in D[q.i][3])inv[k]+=D[q.i][3][k];
-  toast('Removed: '+D[q.i][0],'a');refresh();
+  toast('Removed: '+D[q.i][0],'a');refresh();saveDirty=true;saveGame(true);
 }
 
 function isDry(p){for(const q of placed){if(q.p.distanceTo(p)>12)continue;for(const c of q.col){
