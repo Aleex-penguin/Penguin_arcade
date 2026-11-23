@@ -77,6 +77,13 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
   <button class="btn" id="goNew" hidden>New dive</button>
  </div>
  <p class="cap" id="saveMeta" style="text-align:center;margin-top:8px" hidden></p>
+ <div class="tag" style="margin-top:14px">Graphics quality</div>
+ <div id="qBtns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:6px">
+  <button class="btn" data-q="low">Low</button>
+  <button class="btn" data-q="med">Medium</button>
+  <button class="btn" data-q="high">High</button>
+ </div>
+ <p class="cap" id="qHint" style="text-align:center;margin-top:6px;font-size:12px">Medium · balanced</p>
  <p class="cap" style="text-align:center">WASD swim · Mouse look · Space/Ctrl rise/dive · Shift boost · E interact · Hold LMB scan · 2 flare · F lamp · Tab menu · B build</p></div>
 <div id="menu" class="scr" hidden></div>
 <div id="end" class="scr" hidden></div>
@@ -105,6 +112,35 @@ renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=false;
 renderer.sortObjects=false;
+
+/* quality presets (runtime) */
+const QUALITY_KEY='abyssal_bz_quality';
+const QSET={
+  low:{label:'Low · max performance',pr:1,waterMask:3,faunaMask:3,auroraMask:7,snow:0,mow:0,bubbles:0,fish:1,jelly:0,weeds:0},
+  med:{label:'Medium · balanced',pr:1.25,waterMask:1,faunaMask:1,auroraMask:3,snow:1,mow:1,bubbles:1,fish:1,jelly:1,weeds:1},
+  high:{label:'High · more detail',pr:Math.min(typeof devicePixelRatio!=='undefined'?devicePixelRatio:1,1.75),waterMask:0,faunaMask:0,auroraMask:1,snow:1,mow:1,bubbles:1,fish:1,jelly:1,weeds:1}
+};
+let quality=(function(){try{const q=localStorage.getItem(QUALITY_KEY);return QSET[q]?q:'med';}catch(e){return'med';}})();
+let qCfg=QSET[quality];
+/* populated after meshes exist — avoids TDZ on const bindings */
+const qFX={snow:null,mow:null,bubbles:null,fish:null,jelly:null};
+function applyQuality(q,silent){
+  if(!QSET[q])q='med';
+  quality=q;qCfg=QSET[q];
+  try{localStorage.setItem(QUALITY_KEY,q);}catch(e){}
+  renderer.setPixelRatio(qCfg.pr);
+  if(qFX.snow)qFX.snow.visible=!!qCfg.snow;
+  if(qFX.mow)qFX.mow.visible=!!qCfg.mow;
+  if(qFX.bubbles)qFX.bubbles.visible=!!qCfg.bubbles;
+  if(qFX.fish)qFX.fish.visible=!!qCfg.fish;
+  if(qFX.jelly)qFX.jelly.visible=!!qCfg.jelly;
+  document.querySelectorAll('#qBtns .btn').forEach(b=>{
+    if(b.dataset.q)b.style.borderColor=b.dataset.q===quality?'var(--amber)':'rgba(127,227,255,.42)';
+  });
+  const hint=$('#qHint');if(hint)hint.textContent=qCfg.label;
+  if(!silent&&typeof toast==='function')toast('Graphics: '+q.toUpperCase(),'a');
+}
+applyQuality(quality,true);
 
 const scene=new T.Scene(),cam=new T.PerspectiveCamera(72,1,.12,900);cam.rotation.order='YXZ';scene.add(cam);
 scene.fog=new T.FogExp2(0x0a3d52,.0108);
@@ -339,6 +375,8 @@ const mow=new T.Points(mg,new T.PointsMaterial({color:0xb8e4ff,size:.12,transpar
 const BN=80,bp=new Float32Array(BN*3),bv=new Float32Array(BN);for(let i=0;i<BN;i++){bp.set([0,0,0],i*3);bv[i]=0;}
 const bg=new T.BufferGeometry();bg.setAttribute('position',new T.BufferAttribute(bp,3));
 const bubbles=new T.Points(bg,new T.PointsMaterial({color:0xd0f0ff,size:.16,transparent:true,opacity:.5,depthWrite:false}));scene.add(bubbles);
+qFX.snow=snow;qFX.mow=mow;qFX.bubbles=bubbles;qFX.fish=fish;qFX.jelly=jelly;
+applyQuality(quality,true);
 
 /* flare */
 const flareM=new T.Mesh(new T.SphereGeometry(.38,10,8),new T.MeshBasicMaterial({color:0xff8a40})),flareL=new T.PointLight(0xff8040,0,48,1.5);flareM.visible=false;scene.add(flareM,flareL);let flareT=0;
@@ -505,8 +543,11 @@ function renderMenu(){const f=nearFab();let h='<div class="box plate"><div style
  RECIPES.forEach(r=>{const done=r.g&&gear[r.g],can=!done&&Object.keys(r.in).every(k=>inv[k]>=r.in[k]);h+='<div class="row"><div><div>'+r.n+'</div><p>'+r.d+' '+Object.keys(r.in).map(k=>r.in[k]+' '+NAMES[k]).join(', ')+'</p></div><button class="btn" data-r="'+r.id+'" '+(f&&can?'':'disabled')+'>'+(done?'Built':'Build')+'</button></div>';});
  h+='<h2>Codex '+Object.keys(codex).length+'/'+Object.keys(CODEX).length+'</h2>';
  for(const k in CODEX){const c=CODEX[k];h+='<div class="row"><div><div>'+(codex[k]?c[0]:'Unknown')+'</div><p>'+(codex[k]?c[2]:'Scan it to learn more.')+'</p></div></div>';}
+ h+='<h2>Graphics</h2><div class="row"><div><div>Quality</div><p>'+qCfg.label+'</p></div><div style="display:flex;gap:4px">';
+ ['low','med','high'].forEach(q=>{h+='<button class="btn" data-q="'+q+'" style="'+(q===quality?'border-color:var(--amber)':'')+'">'+q.toUpperCase()+'</button>';});
+ h+='</div></div>';
  menu.innerHTML=h+'</div>';}
-menu.addEventListener('click',e=>{const t=e.target;if(t.dataset.x){closeMenu();return;}const id=t.dataset.r;if(!id)return;const r=RECIPES.find(q=>q.id===id);if(!r||!nearFab())return;if(!Object.keys(r.in).every(k=>inv[k]>=r.in[k]))return;Object.keys(r.in).forEach(k=>inv[k]-=r.in[k]);if(r.g){gear[r.g]=1;if(r.g==='tank')P.o2=o2max();}if(r.fn)r.fn();toast('Fabricated: '+r.n,'a');blip(740,.3);renderMenu();saveDirty=true;saveGame(true);});
+menu.addEventListener('click',e=>{const t=e.target;if(t.dataset.x){closeMenu();return;}if(t.dataset.q){applyQuality(t.dataset.q);renderMenu();return;}const id=t.dataset.r;if(!id)return;const r=RECIPES.find(q=>q.id===id);if(!r||!nearFab())return;if(!Object.keys(r.in).every(k=>inv[k]>=r.in[k]))return;Object.keys(r.in).forEach(k=>inv[k]-=r.in[k]);if(r.g){gear[r.g]=1;if(r.g==='tank')P.o2=o2max();}if(r.fn)r.fn();toast('Fabricated: '+r.n,'a');blip(740,.3);renderMenu();saveDirty=true;saveGame(true);});
 
 /* ending */
 function finale(){flags.final=0;state='end';try{document.exitPointerLock();}catch(e){}const e=$('#end');e.hidden=false;
@@ -534,6 +575,8 @@ $('#go').addEventListener('click',()=>startPlay(false));
 $('#goCont').addEventListener('click',()=>{const d=hasSave();if(!d){refreshTitleSaveUI();return;}applySave(d);startPlay(true);});
 $('#goNew').addEventListener('click',()=>{if(!confirm('Erase the current save and start fresh?'))return;clearSave();Object.keys(inv).forEach(k=>inv[k]=k==='flare'?3:0);Object.keys(gear).forEach(k=>gear[k]=0);Object.keys(flags).forEach(k=>delete flags[k]);Object.keys(codex).forEach(k=>delete codex[k]);qi=0;qStart=-1;P.pos.set(SPAWN.x,.4,SPAWN.z);P.vel.set(0,0,0);P.yaw=0;P.pitch=-.1;P.hp=100;P.o2=75;P.warm=100;P.dead=0;if(typeof CRATE!=='undefined'){CRATE.taken=0;if(CRATE.m)CRATE.m.visible=true;}if(typeof SITES!=='undefined')SITES.forEach(s=>s.visited=0);if(typeof window.__habImport==='function')window.__habImport([]);refreshTitleSaveUI();startPlay(false);});
 refreshTitleSaveUI();
+document.querySelectorAll('#qBtns [data-q]').forEach(b=>b.addEventListener('click',()=>applyQuality(b.dataset.q)));
+applyQuality(quality,true);
 addEventListener('beforeunload',()=>{if(state==='play'||state==='menu')saveGame(true);});
 addEventListener('visibilitychange',()=>{if(document.hidden&&(state==='play'||state==='menu'))saveGame(true);});
 
@@ -626,31 +669,32 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
   renderer.toneMappingExposure=1.08;
  }
  sky.position.copy(cam.position);sky.visible=cy>-8;water.position.set(cam.position.x,0,cam.position.z);
- // water undulation — no per-frame normals (expensive)
- if((frameN&1)===0&&waterGeo.attributes.position){const wp=waterGeo.attributes.position;for(let i=0;i<wp.count;i+=2){const x=wp.getX(i),z=wp.getZ(i);wp.setY(i,Math.sin(time*.7+x*.015+z*.012)*.35+Math.sin(time*1.1+x*.028)*.18);}wp.needsUpdate=true;}
- if((frameN&3)===0)auroras.forEach((a,i)=>{a.material.opacity=.42+.26*Math.sin(time*.35+i*1.8);a.scale.x=1+.12*Math.sin(time*.28+i);a.scale.y=1+.08*Math.sin(time*.4+i*1.3);});
+ // water undulation — quality-gated
+ if((frameN&qCfg.waterMask)===0&&waterGeo.attributes.position){const wp=waterGeo.attributes.position;for(let i=0;i<wp.count;i+=(qCfg.waterMask?2:1)){const x=wp.getX(i),z=wp.getZ(i);wp.setY(i,Math.sin(time*.7+x*.015+z*.012)*.35+Math.sin(time*1.1+x*.028)*.18);}wp.needsUpdate=true;}
+ if((frameN&qCfg.auroraMask)===0)auroras.forEach((a,i)=>{a.material.opacity=.42+.26*Math.sin(time*.35+i*1.8);a.scale.x=1+.12*Math.sin(time*.28+i);a.scale.y=1+.08*Math.sin(time*.4+i*1.3);});
 
  // surface snow
- snow.visible=above;if(above){for(let i=0;i<SN;i++){const o=i*3;snowP[o+1]-=dt*(1.25+(i%5)*.32);snowP[o]+=Math.sin(time+i)*dt*.32;if(snowP[o+1]<-2)snowP[o+1]=28;}snowG.attributes.position.needsUpdate=true;snow.position.copy(cam.position);}
+ snow.visible=!!qCfg.snow&&above;if(snow.visible){for(let i=0;i<SN;i++){const o=i*3;snowP[o+1]-=dt*(1.25+(i%5)*.32);snowP[o]+=Math.sin(time+i)*dt*.32;if(snowP[o+1]<-2)snowP[o+1]=28;}snowG.attributes.position.needsUpdate=true;snow.position.copy(cam.position);}
 
- // marine snow (every other frame)
- mow.visible=cy<-.25&&!(window.hab&&window.hab.dry);
- if(mow.visible&&(frameN&1)===0){const cp=cam.position,step=dt*2;for(let i=0;i<MN;i++){const o=i*3;mp[o+1]-=step*.28;mp[o]+=Math.sin(time*.4+i)*step*.12;let d=mp[o]-cp.x;if(d>26)mp[o]-=52;else if(d<-26)mp[o]+=52;d=mp[o+1]-cp.y;if(d>18)mp[o+1]-=36;else if(d<-18)mp[o+1]+=36;d=mp[o+2]-cp.z;if(d>26)mp[o+2]-=52;else if(d<-26)mp[o+2]+=52;}mg.attributes.position.needsUpdate=true;}
+ // marine snow
+ mow.visible=!!qCfg.mow&&cy<-.25&&!(window.hab&&window.hab.dry);
+ if(mow.visible&&(frameN&qCfg.faunaMask)===0){const cp=cam.position,step=dt*(qCfg.faunaMask+1);for(let i=0;i<MN;i++){const o=i*3;mp[o+1]-=step*.28;mp[o]+=Math.sin(time*.4+i)*step*.12;let d=mp[o]-cp.x;if(d>26)mp[o]-=52;else if(d<-26)mp[o]+=52;d=mp[o+1]-cp.y;if(d>18)mp[o+1]-=36;else if(d<-18)mp[o+1]+=36;d=mp[o+2]-cp.z;if(d>26)mp[o+2]-=52;else if(d<-26)mp[o+2]+=52;}mg.attributes.position.needsUpdate=true;}
 
  // bubbles
- if(play&&!above){bubbleIdx=(bubbleIdx+1)%BN;if(Math.random()<.25){const o=bubbleIdx*3;bp[o]=P.pos.x+rnd(-1.8,1.8);bp[o+1]=P.pos.y+rnd(-1,1);bp[o+2]=P.pos.z+rnd(-1.8,1.8);bv[bubbleIdx]=rnd(.6,1.4);}for(let i=0;i<BN;i++){const o=i*3;if(bv[i]>0){bp[o+1]+=dt*bv[i]*1.8;bv[i]-=dt*.35;if(bp[o+1]>-.3)bv[i]=0;}}bg.attributes.position.needsUpdate=true;}
- bubbles.visible=!above&&!(window.hab&&window.hab.dry);
+ if(qCfg.bubbles&&play&&!above){bubbleIdx=(bubbleIdx+1)%BN;if(Math.random()<.25){const o=bubbleIdx*3;bp[o]=P.pos.x+rnd(-1.8,1.8);bp[o+1]=P.pos.y+rnd(-1,1);bp[o+2]=P.pos.z+rnd(-1.8,1.8);bv[bubbleIdx]=rnd(.6,1.4);}for(let i=0;i<BN;i++){const o=i*3;if(bv[i]>0){bp[o+1]+=dt*bv[i]*1.8;bv[i]-=dt*.35;if(bp[o+1]>-.3)bv[i]=0;}}bg.attributes.position.needsUpdate=true;}
+ bubbles.visible=!!qCfg.bubbles&&!above&&!(window.hab&&window.hab.dry);
 
- // fauna — update every other frame; skip far schools
- if((frameN&1)===0){
-  const fdt=dt*2;let q=0;
+ // fauna
+ fish.visible=!!qCfg.fish;jelly.visible=!!qCfg.jelly;
+ if(qCfg.fish&&(frameN&qCfg.faunaMask)===0){
+  const fdt=dt*(qCfg.faunaMask+1);let q=0;
   for(const s of schools){
    const near=Math.hypot(s.x-cam.position.x,s.z-cam.position.z)<110;
    s.a+=fdt*s.sp;if(near){s.x+=(s.tx-s.x)*fdt*.05;s.z+=(s.tz-s.z)*fdt*.05;if(Math.random()<fdt*.05){s.tx+=rnd(-30,30);s.tz+=rnd(-30,30);}}
    for(let i=0;i<FISH_PER;i++){const a=s.a+i*.9,r=s.r*(.6+.4*Math.sin(i*2.3));dm.position.set(s.x+Math.cos(a)*r,s.y+Math.sin(time+i)*1.25,s.z+Math.sin(a)*r*.8);dm.rotation.set(0,s.a,0);dm.updateMatrix();fish.setMatrixAt(q++,dm.matrix);}
   }
   fish.instanceMatrix.needsUpdate=true;
-  for(let i=0;i<jl.length;i++){const j=jl[i],p=Math.sin(time*1.55+j.ph);dm.position.set(j.x+Math.sin(time*.2+j.ph)*1.55,j.y+p*.55,j.z);dm.rotation.set(0,0,0);dm.scale.set(j.s*(1+p*.09),j.s*(1-p*.13),j.s*(1+p*.09));dm.updateMatrix();jelly.setMatrixAt(i,dm.matrix);}jelly.instanceMatrix.needsUpdate=true;dm.scale.set(1,1,1);dm.rotation.set(0,0,0);
+  if(qCfg.jelly){for(let i=0;i<jl.length;i++){const j=jl[i],p=Math.sin(time*1.55+j.ph);dm.position.set(j.x+Math.sin(time*.2+j.ph)*1.55,j.y+p*.55,j.z);dm.rotation.set(0,0,0);dm.scale.set(j.s*(1+p*.09),j.s*(1-p*.13),j.s*(1+p*.09));dm.updateMatrix();jelly.setMatrixAt(i,dm.matrix);}jelly.instanceMatrix.needsUpdate=true;dm.scale.set(1,1,1);dm.rotation.set(0,0,0);}
   dA+=fdt*.02;drifter.position.set(Math.cos(dA)*135,-46+Math.sin(dA*5)*4.2,Math.sin(dA)*135-22);drifter.rotation.y=-dA+Math.PI;
  }
  // predators every frame (gameplay)
