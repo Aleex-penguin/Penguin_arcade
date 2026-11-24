@@ -31,8 +31,9 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #obj .d{margin-top:4px;font-size:16px;line-height:1.25}
 #obj .m{margin-top:7px;font:400 12px var(--mono);color:var(--dim);display:flex;gap:8px;align-items:center}
 #arrow{display:inline-block;color:var(--amber);font-size:16px}
-#comm{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:min(560px,92vw);padding:12px 18px;opacity:0;transition:opacity .3s;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+#comm{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);width:min(560px,92vw);max-height:44vh;overflow:auto;padding:12px 18px;opacity:0;transition:opacity .3s;box-shadow:0 8px 28px rgba(0,0,0,.4)}
 #comm.on{opacity:1}#comm .n{font:400 11px var(--mono);letter-spacing:.2em;color:var(--line)}
+#ctx{font-size:15px;line-height:1.3}
 #toasts{position:absolute;left:50%;top:14px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
 .toast{padding:6px 16px;font-size:15px;animation:tin .25s,tout .4s 2.6s forwards;box-shadow:0 4px 16px rgba(0,0,0,.35)}.toast.w{color:var(--warn)}.toast.a{color:var(--amber)}
 @keyframes tin{from{opacity:0;transform:translateY(-10px)}}@keyframes tout{to{opacity:0}}
@@ -217,17 +218,48 @@ for(let k=0;k<4;k++){
 }
 
 /* ice shelf, floes, spires – luminous arctic materials */
+const FLOES=[];
 {const cells=[];for(let cx=-32;cx<32;cx++)for(let cz=-32;cz<32;cz++)if(shelf(cx*8+4,cz*8+4))cells.push([cx*8+4,cz*8+4]);
  const iceMat=new T.MeshPhongMaterial({color:0xe8f6ff,emissive:0x1e4a68,emissiveIntensity:.85,transparent:true,opacity:.9,shininess:55,specular:0xb0e0f0});
  const im=new T.InstancedMesh(new T.BoxGeometry(8,3.2,8),iceMat,cells.length),d=new T.Object3D();
  cells.forEach((q,i)=>{d.position.set(q[0],-1.6,q[1]);d.updateMatrix();im.setMatrixAt(i,d.matrix);});scene.add(im);
  for(let i=0;i<16;i++){const r=rnd(3.2,8.5),x=rnd(-95,95),z=rnd(-65,95);if(shelf(x,z))continue;
-  const f=new T.Mesh(new T.CylinderGeometry(r,r*1.12,1.35,10),new T.MeshPhongMaterial({color:0xf8fcff,emissive:0x1a4050,shininess:70,specular:0xc0e8f8}));f.position.set(x,-.25,z);scene.add(f);}
+  const f=new T.Mesh(new T.CylinderGeometry(r,r*1.12,1.35,10),new T.MeshPhongMaterial({color:0xf8fcff,emissive:0x1a4050,shininess:70,specular:0xc0e8f8}));f.position.set(x,-.25,z);scene.add(f);FLOES.push({x,z,r});}
  const spMat=new T.MeshPhongMaterial({color:0xc0eaf8,emissive:0x0e3048,shininess:42,specular:0x80b8d0});
  const sp=new T.InstancedMesh(new T.ConeGeometry(1,1,6),spMat,160);let n=0;
  for(let t=0;t<600&&n<160;t++){const x=rnd(-260,260),z=rnd(-260,260);if(Math.hypot(x-BASE.x,z-BASE.z)<32)continue;
   const h=rnd(3.5,16),w=rnd(1.1,3.4);d.position.set(x,-depthAt(x,z)+h*.42,z);d.rotation.set(rnd(-.18,.18),rnd(0,3),rnd(-.18,.18));d.scale.set(w,h,w);d.updateMatrix();sp.setMatrixAt(n++,d.matrix);}
  sp.count=n;scene.add(sp);d.rotation.set(0,0,0);d.scale.set(1,1,1);}
+/* guaranteed floes near the lifepod so penguins are always findable */
+[[12,-6],[-14,-18],[26,-34],[-30,8]].forEach(q=>{const r=4.2,f=new T.Mesh(new T.CylinderGeometry(r,r*1.12,1.35,10),new T.MeshPhongMaterial({color:0xf8fcff,emissive:0x1a4050,shininess:70,specular:0xc0e8f8}));f.position.set(q[0],-.25,q[1]);scene.add(f);FLOES.push({x:q[0],z:q[1],r});});
+
+/* penguins — wild ones live on floes; catch one and you can release it inside a base module */
+function mkPenguin(){
+ const g=new T.Group(),blk=new T.MeshPhongMaterial({color:0x14181c,shininess:30}),wht=new T.MeshPhongMaterial({color:0xf2f6f8}),org=new T.MeshPhongMaterial({color:0xff9a28});
+ const body=new T.Mesh(new T.SphereGeometry(.28,10,8),blk);body.scale.set(.85,1.25,.8);body.position.y=.4;
+ const belly=new T.Mesh(new T.SphereGeometry(.24,10,8),wht);belly.scale.set(.8,1.1,.5);belly.position.set(0,.38,.12);
+ const head=new T.Mesh(new T.SphereGeometry(.17,10,8),blk);head.position.set(0,.78,.04);
+ const beak=new T.Mesh(new T.ConeGeometry(.045,.14,6).rotateX(Math.PI/2),org);beak.position.set(0,.76,.2);
+ g.add(body,belly,head,beak);
+ for(const s of[-1,1]){
+  const foot=new T.Mesh(new T.BoxGeometry(.12,.04,.2),org);foot.position.set(s*.1,.03,.08);
+  const fl=new T.Mesh(new T.SphereGeometry(.1,6,5),blk);fl.scale.set(.35,1.2,.7);fl.position.set(s*.27,.46,0);fl.rotation.z=s*.45;
+  g.add(foot,fl);
+ }
+ return g;
+}
+const WPENG=[];
+FLOES.slice(0,7).forEach(f=>{const g=mkPenguin(),a=rnd(0,TAU),rr=rnd(0,f.r*.45),x=f.x+Math.cos(a)*rr,z=f.z+Math.sin(a)*rr;g.position.set(x,.43,z);scene.add(g);WPENG.push({m:g,x,z,fx:f.x,fz:f.z,fr:f.r*.6,ang:rnd(0,TAU),t:0,sp:0,caught:0,respawn:0});});
+function updatePengs(dt){
+ for(const w of WPENG){
+  if(w.caught){w.respawn-=dt;if(w.respawn<=0){w.caught=0;w.m.visible=true;}continue;}
+  w.t-=dt;if(w.t<=0){w.ang+=rnd(-1.6,1.6);w.t=rnd(1.5,4);w.sp=Math.random()<.4?0:rnd(.25,.6);}
+  const nx=w.x+Math.sin(w.ang)*w.sp*dt,nz=w.z+Math.cos(w.ang)*w.sp*dt;
+  if(Math.hypot(nx-w.fx,nz-w.fz)<w.fr){w.x=nx;w.z=nz;}else w.ang+=Math.PI*.8;
+  w.m.position.set(w.x,.43,w.z);w.m.rotation.y=w.ang;w.m.rotation.z=w.sp?Math.sin(time*9)*.1:0;
+ }
+}
+function catchPeng(w){w.caught=1;w.respawn=300;w.m.visible=false;inv.penguin=(inv.penguin|0)+1;toast('Penguin caught — release it inside a base module','a');blip(620,.2);saveDirty=true;}
 
 /* lifepod, base, relic – richer materials */
 const lifepod=new T.Group();lifepod.position.set(SPAWN.x,0,SPAWN.z-4);
@@ -382,7 +414,7 @@ applyQuality(quality,true);
 const flareM=new T.Mesh(new T.SphereGeometry(.38,10,8),new T.MeshBasicMaterial({color:0xff8a40})),flareL=new T.PointLight(0xff8040,0,48,1.5);flareM.visible=false;scene.add(flareM,flareL);let flareT=0;
 
 /* state */
-const inv={scrap:0,copper:0,quartz:0,titanium:0,flare:3,charges:0},NAMES={scrap:'Scrap Metal',copper:'Copper Ore',quartz:'Frost Quartz',titanium:'Titanium Ore',flare:'Flare',charges:'Demolition Charges'};
+const inv={scrap:0,copper:0,quartz:0,titanium:0,flare:3,charges:0,penguin:0},NAMES={scrap:'Scrap Metal',copper:'Copper Ore',quartz:'Frost Quartz',titanium:'Titanium Ore',flare:'Flare',charges:'Demolition Charges',penguin:'Penguin'};
 const gear={warm:0,tank:0,suit:0,glide:0},flags={},codex={};
 const P={pos:new T.Vector3(SPAWN.x,.4,SPAWN.z),vel:new T.Vector3(),yaw:0,pitch:-.1,hp:100,o2:75,warm:100,under:false,dead:0,cine:0};
 const cd=new T.Vector3(),rt=new T.Vector3();
@@ -393,9 +425,10 @@ const SAVE_KEY='abyssal_station_bz_v1';
 let saveDirty=false,saveCooldown=0,lastSaveAt=0;
 function collectSave(){
   const hab=(typeof window.__habExport==='function')?window.__habExport():[];
+  const pets=(typeof window.__petCount==='function')?window.__petCount():0;
   return {
     v:1,t:Date.now(),
-    inv:Object.assign({},inv),gear:Object.assign({},gear),
+    inv:Object.assign({},inv,{penguin:(inv.penguin|0)+pets}),gear:Object.assign({},gear),
     flags:Object.assign({},flags),codex:Object.assign({},codex),
     qi:qi,lampOn:lampOn,
     P:{x:P.pos.x,y:P.pos.y,z:P.pos.z,yaw:P.yaw,pitch:P.pitch,hp:P.hp,o2:P.o2,warm:P.warm},
@@ -480,7 +513,7 @@ relic:['The Frozen Relic',30,'Living light under the ice. Kin to the Lantern, la
 const toastEl=$('#toasts'),promptEl=$('#prompt');
 function toast(t,c){const e=document.createElement('div');e.className='toast plate '+(c||'');e.textContent=t;toastEl.append(e);while(toastEl.children.length>4)toastEl.firstChild.remove();setTimeout(()=>e.remove(),3100);}
 let comq=[],comT=0;function say(t){comq.push(t);}
-function updComm(dt){const el=$('#comm');if(comT>0){comT-=dt;if(comT<=0)el.classList.remove('on');}else if(comq.length){$('#ctx').textContent=comq.shift();el.classList.add('on');comT=Math.max(3.5,$('#ctx').textContent.length*.05);blip(500,.05);}}
+function updComm(dt){const el=$('#comm');if(comT>0){comT-=dt;if(comT<=0)el.classList.remove('on');}else if(comq.length){$('#ctx').textContent=comq.shift();el.classList.add('on');comT=Math.max(3.5,Math.min(30,$('#ctx').textContent.length*.05));blip(500,.05);}}
 let AC=null,droneG=null;function audio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),f=AC.createBiquadFilter(),g=droneG=AC.createGain();o.type='sawtooth';o.frequency.value=55;f.type='lowpass';f.frequency.value=180;g.gain.value=.045;o.connect(f);f.connect(g);g.connect(AC.destination);o.start();}catch(e){AC=null;}}
 function blip(f,d,v){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(v||.08,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+(d||.2));o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+(d||.2)+.05);}
 
@@ -518,7 +551,7 @@ function die(){P.dead=1;$('#hurt').style.opacity=1;toast('You blacked out…','w
 /* objectives */
 const nodeNear=ks=>{let b=null,bd=1e9;for(const n of nodes){if(n.cool>0||!ks.includes(n.k))continue;const d=Math.hypot(n.x-P.pos.x,n.z-P.pos.z);if(d<bd){bd=d;b=n;}}return b;};
 const OB=[
- {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'MARA: Rook? This is MARA. I lost your signal earlier. Rook is that a Drop Pod? I don’t have any memory logged of a Drop Pod out here. Adding info to Databank…'},
+ {t:'Dive',x:'Dive below 12 m. Aim down and swim, or hold Ctrl.',ok:()=>depth()>=12,say:'MARA: Signal. “Rook? This is MARA - Maintenance and Reactive Automation. I lost your signal earlier After that…noise. right after you left to explore the trench I lost your signal and someone tried to wipe clean our logs from what we found at Pelagia-9 and they did wipe the instance at Station Nivalis - deeper than Voss\'s deletions. Ice overhead means no air. Find a gap. Rook is that a Drop Pod? I don’t have any memory of a Drop Pod being out here. Adding info to Databank… Someone is covering this up. We need to find who and what is happening on this planet”'},
  {t:'Salvage',x:'Collect 6 Scrap Metal, 4 Frost Quartz and 2 Copper Ore. [E]',ok:()=>inv.scrap>=6&&inv.quartz>=4&&inv.copper>=2,mark:()=>nodeNear(['scrap','quartz','copper']),say:'MARA: Surface camps and underwater modules both left caches. Other foreign pods along the ice are torn apart by something. Salvage what you can. Metal, quartz, copper — stay alive while we map the cover-up.'},
  {t:'Station Nivalis',x:'Swim south to Station Nivalis and enter the dome.',pos:BASE,ok:()=>nearBase(),say:'MARA: Habitat dome, 100 m south, 26 m down. Nivalis was never one station — it was a whole community. Research shacks and modules on the glacier, habitats under the ice and on the surface, deeper pods toward the basin. I can see the architecture. I cannot see why my memory stops the day the lights went out.'},
  {t:'Warm Up',x:'Use the Fabricator [E] to build the Cold-Weather Suit.',pos:BASE,ok:()=>gear.warm,say:'MARA: Build the cold-weather suit. Surface labs are colder than the water. Crews lived up there for months. Their last entry is one word: worse. Dispatch is already nervous that you are still here.'},
@@ -621,6 +654,8 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
    {const ns=nearSite();if(ns&&!ns.visited)curInter={l:'Log '+ns.name,a:()=>visitSite(ns)};else if(ns&&ns.visited&&!curInter)curInter={l:ns.name+' (logged)',a:()=>visitSite(ns)};}
    if(Math.hypot(P.pos.x-RELIC.x,P.pos.z-RELIC.z)<16&&P.pos.y<-90&&qi>=OB.length-1)curInter={l:'Touch the Relic',a:()=>{flags.final=1;finale();}};
    if(!curInter&&window.hab)curInter=window.hab.prompt();
+   if(!curInter&&window.hab)curInter=window.hab.petPrompt();
+   if(!curInter){let wp=null,wd=2.6;for(const w of WPENG){if(w.caught)continue;const d=Math.hypot(P.pos.x-w.x,P.pos.z-w.z);if(d<wd&&P.pos.y>-1.8){wd=d;wp=w;}}if(wp)curInter={l:'Catch Penguin',a:()=>catchPeng(wp)};}
    if(!curInter)for(const n of nodes){if(!n.m.visible)continue;const dx=n.x-P.pos.x,dy=n.y-P.pos.y,dz=n.z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>3.6)continue;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(d>1.8&&dot<.7)continue;if(d<bs){bs=d;curNode=n;}}
    if(hitE){if(curInter)curInter.a();else if(curNode)takeNode(curNode);}
    hitE=0;
@@ -684,26 +719,28 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
  if(qCfg.bubbles&&play&&!above){bubbleIdx=(bubbleIdx+1)%BN;if(Math.random()<.25){const o=bubbleIdx*3;bp[o]=P.pos.x+rnd(-1.8,1.8);bp[o+1]=P.pos.y+rnd(-1,1);bp[o+2]=P.pos.z+rnd(-1.8,1.8);bv[bubbleIdx]=rnd(.6,1.4);}for(let i=0;i<BN;i++){const o=i*3;if(bv[i]>0){bp[o+1]+=dt*bv[i]*1.8;bv[i]-=dt*.35;if(bp[o+1]>-.3)bv[i]=0;}}bg.attributes.position.needsUpdate=true;}
  bubbles.visible=!!qCfg.bubbles&&!above&&!(window.hab&&window.hab.dry);
 
- // fauna
+ // fauna — wild animals are kept out of every built base module (window.hab.repel)
  fish.visible=!!qCfg.fish;jelly.visible=!!qCfg.jelly;
  if(qCfg.fish&&(frameN&qCfg.faunaMask)===0){
-  const fdt=dt*(qCfg.faunaMask+1);let q=0;
+  const fdt=dt*(qCfg.faunaMask+1),HBr=window.hab;let q=0;
   for(const s of schools){
    const near=Math.hypot(s.x-cam.position.x,s.z-cam.position.z)<110;
    s.a+=fdt*s.sp;if(near){s.x+=(s.tx-s.x)*fdt*.05;s.z+=(s.tz-s.z)*fdt*.05;if(Math.random()<fdt*.05){s.tx+=rnd(-30,30);s.tz+=rnd(-30,30);}}
-   for(let i=0;i<FISH_PER;i++){const a=s.a+i*.9,r=s.r*(.6+.4*Math.sin(i*2.3));dm.position.set(s.x+Math.cos(a)*r,s.y+Math.sin(time+i)*1.25,s.z+Math.sin(a)*r*.8);dm.rotation.set(0,s.a,0);dm.updateMatrix();fish.setMatrixAt(q++,dm.matrix);}
+   for(let i=0;i<FISH_PER;i++){const a=s.a+i*.9,r=s.r*(.6+.4*Math.sin(i*2.3));dm.position.set(s.x+Math.cos(a)*r,s.y+Math.sin(time+i)*1.25,s.z+Math.sin(a)*r*.8);if(HBr)HBr.repel(dm.position,.25);dm.rotation.set(0,s.a,0);dm.updateMatrix();fish.setMatrixAt(q++,dm.matrix);}
   }
   fish.instanceMatrix.needsUpdate=true;
-  if(qCfg.jelly){for(let i=0;i<jl.length;i++){const j=jl[i],p=Math.sin(time*1.55+j.ph);dm.position.set(j.x+Math.sin(time*.2+j.ph)*1.55,j.y+p*.55,j.z);dm.rotation.set(0,0,0);dm.scale.set(j.s*(1+p*.09),j.s*(1-p*.13),j.s*(1+p*.09));dm.updateMatrix();jelly.setMatrixAt(i,dm.matrix);}jelly.instanceMatrix.needsUpdate=true;dm.scale.set(1,1,1);dm.rotation.set(0,0,0);}
-  dA+=fdt*.02;drifter.position.set(Math.cos(dA)*135,-46+Math.sin(dA*5)*4.2,Math.sin(dA)*135-22);drifter.rotation.y=-dA+Math.PI;
+  if(qCfg.jelly){for(let i=0;i<jl.length;i++){const j=jl[i],p=Math.sin(time*1.55+j.ph);dm.position.set(j.x+Math.sin(time*.2+j.ph)*1.55,j.y+p*.55,j.z);if(HBr)HBr.repel(dm.position,.5);dm.rotation.set(0,0,0);dm.scale.set(j.s*(1+p*.09),j.s*(1-p*.13),j.s*(1+p*.09));dm.updateMatrix();jelly.setMatrixAt(i,dm.matrix);}jelly.instanceMatrix.needsUpdate=true;dm.scale.set(1,1,1);dm.rotation.set(0,0,0);}
+  dA+=fdt*.02;drifter.position.set(Math.cos(dA)*135,-46+Math.sin(dA*5)*4.2,Math.sin(dA)*135-22);drifter.rotation.y=-dA+Math.PI;if(HBr)HBr.repel(drifter.position,10);
  }
- // predators every frame (gameplay)
+ updatePengs(dt);
+ // predators every frame (gameplay) — they never enter modules and never attack you indoors
  for(const b of biters){const g=b.g,dx=P.pos.x-g.position.x,dy=P.pos.y-g.position.y,dz=P.pos.z-g.position.z,d=Math.hypot(dx,dy,dz);b.cool-=dt;b.flee-=dt;b.t+=dt;let tx,ty,tz,spd=2.2;
   const fd=flareT>0?Math.hypot(flareM.position.x-g.position.x,flareM.position.y-g.position.y,flareM.position.z-g.position.z):1e9;if(fd<30)b.flee=3;
   if(b.flee>0){tx=g.position.x-dx;ty=g.position.y+2;tz=g.position.z-dz;spd=7;}
-  else if(play&&!P.dead&&d<(P.vel.length()>6?42:30)&&!nearBase()&&!P.under){tx=P.pos.x;ty=P.pos.y;tz=P.pos.z;spd=d<12?8.5:5;if(d<3.2&&b.cool<=0){hurt(16);b.cool=2;b.flee=3;}}
+  else if(play&&!P.dead&&d<(P.vel.length()>6?42:30)&&!nearBase()&&!P.under&&!(window.hab&&window.hab.dry)){tx=P.pos.x;ty=P.pos.y;tz=P.pos.z;spd=d<12?8.5:5;if(d<3.2&&b.cool<=0){hurt(16);b.cool=2;b.flee=3;}}
   else{if(b.t>8||Math.hypot(b.wp.x-g.position.x,b.wp.z-g.position.z)<4){b.t=0;b.wp.set(b.home.x+rnd(-30,30),b.home.y+rnd(-5,5),b.home.z+rnd(-30,30));}tx=b.wp.x;ty=b.wp.y;tz=b.wp.z;}
   const v=new T.Vector3(tx-g.position.x,ty-g.position.y,tz-g.position.z);if(v.lengthSq()>1e-4)v.normalize().multiplyScalar(spd);b.vel.lerp(v,Math.min(1,dt*2));g.position.addScaledVector(b.vel,dt);const ty2=-depthAt(g.position.x,g.position.z)+1.5;if(g.position.y<ty2)g.position.y=ty2;if(g.position.y>-4)g.position.y=-4;
+  if(window.hab)window.hab.repel(g.position,2);
   if(b.vel.lengthSq()>.05)g.lookAt(g.position.x+b.vel.x,g.position.y+b.vel.y,g.position.z+b.vel.z);}
  if(flareT>0){flareT-=dt;const gy=-depthAt(flareM.position.x,flareM.position.z)+.5;if(flareM.position.y>gy)flareM.position.y=Math.max(gy,flareM.position.y-dt*1.2);flareL.position.copy(flareM.position);flareL.intensity=(1.8+Math.random()*.6)*clamp(flareT/3,0,1);if(flareT<=0){flareM.visible=false;flareL.intensity=0;}}
  relic.userData.core.rotation.y=time*.55;relic.userData.core.scale.y=3.3+Math.sin(time*1.9)*.22;baseBeacon.visible=Math.sin(time*3.2)>0;
@@ -715,7 +752,7 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
   $('#depth').firstChild.textContent=String(Math.round(dep)).padStart(3,'0');
   bar('#bo',P.o2/o2max(),P.o2<o2max()*.25);bar('#bh',P.hp/100,P.hp<35);bar('#bw',P.warm/100,P.warm<25);
   $('#frost').style.opacity=P.warm<30?(1-P.warm/30)*.92:0;
-  $('#suit').textContent='SUIT RATED '+rating()+' m'+(gear.warm?' · INSULATED':'')+' · FLARES '+inv.flare;
+  $('#suit').textContent='SUIT RATED '+rating()+' m'+(gear.warm?' · INSULATED':'')+' · FLARES '+inv.flare+(inv.penguin?' · PENGUIN ×'+inv.penguin:'');
   {const ns=nearSite();
   $('#zone').textContent=(window.hab&&window.hab.dry)?'HABITAT · PRESSURIZED':nearBase()?'STATION NIVALIS':ns?(ns.name+(ns.visited?' · LOGGED':' · UNLOGGED').toUpperCase()):above?'SURFACE · -18°C':P.under?'UNDER THE ICE':dep>85?'SORROW BASIN':'ARCTIC SHELF';}
   const mk=objMark();if(mk){const dx=mk.x-P.pos.x,dz=mk.z-P.pos.z;$('#arrow').style.transform='rotate('+(Math.atan2(dx,-dz)+P.yaw)+'rad)';$('#dist').textContent=Math.round(Math.hypot(dx,dz))+' m';}else{$('#dist').textContent='';}
@@ -772,13 +809,12 @@ const jct=(g,both)=>{const nt=48,nr=10;
  build((t,sg,k)=>{const c=Math.cos(t),s=Math.sin(t),xc=1.5*Math.abs(c),x=sg*(xc+(2.5-xc)*k);return [x,1.5*s,1.5*c,x/5+.5];},both?[1,-1]:[1]);};
 /* walkable floor for an L corridor */
 const elbowFloor=(g,C)=>{bx(g,C,2.1,.2,1,trim,0,-1.2,-2,1);bx(g,C,1,.2,2.1,trim,2,-1.2,0,1);bx(g,C,1.4,.2,1.4,trim,1,-1.2,-1,1);};
-/* Subnautica-style ladder: black rails, yellow rungs, grab loop — rails are solid colliders */
+/* Subnautica-style ladder: black rails, yellow rungs, grab loop. Records its pose so connected pieces can merge it into one tall ladder */
 const ladder=(g,C,x,z,y0,y1,ry)=>{const L=new T.Group(),h=y1-y0,mid=(y0+y1)/2,blk=new PH({color:0x1e2226,shininess:30}),yel=new PH({color:0xf0b400,shininess:80,emissive:0x3a2a00});
- L.position.set(x,mid,z);L.rotation.y=ry||0;(g.userData.lads=g.userData.lads||[]).push({x,z,y0,y1,ry:ry||0});
+ L.position.set(x,mid,z);L.rotation.y=ry||0;(g.userData.lads=g.userData.lads||[]).push({x,z,y0,y1,ry:ry||0});(g.userData.ladG=g.userData.ladG||[]).push(L);
  for(const s of[-1,1])add(L,new T.CylinderGeometry(.045,.045,h,8),blk,s*.32,0,0);
  for(let y=-h/2+.35;y<h/2-.1;y+=.5)add(L,new T.CylinderGeometry(.04,.04,.64,8).rotateZ(pi/2),yel,0,y,0);
  add(L,new T.TorusGeometry(.32,.045,6,14,pi),yel,0,h/2,0);g.add(L);L.userData.isLad=1;
- /* collision comes from entry.lads in collide() so alignment can move solids with the mesh */
 };
 /* floor / ceiling slab with an optional square hole in the middle */
 const slab=(g,C,SX,SZ,y,th,hs,m)=>{if(!hs){bx(g,C,SX,th,SZ,m,0,y,0,1);return}const a=(SZ-hs)/2,b=(SX-hs)/2;
@@ -838,14 +874,17 @@ const RD=new Set([1,2,3,4,5,6,7]),FH=new Set([1,2,3,4,5,6,7,8,9,12,13,14]),NOH=n
 const blueM=new PH({color:0x2e6aa6,shininess:70,specular:0x9bbcff}),ylwM=new T.MeshBasicMaterial({color:0xd8f060,side:T.DoubleSide});
 const hfT=floorTex.clone(),hcT=ceilTex.clone();[hfT,hcT].forEach(t=>{t.needsUpdate=true;t.repeat.set(1/3,1/3);});
 const HFM=mat(hfT),HCM=mat(hcT);
-/* extra interior and exterior detail for rooms: wall screens, door status lights, ceiling pipes and vents, roof beacons */
+/* extra detail for rooms: Subnautica-style blue base skirt, corner posts, wall screens, door lights and hazard strips, ceiling pipes and vents, roof beacons */
 function details(g,SX,SZ,y0,yt){
  const scrM=new T.MeshBasicMaterial({color:0x7fe8ff}),ambM=new T.MeshBasicMaterial({color:0xffb23a});
+ bx(g,null,SX+.2,.45,SZ+.2,blueM,0,y0-.12,0);
+ for(const a of[-1,1])for(const b of[-1,1])add(g,new T.CylinderGeometry(.2,.2,yt-y0+.1,10),trim,a*(SX/2-.02),(y0+yt)/2,b*(SZ/2-.02));
  for(const ax of[0,1])for(const s of[-1,1]){
   const L=ax?SZ:SX,N=ax?SX/2:SZ/2,cc=(L/2+1.5)/2,p=s*(N-WT-.03);
   const Q=(a,y,w,h,m)=>{if(ax)bx(g,null,.05,h,w,m,p,y,a);else bx(g,null,w,h,.05,m,a,y,p);};
   for(const k of[-1,1]){Q(k*cc,.2,.8,.55,hull2);Q(k*cc,.2,.62,.38,scrM);}
   Q(0,1.78,.5,.07,ambM);
+  const hz=s*(N-WT-.18);for(let i=-1;i<=1;i++){if(ax)bx(g,null,.3,.02,.3,ylwM,hz,y0+.215,i*.9);else bx(g,null,.3,.02,.3,ylwM,i*.9,y0+.215,hz);}
  }
  for(const s of[-1,1]){
   add(g,new T.CylinderGeometry(.08,.08,SX-.8,8).rotateZ(pi/2),trim,0,yt-.35,s*(SZ/2-.3));
@@ -935,7 +974,7 @@ const D=[
 }]];
 
 let building=false,sel=0,rot=0,free=false,ghost=null,ghostOK=false,sig='';
-const placed=[],hatches=[],hmap=new Map(),vj=[],fills=[];
+const placed=[],hatches=[],hmap=new Map(),vj=[],vjp=[],fills=[];
 const G=2.5, sn=v=>Math.round(v/G)*G;
 const gm=new T.MeshBasicMaterial({color:0x6ff0c0,transparent:true,opacity:.4,depthWrite:false,side:T.DoubleSide});
 const make=i=>{const g=new T.Group(),C=[];g.userData.cov={};g.userData.C=C;D[i][4](g,C);return g};
@@ -946,6 +985,8 @@ function rotOff(lx,ly,lz,r){r=((r%4)+4)%4;if(r===0)return [lx,ly,lz];if(r===1)re
 function rotDir(d,r){if(d>=4)return d;return (d+((r%4)+4)%4)%4;}
 function sockWorld(q,si){const [lx,ly,lz,d]=SOCK[q.i][si],o=rotOff(lx,ly,lz,q.rot);return {p:new T.Vector3(q.p.x+o[0],q.p.y+o[1],q.p.z+o[2]),d:rotDir(d,q.rot)};}
 function freeWorldSocks(q){const out=[];(SOCK[q.i]||[]).forEach((s,si)=>{if(q.used&&q.used.has(si))return;const w=sockWorld(q,si);out.push({si,pos:w.p,dir:w.d});});return out;}
+/* world-space ladder records for a piece (ry is the ladder's total yaw so collision follows rotation) */
+function ladsFor(m,p,rot){return (m.userData.lads||[]).map((l,i)=>{const o=rotOff(l.x,0,l.z,rot);return {x:p.x+o[0],z:p.z+o[2],y0:p.y+l.y0,y1:p.y+l.y1,ry:rot*pi/2+(l.ry||0),i};});}
 
 /* snap one of my sockets onto an open socket of a placed piece */
 function findSnap(aim){
@@ -1006,14 +1047,12 @@ function pushBox(p,v,b){const r=RP;
  let k=0;for(let i=1;i<6;i++)if(pen[i]<pen[k])k=i;
  if(window.hab&&window.hab.walk&&k!==2&&k!==3){const up2=b.y1+r-p.y;if(up2>0&&up2<.6){p.y=b.y1+r+.001;if(v.y<0)v.y=0;grd=1;return;}}
  const ax=['x','x','y','y','z','z'][k],sg=k%2?1:-1;p[ax]+=sg*pen[k];if(v[ax]*sg<0)v[ax]=0;if(k===3)grd=1;}
+/* ladder rails + the plate behind them; follows the ladder's real yaw so aligned/rotated ladders collide where they are drawn */
 function pushLad(p,v,l){
- const r=.09;
- for(const side of[-1,1]){
-  const cx=l.x+side*.32,cz=l.z;
-  pushBox(p,v,{x0:cx-r,x1:cx+r,y0:l.y0,y1:l.y1,z0:cz-r,z1:cz+r});
- }
- /* thin back plate — cannot walk straight through */
- pushBox(p,v,{x0:l.x-.28,x1:l.x+.28,y0:l.y0,y1:l.y1,z0:l.z+.12,z1:l.z+.28});
+ const c=Math.round(Math.cos(l.ry||0)),s=Math.round(Math.sin(l.ry||0)),r=.09;
+ for(const side of[-1,1]){const cx=l.x+side*.32*c,cz=l.z-side*.32*s;pushBox(p,v,{x0:cx-r,x1:cx+r,y0:l.y0,y1:l.y1,z0:cz-r,z1:cz+r});}
+ const px=l.x+.2*s,pz=l.z+.2*c,hx=c?.28:.08,hz=c?.08:.28;
+ pushBox(p,v,{x0:px-hx,x1:px+hx,y0:l.y0,y1:l.y1,z0:pz-hz,z1:pz+hz});
 }
 function collide(p,v){grd=0;
  for(let it=0;it<2;it++){
@@ -1023,7 +1062,7 @@ function collide(p,v){grd=0;
    for(const c of q.col){
     if(c.t==='b'){if(c.cv!==undefined&&q.used.has(c.cv))continue;pushBox(p,v,c);}
     else if(c.t!=='i'){const e=tube(p,c);if(e&&e.c>bc){bc=e.c;best=e;}}}
-   if(q.lads)for(const l of q.lads)pushLad(p,v,l);
+   if(q.lads&&(q.i===7||q.i===18||q.shaftLad))for(const l of q.lads)pushLad(p,v,l);
    if(best&&bc<0&&bc>-2*RP){
     const inside=best.d<best.R,tg=inside?best.R-RP:best.R+RP,n=best.n,sc=best.sc;if(inside&&n[1]<-.5)grd=1;
     p.set(best.a[0]+n[0]*tg*sc[0],best.a[1]+n[1]*tg*sc[1],best.a[2]+n[2]*tg*sc[2]);
@@ -1031,6 +1070,13 @@ function collide(p,v){grd=0;
   }
   for(const h of hatches)if(h.open<.8)pushBox(p,v,h.box);
  }}
+
+/* ---------- keep wild animals out of every built module ---------- */
+const exR=i=>i===0||i===15||i===18?0:RD.has(i)?3.6:i===9?6.6:i===13?5.6:i===10?3.4:i===11?5.4:i===16?3.6:i===17?4.2:4.8;
+function repel(pos,pad){let moved=false;
+ for(const q of placed){const R=exR(q.i);if(!R)continue;const RR=R+pad,dx=pos.x-q.p.x,dy=pos.y-q.p.y,dz=pos.z-q.p.z,d=Math.hypot(dx,dy,dz);
+  if(d<RR){if(d<1e-3){pos.x+=RR;}else{const k=RR/d;pos.set(q.p.x+dx*k,q.p.y+dy*k,q.p.z+dz*k);}moved=true;}}
+ return moved;}
 
 /* ---------- hatches (auto-created wherever two pieces connect) ---------- */
 const dirV=d=>[[0,0,1],[1,0,0],[0,0,-1],[-1,0,0],[0,1,0],[0,-1,0]][d];
@@ -1056,42 +1102,49 @@ function addFill(p,dir){const m=new T.Mesh(fillG,hull2);m.position.copy(p);if(di
 /* recompute which sockets are joined, create/remove hatches, show/hide sealing plates */
 function relink(){
  for(const q of placed){q.used=new Set();q.shaftLad=false;}
- const keep=new Set();vj.length=0;for(const f of fills)scene.remove(f);fills.length=0;
+ const keep=new Set();vj.length=0;vjp.length=0;for(const f of fills)scene.remove(f);fills.length=0;
  for(let a=0;a<placed.length;a++){const A=placed[a];
   for(let si=0;si<(SOCK[A.i]||[]).length;si++){const wa=sockWorld(A,si);
    for(let b=a+1;b<placed.length;b++){const B=placed[b];
     for(let sj=0;sj<(SOCK[B.i]||[]).length;sj++){const wb=sockWorld(B,sj);
      if(wa.p.distanceTo(wb.p)<.55&&wb.d===OPP[wa.d]){
       A.used.add(si);B.used.add(sj);
-      const key=[wa.p.x,wa.p.y,wa.p.z].map(v=>Math.round(v*4)).join()+'|'+Math.min(wa.d,wb.d);
-      if(wa.d>3){vj.push(wa.p.clone());if(A.i===7)B.shaftLad=true;if(B.i===7)A.shaftLad=true;}if(RD.has(A.i)!==RD.has(B.i)&&!NOH.has(A.i)&&!NOH.has(B.i)&&A.i!==10&&B.i!==10&&A.i!==11&&B.i!==11)addFill(wa.p,wa.d);}}}}}
+      if(wa.d>3){vj.push(wa.p.clone());vjp.push([A,B]);if(A.i===7)B.shaftLad=true;if(B.i===7)A.shaftLad=true;}
+      if(RD.has(A.i)!==RD.has(B.i)&&!NOH.has(A.i)&&!NOH.has(B.i)&&A.i!==10&&B.i!==10&&A.i!==11&&B.i!==11)addFill(wa.p,wa.d);}}}}}
  for(const q of placed)if(FH.has(q.i))(SOCK[q.i]||[]).forEach((s,si)=>{if(q.used.has(si)||q.m.userData.cov[si])return;const w=sockWorld(q,si),key='f'+[w.p.x,w.p.y,w.p.z].map(v=>Math.round(v*4)).join()+'|'+w.d;keep.add(key);if(!hmap.has(key))addHatch(key,w.p,w.d,RD.has(q.i));});
  for(let i=hatches.length-1;i>=0;i--){const h=hatches[i];if(!keep.has(h.key)){scene.remove(h.g);hmap.delete(h.key);hatches.splice(i,1);}}
  for(const q of placed){const cov=q.m.userData.cov;for(const si in cov)cov[si].visible=!q.used.has(+si);if(q.m.userData.lad)q.m.userData.lad.visible=!!q.shaftLad;}
  alignLadders();
 }
-/* snap vertical-connector / ladder pieces to any nearby ladder so rails line up */
+/* ---------- one big ladder ----------
+   A vertical connector's ladder is the anchor. Every room joined to it (above or below, and any further
+   connectors stacked through those rooms) has its ladder moved to the same spot, rotated the same way and
+   stretched a little past the ceiling/floor opening, so rails and rungs line up into a single tall ladder. */
+function setLad(o,pose,ext){
+ const g=o.m.userData.ladG[0],d=o.m.userData.lads[0],l=o.lads[0],lp=rotOff(pose.x-o.p.x,0,pose.z-o.p.z,-o.rot),y0=l.y0-ext,y1=l.y1+ext;
+ g.position.set(lp[0],(y0+y1)/2-o.p.y,lp[2]);g.rotation.y=pose.ry-o.rot*pi/2;g.scale.set(1,(y1-y0)/(d.y1-d.y0),1);
+ l.x=pose.x;l.z=pose.z;l.y0=y0;l.y1=y1;l.ry=pose.ry;}
 function alignLadders(){
+ /* 1. put every ladder back at its own default pose */
+ for(const q of placed){const G2=q.m.userData.ladG,D2=q.m.userData.lads;if(!q.lads||!G2)continue;
+  q.lads.forEach((l,li)=>{const g=G2[li],d=D2[li];if(!g||!d)return;g.position.set(d.x,(d.y0+d.y1)/2,d.z);g.rotation.y=d.ry||0;g.scale.set(1,1,1);
+   const o=rotOff(d.x,0,d.z,q.rot);l.x=q.p.x+o[0];l.z=q.p.z+o[2];l.y0=q.p.y+d.y0;l.y1=q.p.y+d.y1;l.ry=q.rot*pi/2+(d.ry||0);});}
+ /* 2. merge ladders through vertical joints, anchored on a connector */
+ const seen=new Set();
+ for(const s of placed){
+  if(s.i!==7||seen.has(s)||!s.lads||!s.lads[0])continue;
+  const pose={x:s.lads[0].x,z:s.lads[0].z,ry:s.lads[0].ry},comp=[],stack=[s];seen.add(s);
+  while(stack.length){const a=stack.pop();comp.push(a);
+   for(const pr of vjp){const o=pr[0]===a?pr[1]:pr[1]===a?pr[0]:null;if(!o||seen.has(o)||!o.lads||!o.lads.length)continue;if(o.i!==7&&!o.shaftLad)continue;seen.add(o);stack.push(o);}}
+  for(const o of comp){if(o===s)continue;setLad(o,pose,o.i===7?0:.6);}
+ }
+ /* 3. standalone ladder pieces snap onto a nearby visible ladder */
  for(const q of placed){
-  if(!q.lads||!q.lads.length)continue;
-  if(q.i!==7&&q.i!==18)continue; /* vertical connector + standalone ladder */
-  for(const l of q.lads){
-   let best=null,bd=1.35;
-   for(const o of placed){
-    if(o===q||!o.lads)continue;
-    for(const ol of o.lads){
-     const dy=Math.abs((l.y0+l.y1)*.5-(ol.y0+ol.y1)*.5);
-     const d=Math.hypot(l.x-ol.x,l.z-ol.z);
-     if(d<bd&&dy<7){bd=d;best=ol;}
-    }
-   }
-   if(!best)continue;
-   const dx=best.x-l.x,dz=best.z-l.z;
-   l.x=best.x;l.z=best.z;
-   /* move visual ladder mesh + rebake solid rail boxes */
-   q.m.traverse(ch=>{if(ch.userData&&ch.userData.isLad){ch.position.x+=dx;ch.position.z+=dz;}});
-   q.col=bake(q);
-  }
+  if(q.i!==18||!q.lads||!q.lads[0])continue;
+  const l=q.lads[0];let best=null,bd=1.35;
+  for(const o of placed){if(o===q||!o.lads||!o.lads.length)continue;if(o.i!==7&&o.i!==18&&!o.shaftLad)continue;
+   for(const ol of o.lads){const d=Math.hypot(l.x-ol.x,l.z-ol.z);if(d<bd&&Math.abs((l.y0+l.y1)/2-(ol.y0+ol.y1)/2)<7){bd=d;best=ol;}}}
+  if(best)setLad(q,{x:best.x,z:best.z,ry:best.ry},0);
  }
 }
 
@@ -1126,15 +1179,16 @@ function place(){
   if(placed.some(q=>q.p.distanceTo(t.p)<0.55)){toast('Too close to another piece','w');return false;}
   if(!free)for(const k in D[sel][3])inv[k]-=D[sel][3][k];
   const m=make(sel);m.position.copy(t.p);m.rotation.y=t.rot*pi/2;scene.add(m);
-  const entry={i:sel,p:t.p.clone(),rot:t.rot,m,used:new Set()};entry.col=bake(entry);entry.lads=(m.userData.lads||[]).map(l=>{const o=rotOff(l.x,0,l.z,t.rot);return {x:t.p.x+o[0],z:t.p.z+o[2],y0:t.p.y+l.y0,y1:t.p.y+l.y1};});
+  const entry={i:sel,p:t.p.clone(),rot:t.rot,m,used:new Set()};entry.col=bake(entry);entry.lads=ladsFor(m,t.p,t.rot);
   placed.push(entry);relink();
   toast('Built: '+D[sel][0]+(t.snap?' · hatch fitted':''),'a');blip(700,.2);refresh();saveDirty=true;saveGame(true);return true;
 }
 window.__habExport=()=>placed.map(q=>({i:q.i,p:[q.p.x,q.p.y,q.p.z],rot:q.rot}));
 window.__habImport=arr=>{
+  clearPets();
   while(placed.length){const q=placed.pop();scene.remove(q.m);}
   for(const f of fills)scene.remove(f);fills.length=0;
-  for(const h of hatches)scene.remove(h.g);hatches.length=0;hmap.clear();vj.length=0;
+  for(const h of hatches)scene.remove(h.g);hatches.length=0;hmap.clear();vj.length=0;vjp.length=0;
   if(!arr||!arr.length){relink();return;}
   for(const e of arr){
     if(e.i==null||e.i<0||e.i>=D.length)continue;
@@ -1142,7 +1196,7 @@ window.__habImport=arr=>{
     m.position.copy(p);m.rotation.y=r*pi/2;scene.add(m);
     const entry={i:e.i,p:p,rot:r,m,used:new Set()};
     entry.col=bake(entry);
-    entry.lads=(m.userData.lads||[]).map(l=>{const o=rotOff(l.x,0,l.z,r);return {x:p.x+o[0],z:p.z+o[2],y0:p.y+l.y0,y1:p.y+l.y1};});
+    entry.lads=ladsFor(m,p,r);
     placed.push(entry);
   }
   relink();
@@ -1170,17 +1224,42 @@ function del(){
 function isDry(p){for(const q of placed){if(q.p.distanceTo(p)>12)continue;for(const c of q.col){
   if(c.t==='i'){if(p.x>c.x0&&p.x<c.x1&&p.y>c.y0&&p.y<c.y1&&p.z>c.z0&&p.z<c.z1)return true;}
   else if(c.t!=='b'){const e=tube(p,c);if(e&&e.d<e.R)return true;}}}return false;}
+/* 0 = outside, 1 = room-type interior, 2 = tube-type interior (used to keep pets on one floor level) */
+function dryKind(p){for(const q of placed){if(q.p.distanceTo(p)>12)continue;for(const c of q.col){
+  if(c.t==='i'){if(p.x>c.x0&&p.x<c.x1&&p.y>c.y0&&p.y<c.y1&&p.z>c.z0&&p.z<c.z1)return 1;}
+  else if(c.t!=='b'){const e=tube(p,c);if(e&&e.d<e.R)return 2;}}}return 0;}
 let grd=0,clmL=false;
 function ladderClimb(){const p=P.pos;let on=false;
  for(const q of placed){if(!q.lads||q.p.distanceTo(p)>12)continue;if(q.i!==7&&q.i!==18&&!q.shaftLad)continue;const r=q.i===7?1.6:.9;
   for(const l of q.lads)if(Math.hypot(p.x-l.x,p.z-l.z)<r&&p.y>l.y0-.8&&p.y<l.y1+.8)on=true;}
  const upk=K.Space||tup>0;if(on){if(upk)clmL=true;else if(grd)clmL=false;}else clmL=false;return clmL;}
 function inClimb(){return ladderClimb();}
-function oldClimb(){const p=P.pos;
- for(const q of placed){if(q.p.distanceTo(p)>12)continue;for(const c of q.col)if(c.t==='c'&&c.a===1&&!c.h){const e=tube(p,c);if(e&&e.d<e.R)return true;}}
- const near=v=>Math.hypot(p.x-v.x,p.z-v.z)<2&&Math.abs(p.y-v.y)<4.5;let nz=false;for(const h of hatches)if(h.dir>3&&near(h.pos))nz=true;for(const v of vj)if(near(v))nz=true;const upk=K.Space||tup>0;if(nz){if(upk)clmL=true;else if(grd)clmL=false;}else clmL=false;if(clmL)return true;
- return false;}
-window.hab={dry:false,climb:false,walk:false,get ground(){return grd},collide,prompt:()=>{if(cine)return null;const h=nearHatch();return h?{l:'Open Hatch',a:()=>startCine(h)}:null;}};
+
+/* ---------- pets: a caught penguin can be released inside a module; wild fauna can never get in ---------- */
+const PETS=[];
+function clearPets(){while(PETS.length){const q=PETS.pop();scene.remove(q.m);}}
+function releasePet(){
+ if(!(inv.penguin>0)||!window.hab.dry||!grd)return;
+ const kind=dryKind(P.pos);if(!kind)return;
+ const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),y=P.pos.y-.42;let x=P.pos.x+fx*1.3,z=P.pos.z+fz*1.3;
+ if(dryKind(new T.Vector3(x,y+.6,z))!==kind){x=P.pos.x;z=P.pos.z;}
+ const m=mkPenguin();m.position.set(x,y,z);scene.add(m);
+ PETS.push({m,x,y,z,ox:x,oz:z,kind,ang:rnd(0,TAU),t:0,sp:0});
+ inv.penguin--;toast('Penguin released into the module','a');blip(520,.15);saveDirty=true;}
+function pickPet(q){const i=PETS.indexOf(q);if(i<0)return;PETS.splice(i,1);scene.remove(q.m);inv.penguin=(inv.penguin|0)+1;toast('Penguin back in your inventory','a');blip(420,.12);saveDirty=true;}
+function updatePets(dt){
+ for(const q of PETS){
+  q.t-=dt;if(q.t<=0){q.ang+=rnd(-1.6,1.6);q.t=rnd(1.2,3.5);q.sp=Math.random()<.35?0:rnd(.3,.7);}
+  const nx=q.x+Math.sin(q.ang)*q.sp*dt,nz=q.z+Math.cos(q.ang)*q.sp*dt;
+  if(q.sp){if(Math.hypot(nx-q.ox,nz-q.oz)<4&&dryKind(new T.Vector3(nx,q.y+.6,nz))===q.kind){q.x=nx;q.z=nz;}else q.ang+=Math.PI*.75;}
+  q.m.position.set(q.x,q.y,q.z);q.m.rotation.y=q.ang;q.m.rotation.z=q.sp?Math.sin(performance.now()*.009)*.1:0;}}
+window.__petCount=()=>PETS.length;
+window.hab={dry:false,climb:false,walk:false,get ground(){return grd},collide,repel,
+ petPrompt:()=>{if(cine)return null;let b=null,bd=2.4;for(const q of PETS){const d=Math.hypot(P.pos.x-q.x,P.pos.z-q.z);if(d<bd&&Math.abs(P.pos.y-q.y)<2.2){bd=d;b=q;}}
+  if(b)return {l:'Pick up Penguin',a:()=>pickPet(b)};
+  if(inv.penguin>0&&window.hab.dry&&PETS.length<4&&grd)return {l:'Release Penguin',a:releasePet};
+  return null;},
+ prompt:()=>{if(cine)return null;const h=nearHatch();return h?{l:'Open Hatch',a:()=>startCine(h)}:null;}};
 
 const st=document.createElement('style');
 st.textContent='#bp{position:fixed;right:10px;top:150px;bottom:210px;width:182px;z-index:8;overflow:auto;padding:8px;touch-action:pan-y}#bp .btn{margin:0;padding:6px 4px;font-size:12px}#bp .it{display:block;width:100%;text-align:left;padding:6px 8px;margin:3px 0;font:700 14px var(--ui);color:var(--txt);background:rgba(127,227,255,.08);border:1px solid rgba(127,227,255,.25);cursor:pointer}#bp .it small{display:block;font:400 10px var(--mono);color:var(--dim)}#bp .it.on{border-color:var(--amber);background:rgba(255,193,90,.2)}#bp .it.no small{color:var(--warn)}#bt{position:fixed;left:14px;top:110px;z-index:8}';
@@ -1243,6 +1322,7 @@ let lt=performance.now(),inH=false;
  }
   if(cine&&state==='play')cineTick(dt);
   animHatches(dt);
+  updatePets(dt);
   if(state==='play'&&!P.dead){
     let h=false;
     h=isDry(P.pos);window.hab.dry=h;window.hab.climb=h&&inClimb();
