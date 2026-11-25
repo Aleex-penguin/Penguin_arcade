@@ -61,12 +61,6 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
 .hb-slot.on{border-color:var(--amber);box-shadow:0 0 12px rgba(255,193,90,.35);color:var(--amber)}
 .hb-slot .key{position:absolute;top:2px;left:4px;font-size:9px;opacity:.7}
 .hb-slot .lbl{font-size:11px;margin-top:2px}
-/* minimap */
-#minimap{position:fixed;right:14px;bottom:14px;width:140px;height:140px;border:1px solid rgba(127,227,255,.4);background:rgba(2,12,20,.85);border-radius:4px;z-index:9;pointer-events:auto;cursor:pointer;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.4)}
-#minimap canvas{width:100%;height:100%;display:block}
-#minimap .tag{position:absolute;top:4px;left:6px;font-size:9px;pointer-events:none}
-#pdaMap{display:none}
-#pdaMap.on{display:block}
 </style>
 </head>
 <body>
@@ -88,7 +82,6 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
   <div class="hb-slot" data-s="2"><span class="key">3</span><span class="lbl">FLARE</span></div>
   <div class="hb-slot" data-s="3"><span class="key">4</span><span class="lbl">—</span></div>
 </div>
-<div id="minimap" hidden title="Click to open full Map in PDA"><canvas id="mmC" width="140" height="140"></canvas><div class="tag">MAP</div></div>
 <div id="title" class="scr"><div class="tag" style="margin-bottom:12px">Sorrow Glacier · 74°N</div><h1>Abyssal Station<span>Below Zero</span></h1>
  <p class="cap" style="text-align:center">You ranged too far from Pelagia and found a drop pod that is not yours. A whole community on the ice and under it — abandoned. MARA’s memory was wiped here. Whatever they built after the Lantern is worse than Tartarus.</p>
  <div id="titleBtns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px">
@@ -116,6 +109,15 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){'use strict';
+window.onerror=function(msg,src,line,col,err){
+  try{
+    var el=document.createElement('div');
+    el.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#300;color:#fcc;padding:10px;font:12px monospace;white-space:pre-wrap;max-height:40vh;overflow:auto;border:1px solid #f66';
+    el.textContent='Error: '+msg+'\n'+(src||'')+':'+(line||'')+':'+(col||'')+(err&&err.stack?'\n'+err.stack:'');
+    document.body.appendChild(el);
+  }catch(e){}
+  return false;
+};
 if(!window.THREE){document.querySelector('#title p').textContent='Could not load Three.js. Check your connection.';return;}
 const T=THREE,$=s=>document.querySelector(s),TAU=Math.PI*2;
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,sst=(a,b,x)=>{x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x)},rnd=(a,b)=>a+Math.random()*(b-a);
@@ -143,13 +145,18 @@ function landHeight(x,z){
   return h;
 }
 function depthAt(x,z){
-  const land=landHeight(x,z);
-  if(land>0.4)return -land; // negative depth = above water (land)
+  // Always positive seafloor depth under water. Use landHeight() for islands.
   let y=7+Math.hypot(x-SPAWN.x,z-SPAWN.z)*.3+(fbm(x*.02,z*.02)-.5)*28+(fbm(x*.08+9,z*.08)-.5)*5;
   y+=52*(1-sst(12,95,Math.hypot(x-RELIC.x,z-RELIC.z)));
   y=lerp(26,y,sst(16,40,Math.hypot(x-BASE.x,z-BASE.z)));
   y=lerp(145,y,sst(10,32,Math.hypot(x-RELIC.x,z-RELIC.z)));
   return Math.max(5,y);
+}
+function groundY(x,z){
+  // World-space Y of solid ground: land surface or seafloor
+  const lh=landHeight(x,z);
+  if(lh>0.4)return lh;
+  return -depthAt(x,z);
 }
 const shelf=(x,z)=>{const cx=Math.floor(x/8),cz=Math.floor(z/8),mx=cx*8+4,mz=cz*8+4;return Math.hypot(mx-SPAWN.x,mz-SPAWN.z)>50&&fbm(mx*.03+50,mz*.03)>.6;};
 let creative=false; // free building / infinite resources only in creative
@@ -571,9 +578,8 @@ function startPlay(fromSave){
   saveCooldown=8;saveDirty=true;
   if(!document.body.classList.contains('touch'))toast('Click the view to capture the mouse','a');
   if(fromSave)toast('Dive resumed','a');
-  const hb=$('#hotbar'),mm=$('#minimap');
+  const hb=$('#hotbar');
   if(hb)hb.hidden=false;
-  if(mm)mm.hidden=false;
 }
 const RECIPES=[
  {id:'flare',n:'Flares ×3',d:'Scares predators for a while.',in:{scrap:1,quartz:1},fn:()=>inv.flare+=3},
@@ -719,7 +725,7 @@ function resize(){renderer.setSize(innerWidth,innerHeight,false);cam.aspect=inne
 const C_SURF=new T.Color(0xb0d0e4),C_SEA=new T.Color(0x0a3a50),C_DEEP=new T.Color(0x01050a),C_IN=new T.Color(0x0c1a26),_c=new T.Color();
 let time=0,last=performance.now(),hudT=0,qT=0,curNode=null,curInter=null,warnT=0,bubbleIdx=0,frameN=0;
 function bar(id,v,low){const e=$(id);e.firstElementChild.nextElementSibling.firstElementChild.style.width=clamp(v,0,1)*100+'%';e.classList.toggle('low',low);}
-function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/1000);last=now;if(!(dt>=0))dt=.016;time+=dt;frameN++;
+function frame(now){requestAnimationFrame(frame);try{let dt=Math.min(.05,(now-last)/1000);last=now;if(!(dt>=0))dt=.016;time+=dt;frameN++;
  const play=state==='play';
  if(state==='title'){const a=time*.06;cam.position.set(BASE.x+Math.cos(a)*32,-13,BASE.z+Math.sin(a)*32);cam.lookAt(BASE.x,BY+4,BASE.z);cd.set(0,0,-1);}
  else{
@@ -734,11 +740,11 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
    P.eye=lerp(P.eye||0,HB&&HB.dry&&!clm?1:0,Math.min(1,dt*6));
    P.vel.lerp(dv,Math.min(1,dt*(dry?10:(m>.05||up?3.2:1.7))));if(dry&&!clm){P.vel.y-=18*dt;if(P.vel.y<-14)P.vel.y=-14;if(up>0&&HB.ground)P.vel.y=5.4;}P.pos.addScaledVector(P.vel,dt);
    if(!P.cine&&window.hab)window.hab.collide(P.pos,P.vel);
-   const dAt=depthAt(P.pos.x,P.pos.z);const ty=dAt<0?(-dAt+0.9):(-dAt+1.1);if(P.pos.y<ty){P.pos.y=ty;if(P.vel.y<0)P.vel.y=0;if(dAt<0){P.under=false;}}
+   const gy=groundY(P.pos.x,P.pos.z);const onLandNow=landHeight(P.pos.x,P.pos.z)>0.4;const ty=onLandNow?gy+0.9:gy+1.1;if(P.pos.y<ty){P.pos.y=ty;if(P.vel.y<0)P.vel.y=0;if(onLandNow)P.under=false;}
    P.under=false;if(shelf(P.pos.x,P.pos.z)&&P.pos.y>-3.5){P.pos.y=-3.5;if(P.vel.y>0)P.vel.y=0;P.under=true;if(warnT<=0){toast('Ice overhead: find a gap to breathe','w');warnT=8;}}warnT-=dt;
-   if(P.pos.y>.4){P.pos.y=.4;if(P.vel.y>0)P.vel.y=0;}
+   if(!onLandNow&&P.pos.y>.4){P.pos.y=.4;if(P.vel.y>0)P.vel.y=0;}
    const rr=Math.hypot(P.pos.x,P.pos.z);if(rr>250){P.pos.x*=250/rr;P.pos.z*=250/rr;}
-   const onLand=depthAt(P.pos.x,P.pos.z)<0,surf=(P.pos.y>-.6&&!P.under)||onLand,inB=nearBase(),dep=depth();
+   const onLand=landHeight(P.pos.x,P.pos.z)>0.4,surf=(P.pos.y>-.6&&!P.under)||onLand,inB=nearBase(),dep=depth();
    // air
    if(surf||inB)P.o2=Math.min(o2max(),P.o2+o2max()*.5*dt);else P.o2-=(1+dep/220)*(boost?1.6:1)*dt;
    if(P.o2<=0){P.o2=0;hurt(7*dt);}
@@ -862,6 +868,7 @@ function frame(now){requestAnimationFrame(frame);let dt=Math.min(.05,(now-last)/
   const mk=objMark();if(mk){const dx=mk.x-P.pos.x,dz=mk.z-P.pos.z;$('#arrow').style.transform='rotate('+(Math.atan2(dx,-dz)+P.yaw)+'rad)';$('#dist').textContent=Math.round(Math.hypot(dx,dz))+' m';}else{$('#dist').textContent='';}
   const pr=curInter?curInter.l:curNode?'Collect '+NAMES[curNode.k]:'';promptEl.innerHTML=pr?'<b>E</b>'+pr:'';promptEl.classList.toggle('on',!!pr);
   $('#cross').classList.toggle('hot',!!pr||scanT>0);const sc=$('#scan');sc.style.opacity=scanT>0?1:0;sc.style.borderTopColor=sc.style.borderRightColor='#ffc15a';sc.style.transform='rotate('+scanT*360+'deg)';}}
+}catch(err){if(!window.__frameErr){window.__frameErr=1;console.error('frame',err);try{toast('Engine hitch — check console','w');}catch(e){}}}
 }
 
 /* ===== BASE BUILDER — walkable corridors + rooms, auto hatches, solid collision ===== */
@@ -1120,7 +1127,8 @@ function setGhost(){
 function freeTarget(){
   const x=sn(cam.position.x+cd.x*10), z=sn(cam.position.z+cd.z*10);
   let y=cam.position.y+cd.y*10;
-  y=sn(Math.min(Math.max(y,-depthAt(x,z)+D[sel][1]/2+.2),-2.5));
+  const floor=(typeof groundY==='function'?groundY(x,z):-depthAt(x,z))+D[sel][1]/2+.2;
+  y=sn(Math.min(Math.max(y,floor),Math.max(floor, -2.5)));
   return new T.Vector3(x,y,z);
 }
 function target(){
@@ -1456,11 +1464,12 @@ let lt=performance.now(),inH=false;
 }
 
 /* ========== HOTBAR + TOOLS IN HAND + MINIMAP + PLACEABLE FAB/LOCKER ========== */
-(function toolsAndMap(){
+try{(function toolsAndMap(){
   function makeScanner(){
     const g=new T.Group();
     const body=new T.Mesh(new T.BoxGeometry(.12,.04,.28),new T.MeshPhongMaterial({color:0x3a4a55,shininess:40}));
-    const lens=new T.Mesh(new T.CylinderGeometry(.035,.04,.06,10).rotateX(Math.PI/2),new T.MeshPhongMaterial({color:0x7fe3ff,emissive:0x1a4050}));
+    const lensGeo=new T.CylinderGeometry(.035,.04,.06,10);lensGeo.rotateX(Math.PI/2);
+    const lens=new T.Mesh(lensGeo,new T.MeshPhongMaterial({color:0x7fe3ff,emissive:0x1a4050}));
     lens.position.z=-.16;
     const light=new T.PointLight(0x7fe3ff,0,4);light.position.z=-.2;
     g.add(body,lens,light);g.userData.light=light;
@@ -1477,26 +1486,30 @@ let lt=performance.now(),inH=false;
   function makeFlareGun(){
     const g=new T.Group();
     const body=new T.Mesh(new T.BoxGeometry(.08,.06,.22),new T.MeshPhongMaterial({color:0x6a4030,shininess:30}));
-    const barrel=new T.Mesh(new T.CylinderGeometry(.025,.03,.14,8).rotateX(Math.PI/2),new T.MeshPhongMaterial({color:0x4a3030}));
+    const barrelGeo=new T.CylinderGeometry(.025,.03,.14,8);barrelGeo.rotateX(Math.PI/2);
+    const barrel=new T.Mesh(barrelGeo,new T.MeshPhongMaterial({color:0x4a3030}));
     barrel.position.z=-.16;
     g.add(body,barrel);return g;
   }
-  const handRoot=new T.Group();handRoot.position.set(.28,-.22,-.45);cam.add(handRoot);
-  toolMeshes.scanner=makeScanner();toolMeshes.builder=makeBuilderTool();toolMeshes.flare=makeFlareGun();
-  Object.values(toolMeshes).forEach(m=>{m.visible=false;handRoot.add(m);});
+  const handRoot=new T.Group();handRoot.position.set(.28,-.22,-.45);
+  try{cam.add(handRoot);}catch(e){console.warn('handRoot',e);}
+  try{
+    toolMeshes.scanner=makeScanner();toolMeshes.builder=makeBuilderTool();toolMeshes.flare=makeFlareGun();
+    Object.keys(toolMeshes).forEach(k=>{const m=toolMeshes[k];if(m){m.visible=false;handRoot.add(m);}});
+  }catch(e){console.warn('toolMeshes',e);}
 
   function selectSlot(s){
     if(s<0||s>3)return;
-    hotbarSlot=s;
-    document.querySelectorAll('#hotbar .hb-slot').forEach((el,i)=>el.classList.toggle('on',i===s));
-    const tool=HOTBAR_TOOLS[s];
-    Object.keys(toolMeshes).forEach(k=>{toolMeshes[k].visible=k===tool;});
+    hotbarSlot=s|0;
+    try{document.querySelectorAll('#hotbar .hb-slot').forEach((el,i)=>el.classList.toggle('on',i===s));}catch(e){}
+    const tool=HOTBAR_TOOLS[s]||'scanner';
+    Object.keys(toolMeshes).forEach(k=>{if(toolMeshes[k])toolMeshes[k].visible=k===tool;});
     const B=window.__builder;
     if(tool==='builder'){
-      if(B&&!B.building)B.open();
-    }else if(B&&B.building){B.close();}
+      if(B&&!B.building)try{B.open();}catch(e){}
+    }else if(B&&B.building){try{B.close();}catch(e){}}
   }
-  selectSlot(0);
+  try{selectSlot(0);}catch(e){console.warn('selectSlot',e);}
 
   addEventListener('keydown',e=>{
     if(state!=='play')return;
@@ -1569,63 +1582,8 @@ let lt=performance.now(),inH=false;
     };
   };
 
-  const mmC=$('#mmC'),mmx=mmC?mmC.getContext('2d'):null;
-  const POIS=[];
-  function addPOI(x,z,label,kind){POIS.push({x,z,label,kind:kind||'mara'});}
-  addPOI(BASE.x,BASE.z,'Station Nivalis','base');
-  addPOI(RELIC.x,RELIC.z,'Sorrow Basin','relic');
-  addPOI(SPAWN.x,SPAWN.z,'Drop Pod','spawn');
-  SITES.forEach(s=>addPOI(s.x,s.z,s.name,s.kind==='mountain'?'mountain':s.kind));
-  ISLANDS.forEach(i=>addPOI(i.x,i.z,i.name,'land'));
-
-  function drawMinimap(){
-    if(!mmx||state!=='play')return;
-    const W=140,H=140,scale=.22;
-    mmx.fillStyle='rgba(2,12,20,.92)';mmx.fillRect(0,0,W,H);
-    mmx.save();mmx.translate(W/2,H/2);
-    mmx.fillStyle='rgba(180,200,210,.35)';
-    ISLANDS.forEach(isl=>{
-      const px=(isl.x-P.pos.x)*scale,pz=(isl.z-P.pos.z)*scale;
-      mmx.beginPath();mmx.arc(px,pz,Math.max(4,isl.r*scale),0,TAU);mmx.fill();
-    });
-    POIS.forEach(p=>{
-      const px=(p.x-P.pos.x)*scale,pz=(p.z-P.pos.z)*scale;
-      if(Math.hypot(px,pz)>70)return;
-      mmx.fillStyle=p.kind==='relic'?'#9affff':p.kind==='base'?'#ffc15a':p.kind==='mountain'?'#e8a040':p.kind==='land'?'#a0c0d0':'#7fe3ff';
-      mmx.beginPath();mmx.arc(px,pz,3,0,TAU);mmx.fill();
-    });
-    mmx.fillStyle='#ffc15a';mmx.beginPath();mmx.arc(0,0,4,0,TAU);mmx.fill();
-    mmx.strokeStyle='#ffc15a';mmx.beginPath();mmx.moveTo(0,0);mmx.lineTo(-Math.sin(P.yaw)*10,-Math.cos(P.yaw)*10);mmx.stroke();
-    mmx.restore();
-    mmx.strokeStyle='rgba(127,227,255,.3)';mmx.strokeRect(.5,.5,W-1,H-1);
-  }
-  setInterval(drawMinimap,200);
-
-  if($('#minimap'))$('#minimap').addEventListener('click',()=>{
-    if(state!=='play')return;
-    let h='<div class="box plate"><div style="display:flex;justify-content:space-between;align-items:center"><div class="tag">PDA · Map</div><button class="btn" data-x="close">Close</button></div>';
-    h+='<h2>Known locations</h2>';
-    POIS.forEach(p=>{
-      const d=Math.round(Math.hypot(p.x-P.pos.x,p.z-P.pos.z));
-      h+='<div class="row"><div><div>'+p.label+'</div><p>'+d+' m · '+p.kind+'</p></div></div>';
-    });
-    h+='<p class="cap">MARA marks points of interest as you explore. Mountain sites on the ridges hold deeper Project Nivalis data on the Relic.</p></div>';
-    menu.innerHTML=h;menu.hidden=false;state='menu';
-    try{document.exitPointerLock();}catch(e){}
-  });
-
-  const _origStart = startPlay;
-  // wrap without reassigning the function binding (strict mode safe)
-  window.__startPlayWrapped = function(fromSave){
-    _origStart(fromSave);
-    if($('#hotbar'))$('#hotbar').hidden=false;
-    if($('#minimap'))$('#minimap').hidden=false;
-  };
-  // replace click handlers that call startPlay
-  const go=$('#go'), goCont=$('#goCont'), goNew=$('#goNew');
-  if(go){go.onclick=null; go.addEventListener('click',()=>window.__startPlayWrapped(false));}
-  if(goCont){goCont.onclick=null; goCont.addEventListener('click',()=>{const d=hasSave();if(!d){refreshTitleSaveUI();return;}applySave(d);window.__startPlayWrapped(true);});}
-})();
+  // startPlay already shows hotbar; no minimap
+})();}catch(err){console.error('toolsAndMap',err);}
 
 requestAnimationFrame(frame);
 })();
