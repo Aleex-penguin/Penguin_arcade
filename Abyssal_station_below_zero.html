@@ -760,11 +760,10 @@ function frame(now){requestAnimationFrame(frame);try{let dt=Math.min(.05,(now-la
    if(nearCrate()){curInter={l:'Open supply crate',a:()=>takeCrate()};}
    {const ns=nearSite();if(ns&&!ns.visited)curInter={l:'Log '+ns.name,a:()=>visitSite(ns)};else if(ns&&ns.visited&&!curInter)curInter={l:ns.name+' (logged)',a:()=>visitSite(ns)};}
    if(Math.hypot(P.pos.x-RELIC.x,P.pos.z-RELIC.z)<18&&P.pos.y<-120&&qi>=OB.length-1)curInter={l:'Touch the Relic',a:()=>{flags.final=1;finale();}};
-   if(!curInter&&typeof window.__nearInterior==='function'){const ni=window.__nearInterior();if(ni){if(ni.type==='fab')curInter={l:'Use Fabricator',a:()=>toggleMenu()};else if(ni.type==='locker')curInter={l:'Open Wall Locker',a:()=>window.__openLocker(ni)};}}
-   if(!curInter&&window.hab&&window.hab.dry&&((inv.fabricator|0)>0||creative)){curInter={l:'Install Fabricator',a:()=>window.__placeFab&&window.__placeFab()};}
-   if(!curInter&&window.hab&&window.hab.dry&&((inv.locker|0)>0||creative)){curInter={l:'Install Wall Locker',a:()=>window.__placeLocker&&window.__placeLocker()};}
+   // Priority: hatches first, then use placed interiors, then install (so install never blocks hatch/use)
    if(!curInter&&window.hab)curInter=window.hab.prompt();
    if(!curInter&&window.hab)curInter=window.hab.petPrompt();
+   if(!curInter&&typeof window.__nearInterior==='function'){const ni=window.__nearInterior();if(ni){if(ni.type==='fab')curInter={l:'Use Fabricator',a:()=>toggleMenu()};else if(ni.type==='locker')curInter={l:'Open Wall Locker',a:()=>window.__openLocker(ni)};}}
    if(!curInter){let wp=null,wd=2.6;for(const w of WPENG){if(w.caught)continue;const d=Math.hypot(P.pos.x-w.x,P.pos.z-w.z);if(d<wd&&P.pos.y>-1.8){wd=d;wp=w;}}if(wp)curInter={l:'Catch Penguin',a:()=>catchPeng(wp)};}
    if(!curInter)for(const n of nodes){if(!n.m.visible)continue;const dx=n.x-P.pos.x,dy=n.y-P.pos.y,dz=n.z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>3.6)continue;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(d>1.8&&dot<.7)continue;if(d<bs){bs=d;curNode=n;}}
    if(hitE){if(curInter)curInter.a();else if(curNode)takeNode(curNode);}
@@ -978,9 +977,9 @@ const SOCK={
   12:RS(3,3),
   13:[[0,0,3.5,0],[0,0,-3.5,2],[3.5,0,0,1],[-3.5,0,0,3],[0,2.3,0,4]],
   14:RS(3,3),
-  15:[[0,0,0,0]],16:[[0,0,0,0]],17:[[0,0,0,0]]
+  15:[[0,0,0,0]],16:[[0,0,0,0]],17:[[0,0,0,0]],18:[],19:[],20:[]
 };
-const RD=new Set([1,2,3,4,5,6,7]),FH=new Set([1,2,3,4,5,6,7,8,9,12,13,14]),NOH=new Set([15]); // round corridors + round shaft → round hatches; FH pieces get a hatch on every end exposed to water
+const RD=new Set([1,2,3,4,5,6,7]),FH=new Set([1,2,3,4,5,6,7,8,9,12,13,14]),NOH=new Set([15,19,20]); // round corridors + round shaft → round hatches; FH pieces get a hatch on every end exposed to water
 
 const blueM=new PH({color:0x2e6aa6,shininess:70,specular:0x9bbcff}),ylwM=new T.MeshBasicMaterial({color:0xd8f060,side:T.DoubleSide});
 const hfT=floorTex.clone(),hcT=ceilTex.clone();[hfT,hcT].forEach(t=>{t.needsUpdate=true;t.repeat.set(1/3,1/3);});
@@ -1084,6 +1083,8 @@ const D=[
 ['Ladder',3.6,0,{scrap:1},(g,C)=>{ladder(g,C,0,0,-1.5,2.1);
 }]];
 
+const INTERIOR_IDX={19:'fab',20:'locker'};
+const isInterior=i=>!!INTERIOR_IDX[i];
 let building=false,sel=0,rot=0,free=false,ghost=null,ghostOK=false,sig='';
 const placed=[],hatches=[],hmap=new Map(),vj=[],vjp=[],fills=[];
 const G=2.5, sn=v=>Math.round(v/G)*G;
@@ -1264,7 +1265,7 @@ function alignLadders(){
 /* ---------- hatch walk-through animation ---------- */
 let cine=null;
 const ease=t=>t*t*(3-2*t),ang=(a,b,k)=>{const d=((b-a+pi)%(2*pi)+2*pi)%(2*pi)-pi;return a+d*k};
-function nearHatch(){let b=null,bd=2.7;for(const h of hatches){const d=h.pos.distanceTo(P.pos);if(d<bd){bd=d;b=h;}}return b;}
+function nearHatch(){let b=null,bd=3.4;for(const h of hatches){const d=h.pos.distanceTo(P.pos);if(d<bd){bd=d;b=h;}}return b;}
 function startCine(h){
  if(cine)return;
  const av=new T.Vector3(...dirV(h.dir)),s=Math.sign(new T.Vector3().subVectors(P.pos,h.pos).dot(av))||1,mv=av.clone().multiplyScalar(-s),vert=Math.abs(mv.y)>.5;
@@ -1286,6 +1287,19 @@ function animHatches(dt){
 
 function place(){
   if(!building||state!=='play'||!ghostOK||P.cine)return false;
+  // Interior furniture: Fabricator / Wall Locker — only inside a pressurized module
+  if(isInterior(sel)){
+    if(!window.hab||!window.hab.dry){toast('Must be inside a module','w');return false;}
+    if(!can(sel)){toast('Need more materials','w');return false;}
+    if(!creative)for(const k in D[sel][3])inv[k]-=D[sel][3][k];
+    const type=INTERIOR_IDX[sel];
+    const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw);
+    const x=P.pos.x+fx*1.6,y=P.pos.y-.2,z=P.pos.z+fz*1.6;
+    const m=make(sel);m.position.set(x,y,z);m.rotation.y=P.yaw;scene.add(m);
+    const entry={type,x,y,z,yaw:P.yaw,m,storage:type==='locker'?{}:null,i:sel};
+    if(typeof placedInterior!=='undefined')placedInterior.push(entry);
+    toast(type==='fab'?'Fabricator installed':'Wall Locker installed','a');blip(640,.2);refresh();saveDirty=true;saveGame(true);return true;
+  }
   const t=target();
   const mustConnect=hasSocks(sel)&&placed.length>0&&!creative;
   if(mustConnect&&!t.snap){toast('Aim at an open corridor or room end','w');return false;}
@@ -1326,6 +1340,17 @@ window.buildTryPlace=buildTryPlace;
 function del(){
   if(!building||state!=='play'||P.cine)return;
   const aim=new T.Vector3().copy(cam.position).addScaledVector(cd,10);
+  // Prefer removing nearby interior furniture when selected / in range
+  if(typeof placedInterior!=='undefined'&&placedInterior.length){
+    let bi=-1,bd=3.5;
+    placedInterior.forEach((o,i)=>{const d=Math.hypot(aim.x-o.x,aim.y-o.y,aim.z-o.z);if(d<bd){bd=d;bi=i;}});
+    if(bi>=0){
+      const o=placedInterior.splice(bi,1)[0];
+      scene.remove(o.m);
+      if(!creative&&o.i!=null&&D[o.i])for(const k in D[o.i][3])inv[k]=(inv[k]|0)+(D[o.i][3][k]|0);
+      toast('Removed: '+(o.type==='fab'?'Fabricator':'Wall Locker'),'a');refresh();saveDirty=true;saveGame(true);return;
+    }
+  }
   let b=-1,bd=5.5;
   placed.forEach((q,i)=>{const d=q.p.distanceTo(aim);if(d<bd){bd=d;b=i;}});
   if(b<0){toast('Nothing to remove here','w');return;}
@@ -1383,7 +1408,7 @@ const bp=document.createElement('div');bp.id='bp';bp.className='plate';bp.hidden
 function refresh(){
   const s=bp.scrollTop;
   sig=JSON.stringify(inv)+creative;
-  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap and a hatch fits at every joint · LMB place · RMB/X remove · R rotate · Near a hatch press ACT / E to open it'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>'<button class="it'+(i===sel?' on':'')+(can(i)?'':' no')+'" data-i="'+i+'">'+d[0]+'<small>'+Object.keys(d[3]).map(k=>d[3][k]+' '+k).join(' · ')+'</small></button>').join('')+'<div class="cap" style="font-size:10px;margin-top:6px">Pieces placed: '+placed.length+'</div>';
+  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap · Select Fabricator / Wall Locker to place furniture inside a module · LMB place · RMB/X remove · R rotate · E / ACT open hatches'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>'<button class="it'+(i===sel?' on':'')+(can(i)?'':' no')+'" data-i="'+i+'">'+d[0]+'<small>'+Object.keys(d[3]).map(k=>d[3][k]+' '+k).join(' · ')+'</small></button>').join('')+'<div class="cap" style="font-size:10px;margin-top:6px">Pieces placed: '+placed.length+'</div>';
   bp.scrollTop=s;
 }
 bp.addEventListener('click',e=>{
@@ -1452,11 +1477,19 @@ let lt=performance.now(),inH=false;
     inH=h;
   }
   if(building&&ghost&&state==='play'){
-    const t=target();
-    ghost.position.copy(t.p);
-    ghost.rotation.y=t.rot*pi/2;
-    const mustConnect=hasSocks(sel)&&placed.length>0&&!creative;
-    ghostOK=can(sel)&&(!mustConnect||!!t.snap)&&!placed.some(q=>q.p.distanceTo(t.p)<0.5);
+    if(isInterior(sel)){
+      // Furniture ghost: float in front of the player; only valid inside a dry module
+      const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw);
+      ghost.position.set(P.pos.x+fx*1.6,P.pos.y-.15,P.pos.z+fz*1.6);
+      ghost.rotation.y=P.yaw;
+      ghostOK=can(sel)&&!!(window.hab&&window.hab.dry);
+    }else{
+      const t=target();
+      ghost.position.copy(t.p);
+      ghost.rotation.y=t.rot*pi/2;
+      const mustConnect=hasSocks(sel)&&placed.length>0&&!creative;
+      ghostOK=can(sel)&&(!mustConnect||!!t.snap)&&!placed.some(q=>q.p.distanceTo(t.p)<0.5);
+    }
     gm.color.setHex(ghostOK?0x6ff0c0:0xff5a48);
     if(sig!==JSON.stringify(inv)+creative)refresh();
   }
@@ -1548,7 +1581,7 @@ try{(function toolsAndMap(){
     toast(type==='fab'?'Fabricator installed':'Wall Locker installed','a');blip(640,.2);saveDirty=true;return true;
   }
   function nearInterior(){
-    let best=null,bd=2.4;
+    let best=null,bd=3.2;
     for(const o of placedInterior){
       const d=Math.hypot(P.pos.x-o.x,P.pos.y-o.y,P.pos.z-o.z);
       if(d<bd){bd=d;best=o;}
