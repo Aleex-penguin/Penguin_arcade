@@ -520,10 +520,10 @@ function collectSave(){
     flags:Object.assign({},flags),codex:Object.assign({},codex),
     qi:qi,lampOn:lampOn,
     P:{x:P.pos.x,y:P.pos.y,z:P.pos.z,yaw:P.yaw,pitch:P.pitch,hp:P.hp,o2:P.o2,warm:P.warm},
-    hab:hab
-  };
-}
-function saveGame(silent){
+       hab:hab,
+    int:(typeof window.__intExport==='function')?window.__intExport():[],
+    dec:(typeof window.__decExport==='function')?window.__decExport():[]
+  }; function saveGame(silent){
   if(state!=='play'&&state!=='menu')return false;
   if(P.dead||P.cine)return false;
   try{
@@ -550,7 +550,9 @@ function applySave(d){
     P.hp=d.P.hp!=null?d.P.hp:100;P.o2=d.P.o2!=null?d.P.o2:o2max();P.warm=d.P.warm!=null?d.P.warm:100;
     P.dead=0;P.cine=0;
   }
-  if(Array.isArray(d.hab)&&typeof window.__habImport==='function')window.__habImport(d.hab);
+ if(Array.isArray(d.hab)&&typeof window.__habImport==='function')window.__habImport(d.hab);
+  if(typeof window.__intImport==='function')window.__intImport(d.int||[]);
+  if(typeof window.__decImport==='function')window.__decImport(d.dec||[]);
   if(typeof CRATE!=='undefined'){CRATE.taken=!!(inv.charges>=1||(d.flags&&d.flags.crateTaken));if(CRATE.m)CRATE.m.visible=!CRATE.taken;}
   if(typeof SITES!=='undefined')SITES.forEach(s=>{s.visited=!!(d.flags&&d.flags['site_'+s.id]);});
   lastSaveAt=d.t||Date.now();
@@ -634,7 +636,7 @@ if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
 /* gameplay helpers */
 function throwFlare(){if(state!=='play')return;if(inv.flare<1){toast('No flares','w');return;}inv.flare--;flareM.position.copy(P.pos).addScaledVector(cd,6);flareM.visible=true;flareT=22;blip(900,.4);}
 const nearBase=()=>Math.hypot(P.pos.x-BASE.x,P.pos.z-BASE.z)<11&&P.pos.y>BY-1&&P.pos.y<BY+14;
-const nearFab=()=>Math.hypot(P.pos.x-BASE.x,P.pos.z-BASE.z-(-4))<9&&P.pos.y>BY-1&&P.pos.y<BY+10;
+const nearFab=()=>(Math.hypot(P.pos.x-BASE.x,P.pos.z-BASE.z-(-4))<9&&P.pos.y>BY-1&&P.pos.y<BY+10)||placedInterior.some(o=>o.type==='fab'&&Math.hypot(P.pos.x-o.x,P.pos.y-o.y,P.pos.z-o.z)<3.2);
 function takeNode(n){const amt=n.k==='scrap'?1+(Math.random()*2|0):1+(Math.random()*2|0);inv[n.k]+=amt;n.cool=240;n.m.visible=false;toast('+'+amt+' '+NAMES[n.k]);blip(660,.12);saveDirty=true;}
 function scanTargets(cb){for(const s of schools)cb('shoal',s.x,s.y,s.z,s.r);for(let i=0;i<jl.length;i++)cb('medusa',jl[i].x,jl[i].y,jl[i].z,2);for(const b of biters)cb('biter',b.g.position.x,b.g.position.y,b.g.position.z,3);cb('drifter',drifter.position.x,drifter.position.y,drifter.position.z,10);for(const w of weeds)cb('weed',w.x,w.y,w.z,3);for(const v of vents)cb('vent',v.x,v.y,v.z,3);cb('relic',RELIC.x,-128,RELIC.z,8);cb('station',BASE.x,BY+4,BASE.z,13);cb('lifepod',lifepod.position.x,0,lifepod.position.z,3);}
 let scanT=0,scanId=null;
@@ -763,6 +765,7 @@ function frame(now){requestAnimationFrame(frame);try{let dt=Math.min(.05,(now-la
    // Priority: hatches first, then use placed interiors, then install (so install never blocks hatch/use)
    if(!curInter&&window.hab)curInter=window.hab.prompt();
    if(!curInter&&window.hab)curInter=window.hab.petPrompt();
+   if(!curInter&&window.__decUse)curInter=window.__decUse();
    if(!curInter&&typeof window.__nearInterior==='function'){const ni=window.__nearInterior();if(ni){if(ni.type==='fab')curInter={l:'Use Fabricator',a:()=>toggleMenu()};else if(ni.type==='locker')curInter={l:'Open Wall Locker',a:()=>window.__openLocker(ni)};}}
    if(!curInter){let wp=null,wd=2.6;for(const w of WPENG){if(w.caught)continue;const d=Math.hypot(P.pos.x-w.x,P.pos.z-w.z);if(d<wd&&P.pos.y>-1.8){wd=d;wp=w;}}if(wp)curInter={l:'Catch Penguin',a:()=>catchPeng(wp)};}
    if(!curInter)for(const n of nodes){if(!n.m.visible)continue;const dx=n.x-P.pos.x,dy=n.y-P.pos.y,dz=n.z-P.pos.z,d=Math.hypot(dx,dy,dz);if(d>3.6)continue;const dot=(dx*cd.x+dy*cd.y+dz*cd.z)/(d||1);if(d>1.8&&dot<.7)continue;if(d<bs){bs=d;curNode=n;}}
@@ -977,9 +980,9 @@ const SOCK={
   12:RS(3,3),
   13:[[0,0,3.5,0],[0,0,-3.5,2],[3.5,0,0,1],[-3.5,0,0,3],[0,2.3,0,4]],
   14:RS(3,3),
-  15:[[0,0,0,0]],16:[[0,0,0,0]],17:[[0,0,0,0]],18:[],19:[],20:[]
+  15:[[0,0,0,0]],16:[[0,0,0,0]],17:[[0,0,0,0]],18:[],19:[],20:[],21:[[0,0,0,0]]
 };
-const RD=new Set([1,2,3,4,5,6,7]),FH=new Set([1,2,3,4,5,6,7,8,9,12,13,14]),NOH=new Set([15,19,20]); // round corridors + round shaft → round hatches; FH pieces get a hatch on every end exposed to water
+const RD=new Set([1,2,3,4,5,6,7]),FH=new Set([1,2,3,4,5,6,7,8,9,12,13,14]),NOH=new Set([15,19,20,21]); // round corridors + round shaft → round hatches; FH pieces get a hatch on every end exposed to water
 
 const blueM=new PH({color:0x2e6aa6,shininess:70,specular:0x9bbcff}),ylwM=new T.MeshBasicMaterial({color:0xd8f060,side:T.DoubleSide});
 const hfT=floorTex.clone(),hcT=ceilTex.clone();[hfT,hcT].forEach(t=>{t.needsUpdate=true;t.repeat.set(1/3,1/3);});
@@ -1089,8 +1092,46 @@ const D=[
 ['Wall Locker',0,0,{scrap:3,copper:1},(g,C)=>{
   bx(g,null,.7,.9,.25,hull,0,0,0);
   bx(g,null,.55,.7,.04,hull2,0,0,.14);
-}]];
-
+}],
+['Wall Panel',2,0,{scrap:2,copper:1},(g,C)=>{
+  const pn=new PH({color:0xc8d0d8,shininess:55,specular:0xa0b0c0}),ed=new PH({color:0x2a3238,shininess:40}),bay=new PH({color:0xb8c0c8,shininess:45}),cy=new T.MeshBasicMaterial({color:0x4ad8ff}),yb=new T.MeshBasicMaterial({color:0xe8c040}),dot=new PH({color:0x5a6570}),dg=new T.SphereGeometry(.035,6,5);
+  bx(g,null,3.1,3.1,.2,pn,0,0,0);
+  bx(g,null,3.2,.14,.3,ed,0,1.52,0);bx(g,null,3.2,.14,.3,ed,0,-1.52,0);bx(g,null,.14,3.1,.3,ed,1.55,0,0);bx(g,null,.14,3.1,.3,ed,-1.55,0,0);
+  for(const f of[1,-1])for(const sx of[-.75,.75]){
+    bx(g,null,1.25,2,.08,bay,sx,0,f*.12);bx(g,null,1.05,.06,.04,cy,sx,.8,f*.17);bx(g,null,.7,.05,.04,yb,sx,-.75,f*.17);
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++)add(g,dg,dot,sx-.12+c*.12,.45-r*.16,f*.17);
+  }
+  C.push(['b',0,0,0,3.15,3.1,.35]);
+}],
+/* ---- interior decor (base at y=0, front = +z, back plate at z=0 for wall items) ---- */
+['Bench',0,0,{scrap:2},g=>{const{gr,dk}=DM;dB(g,2.2,.14,.6,gr,0,.42,0);dB(g,2.2,.06,.64,dk,0,.5,0);for(const s of[-1,1])dB(g,.1,.4,.5,dk,s*.95,.2,0);},{sec:'Interior decor',mode:'floor',side:'in',bx:[2.2,.5,.6]}],
+['Bed',0,0,{scrap:3,copper:1},g=>{const{wh,dk,nv,cy}=DM;dB(g,1.3,.22,2.2,dk,0,.16,0);dB(g,1.2,.16,2,nv,0,.35,0);dB(g,.5,.1,.35,wh,-.28,.48,-.75);dB(g,.5,.1,.35,wh,.28,.48,-.75);dB(g,1.3,.5,.1,dk,0,.45,-1.1);dB(g,.9,.03,.06,cy,0,.1,1.11);},{mode:'floor',side:'in',use:['Rest','rest'],bx:[1.3,.5,2.2]}],
+['Bed 2',0,0,{scrap:4,copper:1},g=>{const{wh,dk,nv,cy}=DM;dB(g,1.9,.22,2.2,dk,0,.16,0);dB(g,1.8,.16,2,nv,0,.35,0);dB(g,1.8,.06,1.2,wh,0,.46,.4);for(const s of[-1,1])dB(g,.7,.1,.35,wh,s*.45,.48,-.75);dB(g,1.9,.5,.1,dk,0,.45,-1.1);dB(g,1.2,.03,.06,cy,0,.1,1.11);},{mode:'floor',side:'in',use:['Rest','rest'],bx:[1.9,.5,2.2]}],
+['Narrow Bed',0,0,{scrap:2,copper:1},g=>{const{wh,dk,nv,cy}=DM;dB(g,.95,.22,2.2,dk,0,.16,0);dB(g,.85,.16,2,wh,0,.35,0);dB(g,.5,.1,.35,nv,0,.48,-.75);dB(g,.95,.5,.1,dk,0,.45,-1.1);dB(g,.6,.03,.06,cy,0,.1,1.11);},{mode:'floor',side:'in',use:['Rest','rest'],bx:[.95,.5,2.2]}],
+['Desk',0,0,{scrap:3,copper:1},g=>{const{gr,dk,gn}=DM;dB(g,2.2,.1,.8,gr,0,.85,0);for(const s of[-1,1])dB(g,.1,.85,.7,dk,s*1.05,.42,0);dB(g,.6,.02,.3,gn,0,.91,-.05);dB(g,.9,.02,.2,dk,-.6,.91,.15);},{mode:'floor',side:'in',bx:[2.2,.9,.8]}],
+['Swivel Chair',0,0,{scrap:2},g=>{const{wh,gr}=DM;dC(g,.35,.35,.05,gr,0,.04,0);dC(g,.06,.06,.4,gr,0,.25,0);dB(g,.55,.12,.55,wh,0,.5,0);dB(g,.5,.7,.1,wh,0,.92,-.27);dB(g,.3,.2,.1,wh,0,1.4,-.27);},{mode:'floor',side:'in',bx:[.6,1.5,.6]}],
+['Office Chair',0,0,{scrap:2,copper:1},g=>{const{wh,nv,or}=DM;for(const a of[-1,1])for(const b of[-1,1])dC(g,.03,.03,.45,wh,a*.22,.22,b*.22);dB(g,.55,.1,.55,nv,0,.5,0);dB(g,.5,.6,.08,nv,0,.9,-.26);dB(g,.3,.2,.02,or,0,.95,-.21);},{mode:'floor',side:'in',bx:[.6,1.25,.6]}],
+['Command Chair',0,0,{scrap:3,copper:2},g=>{const{gr,dk,or}=DM;dB(g,.7,.1,.7,dk,0,.05,0);dB(g,.12,.45,.12,dk,0,.3,0);dB(g,.65,.12,.65,gr,0,.5,0);dB(g,.6,.9,.12,gr,0,1,-.3);for(const s of[-1,1])dB(g,.08,.08,.5,dk,s*.36,.75,0);dB(g,.4,.05,.02,or,0,1.25,-.23);},{mode:'floor',side:'in',bx:[.75,1.5,.75]}],
+['Sign',0,0,{scrap:1},g=>{const{dk,cy}=DM;dB(g,1.2,.4,.06,dk,0,0,.03);dB(g,.8,.06,.02,cy,0,.07,.07);dB(g,.5,.04,.02,cy,0,-.07,.07);},{mode:'wall',side:'in'}],
+['Picture Frame',0,0,{scrap:1,quartz:1},g=>{const{gr,nv,bl,or}=DM;dB(g,1.1,.7,.06,gr,0,0,.03);dB(g,.95,.55,.02,nv,0,0,.07);dB(g,.95,.25,.02,bl,0,-.15,.08);dB(g,.95,.08,.02,or,0,.02,.085);},{mode:'wall',side:'in'}],
+['Bar Table',0,0,{scrap:2,quartz:1},g=>{const{gr,wh}=DM;dC(g,.4,.45,.06,gr,0,.03,0);dC(g,.05,.05,.95,wh,0,.5,0);dC(g,.7,.7,.04,glass,0,1,0);dC(g,.72,.72,.02,wh,0,.98,0);},{mode:'floor',side:'in',bx:[1.4,1.05,1.4]}],
+['Trash Can',0,0,{scrap:1},g=>{const{nv,yl}=DM;dC(g,.28,.25,.8,nv,0,.4,0);dC(g,.29,.29,.06,yl,0,.2,0);dC(g,.29,.29,.06,yl,0,.6,0);dC(g,.3,.3,.05,yl,0,.83,0);},{mode:'floor',side:'in',use:['Search Trash Can','trash'],bx:[.6,.85,.6]}],
+['Nuclear Waste Disposal',0,0,{scrap:2,copper:1},g=>{const{wh,dk,rd}=DM;dB(g,.55,.9,.5,wh,0,.45,0);dB(g,.5,.1,.45,dk,0,.94,0);dB(g,.2,.2,.02,rd,0,.5,.26);},{mode:'floor',side:'in',bx:[.6,1,.55]}],
+['Vending Machine',0,0,{scrap:3,copper:2},g=>{const{or,nv,dk,cy,yl,rd,gn,wh}=DM,pc=[cy,yl,rd,gn,wh];dB(g,.95,1.9,.75,or,0,.95,0);dB(g,.7,1.1,.02,nv,0,1.2,.38);for(let r=0;r<4;r++)for(let c=0;c<4;c++)dB(g,.1,.16,.02,pc[(r+c)%5],-.24+c*.16,.8+r*.25,.39);dB(g,.2,.35,.02,dk,.33,.5,.38);dB(g,.6,.2,.02,cy,-.05,.35,.38);},{mode:'floor',side:'in',use:['Use Vending Machine','vend'],bx:[1,1.9,.8]}],
+['Coffee Vending Machine',0,0,{scrap:3,copper:2},g=>{const{bl,nv,dk,cy,wh}=DM;dB(g,.9,1.6,.7,bl,0,.8,0);dB(g,.5,.4,.02,nv,0,1.2,.36);dB(g,.25,.15,.02,cy,0,1.2,.37);dB(g,.5,.3,.02,dk,0,.65,.36);dB(g,.12,.14,.12,wh,0,.5,.4);dC(g,.04,.04,.15,dk,0,.82,.36);},{mode:'floor',side:'in',use:['Get Coffee','coffee'],bx:[.9,1.6,.7]}],
+['Lab Counter',0,0,{scrap:3,copper:1},g=>{const{gr,dk}=DM;dB(g,2,.9,.7,gr,0,.45,0);dB(g,2.05,.06,.75,dk,0,.93,0);for(const x of[-.33,.33])dB(g,.02,.7,.02,dk,x,.45,.36);for(const x of[-.66,0,.66])dB(g,.25,.04,.03,dk,x,.7,.37);},{mode:'floor',side:'in',bx:[2.05,.95,.75]}],
+/* ---- exterior modules ---- */
+['Solar Panel',0,0,{scrap:3,copper:2,quartz:2},g=>{const{wh,dk,yl,sol}=DM;dC(g,.28,.3,.3,dk,0,.15,0);dC(g,.3,.3,.06,yl,0,.32,0);dC(g,.06,.06,.5,wh,0,.6,0);for(const s of[-1,1]){const w=dB(g,1.3,.06,1,sol,s*.62,1.05,0);w.rotation.z=s*.3;const f=dB(g,1.38,.04,1.08,wh,s*.62,1.02,0);f.rotation.z=s*.3;}},{sec:'Exterior modules',mode:'ground',bx:[.6,1.1,.6]}],
+['Thermal Plant',0,0,{scrap:4,copper:3,titanium:1},g=>{const{wh,dk,cy}=DM;for(let k=0;k<3;k++){const a=k*2.094,f=add(g,new T.SphereGeometry(.4,10,6),wh,Math.sin(a)*.6,.18,Math.cos(a)*.6);f.scale.y=.45;}dC(g,.3,.4,.8,wh,0,.7,0);dB(g,.75,.8,.55,wh,0,1.3,0);for(let i=0;i<4;i++)dB(g,.5,.03,.02,dk,0,1.12+i*.14,.28);dB(g,.35,.06,.02,cy,0,.95,.2);},{mode:'ground',lit:[1,0xff9a48,.9,12,0],bx:[1.2,1.7,1.2]}],
+['Power Transmitter',0,0,{scrap:3,copper:2,quartz:1},g=>{const{wh,gr,cy}=DM;dC(g,.3,.35,.1,wh,0,.05,0);for(const s of[-1,1])dB(g,.05,1.7,.05,wh,s*.12,1,0);dB(g,.3,.06,.06,gr,0,.3,0);dB(g,.3,.06,.06,gr,0,1.8,0);dB(g,.08,1.2,.02,cy,0,1.05,.04);add(g,new T.SphereGeometry(.17,12,8),gr,0,2,0);},{mode:'ground',bx:[.6,2.2,.6]}],
+['Floodlight',0,0,{scrap:2,copper:1,quartz:2},g=>{const{wh,gr,lt}=DM;for(let k=0;k<3;k++){const a=k*2.094,l=add(g,new T.CylinderGeometry(.025,.025,1.5,6),gr,Math.sin(a)*.3,.72,Math.cos(a)*.3);l.rotation.set(-.25*Math.cos(a),0,.25*Math.sin(a));}dC(g,.04,.04,2.1,gr,0,1.2,0);for(const y of[2.45,2.15])for(const s of[-1,1]){dB(g,.5,.28,.08,wh,s*.32,y,0);dB(g,.44,.22,.02,lt,s*.32,y,.05);}},{mode:'ground',lit:[2.3,0xfff4d8,2.2,40,.6],bx:[.7,2.6,.7]}],
+['Spotlight',0,0,{scrap:2,copper:1,quartz:1},g=>{const{wh,gr,dk,lt}=DM;dB(g,.5,.06,.5,gr,0,.03,0);dB(g,.12,.3,.12,gr,0,.2,0);dB(g,.5,.3,.34,wh,0,.5,0);dB(g,.4,.22,.02,lt,0,.5,.18);dB(g,.3,.1,.1,dk,0,.5,-.2);},{mode:'ground',lit:[.5,0xfff0c8,1.8,26,.5],bx:[.55,.7,.55]}],
+['Exterior Growbed',0,0,{scrap:3,copper:1},g=>{const{wh,soil,gn}=DM;dB(g,2.04,.28,1.04,soil,0,.17,0);dB(g,2.2,.35,.08,wh,0,.18,.56);dB(g,2.2,.35,.08,wh,0,.18,-.56);for(const s of[-1,1])dB(g,.08,.35,1.04,wh,s*1.06,.18,0);for(let i=0;i<7;i++)add(g,new T.ConeGeometry(.08,.3,5),gn,-.85+i*.28,.4,((i%2)-.5)*.5);},{mode:'ground',bx:[2.2,.4,1.2]}],
+['Base Pipe Connector',0,0,{scrap:3,copper:1},g=>{const{gr,dk,wh,yl}=DM;dC(g,.55,.55,.14,gr,0,.07,0);dC(g,.42,.42,.5,wh,0,.45,0);for(const y of[.3,.45,.6])dC(g,.45,.45,.04,gr,0,y,0);dC(g,.3,.3,.2,dk,0,.8,0);dC(g,.08,.08,.18,yl,0,.98,0);},{mode:'ground',bx:[1,1.1,1]}],
+['Exterior Wall Light',0,0,{scrap:1,quartz:1},g=>{const{wh,dk,lt}=DM;dB(g,.3,.5,.06,dk,0,0,.03);dB(g,.28,.55,.16,wh,0,0,.14);for(let i=0;i<3;i++)dB(g,.2,.02,.02,dk,0,.12+i*.05,.23);dB(g,.16,.04,.02,lt,0,-.2,.23);for(const s of[-1,1])dB(g,.05,.3,.12,wh,s*.17,0,.1);},{mode:'wall',side:'out',lit:[0,0xdff4ff,1.4,16,.6]}]];
+const DM={wh:new PH({color:0xe4eaee,shininess:60,specular:0x8899aa}),gr:new PH({color:0x8a949c,shininess:50}),dk:new PH({color:0x1e252b,shininess:35}),nv:new PH({color:0x1f2a3a,shininess:40}),bl:new PH({color:0x2e6aa6,shininess:70,specular:0x9bbcff}),yl:new PH({color:0xe8b820,shininess:50}),or:new PH({color:0xe0702a,shininess:40}),rd:new PH({color:0xb83a2a}),soil:new PH({color:0x5a4430}),sol:new PH({color:0x1f4fa8,shininess:90,specular:0x88aaff,emissive:0x0a1f4a}),cy:new T.MeshBasicMaterial({color:0x4ad8ff}),gn:new T.MeshBasicMaterial({color:0x6ff0c0}),lt:new T.MeshBasicMaterial({color:0xfff0c0})},
+dB=(g,w,h,d,m,x,y,z)=>bx(g,null,w,h,d,m,x,y,z),
+dC=(g,a,b,h,m,x,y,z)=>add(g,new T.CylinderGeometry(a,b,h,14),m,x,y,z);
 const INTERIOR_IDX={19:'fab',20:'locker'};
 const isInterior=i=>!!INTERIOR_IDX[i];
 let building=false,sel=0,rot=0,free=false,ghost=null,ghostOK=false,sig='';
@@ -1191,6 +1232,7 @@ function collide(p,v){grd=0;
     const dn=v.x*n[0]+v.y*n[1]+v.z*n[2];if((inside&&dn>0)||(!inside&&dn<0))v.x-=n[0]*dn,v.y-=n[1]*dn,v.z-=n[2]*dn;}
   }
   for(const h of hatches)if(h.open<.8)pushBox(p,v,h.box);
+  for(const e of decor)if(e.box)pushBox(p,v,e.box);
  }}
 
 /* ---------- keep wild animals out of every built module ---------- */
@@ -1294,7 +1336,9 @@ function animHatches(dt){
   h.dr.visible=h.free||h.open<.98;h.lm.color.setHex(h.open>.5?0x6ff0c0:0xffc15a);}}
 
 function place(){
-  if(!building||state!=='play'||!ghostOK||P.cine)return false;
+ if(!building||state!=='play'||P.cine)return false;
+  if(D[sel][5])return placeDecor();
+  if(!ghostOK)return false;
   // Interior furniture: Fabricator / Wall Locker — only inside a pressurized module
   if(isInterior(sel)){
     if(!window.hab||!window.hab.dry){toast('Must be inside a module','w');return false;}
@@ -1318,9 +1362,76 @@ function place(){
   placed.push(entry);relink();
   toast('Built: '+D[sel][0]+(t.snap?' · hatch fitted':''),'a');blip(700,.2);refresh();saveDirty=true;saveGame(true);return true;
 }
+/* ===== DECOR (furniture + exterior modules) ===== */
+const decor=[],DLP=[0,1].map(()=>{const l=new T.PointLight(0xfff2d0,0,16,2);scene.add(l);return l;});let decTgt=null,dlT=0;
+function addDecor(i,x,y,z,ry){const m=make(i),o=D[i][5],e={i,x,y,z,ry,m,box:null,cd:0};m.position.set(x,y,z);m.rotation.y=ry;scene.add(m);
+ if(o.bx){const q=Math.round(ry/(pi/2))&1,w=q?o.bx[2]:o.bx[0],d=q?o.bx[0]:o.bx[2];e.box={x0:x-w/2,x1:x+w/2,y0:y,y1:y+o.bx[1],z0:z-d/2,z1:z+d/2};}
+ decor.push(e);return e;}
+function rayBoxes(o,d,maxT){let best=null;const O=[o.x,o.y,o.z],V=[d.x,d.y,d.z];
+ for(const q of placed){if(q.p.distanceTo(o)>maxT+14)continue;
+  for(const c of q.col){if(c.t!=='b'||(c.cv!==undefined&&q.used.has(c.cv)))continue;
+   const lo=[c.x0,c.y0,c.z0],hi=[c.x1,c.y1,c.z1];let t0=0,t1=maxT,ax=-1,sg=0,ok=true;
+   for(let k=0;k<3&&ok;k++){
+    if(Math.abs(V[k])<1e-6){if(O[k]<lo[k]||O[k]>hi[k])ok=false;continue;}
+    let a=(lo[k]-O[k])/V[k],b=(hi[k]-O[k])/V[k],s=-1;if(a>b){const t=a;a=b;b=t;s=1;}
+    if(a>t0){t0=a;ax=k;sg=s;}if(b<t1)t1=b;if(t0>t1)ok=false;}
+   if(ok&&ax>=0&&t0>.05&&(!best||t0<best.t)){const n=[0,0,0];n[ax]=sg;best={t:t0,n:new T.Vector3(n[0],n[1],n[2])};}}}
+ return best;}
+function rayGround(o,d,maxT){let prev=0;
+ for(let t=.5;t<=maxT;t+=.5){if(o.y+d.y*t<=groundY(o.x+d.x*t,o.z+d.z*t)){let a=prev,b=t;
+  for(let i=0;i<6;i++){const m=(a+b)/2;if(o.y+d.y*m<=groundY(o.x+d.x*m,o.z+d.z*m))b=m;else a=m;}
+  const x=o.x+d.x*b,z=o.z+d.z*b;return {t:b,p:new T.Vector3(x,groundY(x,z),z)};}prev=t;}
+ return null;}
+function decorTarget(){
+ const o=D[sel][5],org=cam.position,res={p:null,ry:0,ok:false,why:''},q4=Math.round((P.yaw+rot*pi/2)/(pi/2))*(pi/2);
+ if(o.mode==='floor'){
+  const x=P.pos.x-Math.sin(P.yaw)*1.8,z=P.pos.z-Math.cos(P.yaw)*1.8,y=P.pos.y-RP;
+  res.p=new T.Vector3(x,y,z);res.ry=q4;
+  if(!(window.hab&&window.hab.dry&&grd))res.why='Stand inside a module to place furniture';
+  else if(!isDry(new T.Vector3(x,y+1,z)))res.why='No room there';else res.ok=true;
+  return res;}
+ if(o.mode==='wall'){
+  const h=rayBoxes(org,cd,7);if(!h){res.why='Aim at a wall';return res;}
+  const p=org.clone().addScaledVector(cd,h.t).addScaledVector(h.n,.02);res.p=p;res.ry=Math.atan2(h.n.x,h.n.z);
+  if(Math.abs(h.n.y)>.3){res.why='Needs a vertical wall';return res;}
+  const inside=isDry(p.clone().addScaledVector(h.n,.6));
+  if(o.side==='in'&&!inside)res.why='Place this inside a module';
+  else if(o.side==='out'&&inside)res.why='Place this on an outer wall';else res.ok=true;
+  return res;}
+ const h=rayBoxes(org,cd,12),g=rayGround(org,cd,16);let p=null;
+ if(h&&(!g||h.t<g.t)){if(h.n.y>.7)p=org.clone().addScaledVector(cd,h.t);else{res.why='Aim at the ground or a roof';return res;}}
+ else if(g){p=g.p;p.x=Math.round(p.x*2)/2;p.z=Math.round(p.z*2)/2;p.y=groundY(p.x,p.z);}
+ else{res.why='Aim at the ground';return res;}
+ res.p=p;res.ry=q4;
+ if(isDry(new T.Vector3(p.x,p.y+1,p.z)))res.why='Exterior item — place it outside';else res.ok=true;
+ return res;}
+function placeDecor(){
+ const t=decTgt;if(!t||!t.p||!t.ok){toast(t&&t.why?t.why:'Cannot place here','w');return false;}
+ if(!can(sel)){toast('Need more materials','w');return false;}
+ if(!creative)for(const k in D[sel][3])inv[k]-=D[sel][3][k];
+ addDecor(sel,t.p.x,t.p.y,t.p.z,t.ry);
+ toast('Placed: '+D[sel][0],'a');blip(640,.2);refresh();saveDirty=true;saveGame(true);return true;}
+function updDecorLights(dt){dlT-=dt;if(dlT>0)return;dlT=.35;
+ const c=decor.filter(o=>D[o.i][5].lit).map(o=>({o,d:Math.hypot(o.x-cam.position.x,o.y-cam.position.y,o.z-cam.position.z)})).sort((a,b)=>a.d-b.d);
+ DLP.forEach((l,i)=>{const e=c[i];if(e&&e.d<45){const L=D[e.o.i][5].lit;l.position.set(e.o.x+Math.sin(e.o.ry)*L[4],e.o.y+L[0],e.o.z+Math.cos(e.o.ry)*L[4]);l.color.setHex(L[1]);l.intensity=L[2];l.distance=L[3];}else l.intensity=0;});}
+function decUse(o,k){const now=performance.now();if(o.cd&&now<o.cd){toast('Not ready yet','w');return;}
+ if(k==='rest'){P.hp=100;P.warm=100;P.o2=o2max();toast('You rest. Health and warmth restored','a');o.cd=now+20000;}
+ else if(k==='coffee'){P.warm=Math.min(100,P.warm+45);toast('Hot coffee. Body heat restored','a');o.cd=now+15000;}
+ else if(k==='vend'){toast('Sold out — the stock is long gone','a');o.cd=now+3000;}
+ else if(k==='trash'){if(Math.random()<.4){inv.scrap=(inv.scrap|0)+1;toast('+1 Scrap Metal','a');}else toast('Nothing useful','a');o.cd=now+30000;}
+ blip(560,.15);saveDirty=true;}
+window.__decUse=()=>{if(cine)return null;let b=null,bd=2.4;
+ for(const o of decor){const u=D[o.i][5].use;if(!u)continue;const d=Math.hypot(P.pos.x-o.x,P.pos.z-o.z);if(d<bd&&Math.abs(P.pos.y-o.y)<3){bd=d;b=o;}}
+ return b?{l:D[b.i][5].use[0],a:()=>decUse(b,D[b.i][5].use[1])}:null;};
+window.__decExport=()=>decor.map(o=>({i:o.i,x:o.x,y:o.y,z:o.z,ry:o.ry}));
+window.__decImport=arr=>{while(decor.length)scene.remove(decor.pop().m);(arr||[]).forEach(e=>{if(D[e.i]&&D[e.i][5])addDecor(e.i,e.x,e.y,e.z,e.ry||0);});};
+window.__intExport=()=>placedInterior.map(o=>({i:o.i,x:o.x,y:o.y,z:o.z,yaw:o.yaw,s:o.storage}));
+window.__intImport=arr=>{while(placedInterior.length)scene.remove(placedInterior.pop().m);
+ (arr||[]).forEach(e=>{if(e.i!==19&&e.i!==20)return;const m=make(e.i);m.position.set(e.x,e.y,e.z);m.rotation.y=e.yaw||0;scene.add(m);
+  placedInterior.push({type:INTERIOR_IDX[e.i],x:e.x,y:e.y,z:e.z,yaw:e.yaw||0,m,storage:e.i===20?(e.s||{}):null,i:e.i});});};
 window.__habExport=()=>placed.map(q=>({i:q.i,p:[q.p.x,q.p.y,q.p.z],rot:q.rot}));
 window.__habImport=arr=>{
-  clearPets();
+  clearPets();window.__decImport([]);window.__intImport([]);
   while(placed.length){const q=placed.pop();scene.remove(q.m);}
   for(const f of fills)scene.remove(f);fills.length=0;
   for(const h of hatches)scene.remove(h.g);hatches.length=0;hmap.clear();vj.length=0;vjp.length=0;
@@ -1348,6 +1459,12 @@ window.buildTryPlace=buildTryPlace;
 function del(){
   if(!building||state!=='play'||P.cine)return;
   const aim=new T.Vector3().copy(cam.position).addScaledVector(cd,10);
+  if(D[sel][5]){let bi=-1,bt=1e9;
+    decor.forEach((o,k)=>{const dx=o.x-cam.position.x,dy=o.y+.5-cam.position.y,dz=o.z-cam.position.z,t=dx*cd.x+dy*cd.y+dz*cd.z;if(t<0||t>14)return;if(Math.hypot(dx-cd.x*t,dy-cd.y*t,dz-cd.z*t)<1.6&&t<bt){bt=t;bi=k;}});
+    if(bi<0){toast('Aim at a '+D[sel][0]+' to remove it','w');return;}
+    const o=decor.splice(bi,1)[0];scene.remove(o.m);
+    if(!creative)for(const k in D[o.i][3])inv[k]=(inv[k]|0)+(D[o.i][3][k]|0);
+    toast('Removed: '+D[o.i][0],'a');refresh();saveDirty=true;saveGame(true);return;}
   // Prefer removing nearby interior furniture when selected / in range
   if(typeof placedInterior!=='undefined'&&placedInterior.length){
     let bi=-1,bd=3.5;
@@ -1416,7 +1533,7 @@ const bp=document.createElement('div');bp.id='bp';bp.className='plate';bp.hidden
 function refresh(){
   const s=bp.scrollTop;
   sig=JSON.stringify(inv)+creative;
-  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap · Select Fabricator / Wall Locker to place furniture inside a module · LMB place · RMB/X remove · R rotate · E / ACT open hatches'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>'<button class="it'+(i===sel?' on':'')+(can(i)?'':' no')+'" data-i="'+i+'">'+d[0]+'<small>'+Object.keys(d[3]).map(k=>d[3][k]+' '+k).join(' · ')+'</small></button>').join('')+'<div class="cap" style="font-size:10px;margin-top:6px">Pieces placed: '+placed.length+'</div>';
+  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap · Select Fabricator / Wall Locker inside a module · Wall Panel seals open ends / hatches · LMB place · RMB/X remove · R rotate · E / ACT open hatches'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>(d[5]&&d[5].sec?'<div class="tag" style="margin:8px 0 2px">'+d[5].sec+'</div>':'')+'<button class="it'
   bp.scrollTop=s;
 }
 bp.addEventListener('click',e=>{
@@ -1475,8 +1592,9 @@ let lt=performance.now(),inH=false;
   if(!P.dead&&!P.cine&&hb.dry&&!hb.climb){const sp=Math.hypot(P.vel.x,P.vel.z);if(!grd)fallV=Math.min(fallV,P.vel.y);else{if(!wasG&&fallV<-6)blip(70,.16,.1);fallV=0;if(sp>1){stepT-=dt*sp/3.6;if(stepT<=0){stepT=.45;blip(90+Math.random()*35,.07,.05);}}}wasG=grd;}
  }
   if(cine&&state==='play')cineTick(dt);
-  animHatches(dt);
+    animHatches(dt);
   updatePets(dt);
+  updDecorLights(dt);
   if(state==='play'&&!P.dead){
     let h=false;
     h=isDry(P.pos);window.hab.dry=h;window.hab.climb=h&&inClimb();
@@ -1485,14 +1603,19 @@ let lt=performance.now(),inH=false;
     inH=h;
   }
   if(building&&ghost&&state==='play'){
-    if(isInterior(sel)){
+    if(D[sel][5]){
+      const t=decorTarget();decTgt=t;ghost.visible=!!t.p;
+      if(t.p){ghost.position.copy(t.p);ghost.rotation.y=t.ry;}
+      ghostOK=!!t.ok&&can(sel);
+    }else if(isInterior(sel)){
+      ghost.visible=true;
       // Furniture ghost: float in front of the player; only valid inside a dry module
       const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw);
       ghost.position.set(P.pos.x+fx*1.6,P.pos.y-.15,P.pos.z+fz*1.6);
       ghost.rotation.y=P.yaw;
       ghostOK=can(sel)&&!!(window.hab&&window.hab.dry);
     }else{
-      const t=target();
+      ghost.visible=true;const t=target();
       ghost.position.copy(t.p);
       ghost.rotation.y=t.rot*pi/2;
       const mustConnect=hasSocks(sel)&&placed.length>0&&!creative;
