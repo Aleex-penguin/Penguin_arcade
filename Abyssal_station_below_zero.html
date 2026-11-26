@@ -395,7 +395,7 @@ const relic=new T.Group();relic.position.set(RELIC.x,-138,RELIC.z);scene.add(rel
 }
 
 /* vents with stronger warm glow */
-const t=(i+1)/7;let x=0,z=0,tr=0;do{x=lerp(BASE.x,RELIC.x,t)+rnd(-30,30);z=lerp(BASE.z,RELIC.z,t)+rnd(-30,30);}while(elevation(x,z)>-9&&tr++<40);const y=groundY(x,z),g=new T.Group();g.position.set(x,y,z);
+const vents=[];for(let i=0;i<6;i++){const t=(i+1)/7;let x=0,z=0,tr=0;do{x=lerp(BASE.x,RELIC.x,t)+rnd(-30,30);z=lerp(BASE.z,RELIC.z,t)+rnd(-30,30);}while(elevation(x,z)>-9&&tr++<40);const y=groundY(x,z),g=new T.Group();g.position.set(x,y,z);
  const c=new T.Mesh(new T.ConeGeometry(2.1,4.2,9),new T.MeshPhongMaterial({color:0x2a2226,emissive:0x2a1008}));c.position.y=2.1;
  const o=new T.Mesh(new T.SphereGeometry(1.15,10,8),new T.MeshBasicMaterial({color:0xff9a48}));o.position.y=4.4;g.add(c,o);
  const vl=new T.PointLight(0xff7030,2.1,22,1.9);vl.position.y=4.2;g.add(vl);scene.add(g);vents.push({x,y:y+4.2,z});}
