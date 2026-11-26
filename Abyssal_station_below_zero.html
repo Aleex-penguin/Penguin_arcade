@@ -1081,6 +1081,14 @@ const D=[
   C.push(['c',0,yc,0,'y',RH/2,R,1]);
 }],
 ['Ladder',3.6,0,{scrap:1},(g,C)=>{ladder(g,C,0,0,-1.5,2.1);
+}],
+['Fabricator',0,0,{scrap:4,copper:3,quartz:2},(g,C)=>{
+  bx(g,null,.9,.7,.55,hull,0,0,0);
+  add(g,new T.BoxGeometry(.55,.35,.04),new T.MeshBasicMaterial({color:0x6ff0c0}),0,.15,.28);
+}],
+['Wall Locker',0,0,{scrap:3,copper:1},(g,C)=>{
+  bx(g,null,.7,.9,.25,hull,0,0,0);
+  bx(g,null,.55,.7,.04,hull2,0,0,.14);
 }]];
 
 const INTERIOR_IDX={19:'fab',20:'locker'};
