@@ -106,7 +106,17 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
  <p class="cap" style="text-align:center">WASD swim · Mouse look · Space/Ctrl rise/dive · Shift boost · E interact · 1-4 hotbar · F lamp · Tab PDA · B / Builder tool</p></div>
 <div id="menu" class="scr" hidden></div>
 <div id="end" class="scr" hidden></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+window.addEventListener('error',function(e){
+  var el=document.createElement('div');
+  el.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#300;color:#fcc;padding:10px;font:13px monospace;white-space:pre-wrap;max-height:50vh;overflow:auto;border:1px solid #f66';
+  el.textContent='ERROR: '+e.message+'\nline '+e.lineno+' col '+e.colno+'\n'+(e.filename||'');
+  document.body.appendChild(el);
+},true);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> 
 <script>
 (function(){'use strict';
 window.onerror=function(msg,src,line,col,err){
