@@ -522,8 +522,10 @@ function collectSave(){
     P:{x:P.pos.x,y:P.pos.y,z:P.pos.z,yaw:P.yaw,pitch:P.pitch,hp:P.hp,o2:P.o2,warm:P.warm},
        hab:hab,
     int:(typeof window.__intExport==='function')?window.__intExport():[],
-    dec:(typeof window.__decExport==='function')?window.__decExport():[]
-  }; function saveGame(silent){
+        dec:(typeof window.__decExport==='function')?window.__decExport():[]
+  };
+}
+function saveGame(silent){
   if(state!=='play'&&state!=='menu')return false;
   if(P.dead||P.cine)return false;
   try{
@@ -1533,8 +1535,9 @@ const bp=document.createElement('div');bp.id='bp';bp.className='plate';bp.hidden
 function refresh(){
   const s=bp.scrollTop;
   sig=JSON.stringify(inv)+creative;
-  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap · Select Fabricator / Wall Locker inside a module · Wall Panel seals open ends / hatches · LMB place · RMB/X remove · R rotate · E / ACT open hatches'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>(d[5]&&d[5].sec?'<div class="tag" style="margin:8px 0 2px">'+d[5].sec+'</div>':'')+'<button class="it'
+  bp.innerHTML='<div class="tag">Habitat builder'+(creative?' · CREATIVE':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px"><button class="btn" data-a="place">Place</button><button class="btn" data-a="rot">Rotate</button><button class="btn" data-a="del">Remove</button><button class="btn" data-a="close">Close</button></div><div class="cap" style="margin:4px 0;font-size:10px;line-height:1.3">Aim at open ends — pieces snap · Select Fabricator / Wall Locker inside a module · Wall Panel seals open ends / hatches · LMB place · RMB/X remove · R rotate · E / ACT open hatches'+(creative?' · Free placement (creative)':'')+'</div>'+D.map((d,i)=>(d[5]&&d[5].sec?'<div class="tag" style="margin:8px 0 2px">'+d[5].sec+'</div>':'')+'<button class="it'+(i===sel?' on':'')+(can(i)?'':' no')+'" data-i="'+i+'">'+d[0]+'<small>'+Object.keys(d[3]).map(k=>d[3][k]+' '+k).join(' · ')+'</small></button>').join('')+'<div class="cap" style="font-size:10px;margin-top:6px">Pieces placed: '+placed.length+'</div>';
   bp.scrollTop=s;
+  
 }
 bp.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
