@@ -1657,7 +1657,6 @@ function del(){
   const aim=new T.Vector3().copy(cam.position).addScaledVector(cd,10);
   if(D[sel][5]){let bi=-1,bt=1e9;
         decor.forEach((o,k)=>{const ys=[];if(o.sup){const Hm=Math.max(o.sup.hl,o.sup.hr);for(let yy=o.y-.3;yy>o.y-Hm;yy-=1.2)ys.push(yy);}else ys.push(o.y+.5);
-         decor.forEach((o,k)=>{const ys=[];if(o.sup){const Hm=Math.max(o.sup.hl,o.sup.hr);for(let yy=o.y-.3;yy>o.y-Hm;yy-=1.2)ys.push(yy);}else ys.push(o.y+.5);
      for(const yy of ys){const dx=o.x-cam.position.x,dy=yy-cam.position.y,dz=o.z-cam.position.z,t=dx*cd.x+dy*cd.y+dz*cd.z;if(t<0||t>14)continue;if(Math.hypot(dx-cd.x*t,dy-cd.y*t,dz-cd.z*t)<1.6&&t<bt){bt=t;bi=k;}}});
     if(bi<0){toast('Aim at a '+D[sel][0]+' to remove it','w');return;}
     const o=decor.splice(bi,1)[0];scene.remove(o.m);
