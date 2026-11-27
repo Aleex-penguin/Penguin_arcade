@@ -881,6 +881,7 @@ function frame(now){requestAnimationFrame(frame);try{let dt=Math.min(.05,(now-la
    else{dv.addScaledVector(cd,az).addScaledVector(rt,ax);dv.y+=up*.85;if(dv.lengthSq()>1)dv.normalize();dv.multiplyScalar(sp);}
    P.eye=lerp(P.eye||0,HB&&HB.dry&&!clm?1:0,Math.min(1,dt*6));
    const wm=dry||wlk;P.vel.lerp(dv,Math.min(1,dt*(wm?10:(m>.05||up?3.2:1.7))));if(wm&&!clm){P.vel.y-=18*dt;if(P.vel.y<-14)P.vel.y=-14;if(up>0&&(dry?HB.ground:P.pos.y<groundY(P.pos.x,P.pos.z)+1.0))P.vel.y=5.4;}
+      P.pos.addScaledVector(P.vel,dt);
    if(!P.cine&&window.hab)window.hab.collide(P.pos,P.vel);
    const gy=groundY(P.pos.x,P.pos.z);const onLandNow=landHeight(P.pos.x,P.pos.z)>0.4;const ty=onLandNow?gy+0.9:gy+1.1;if(P.pos.y<ty){P.pos.y=ty;if(P.vel.y<0)P.vel.y=0;if(onLandNow)P.under=false;}
    P.under=false;if(shelf(P.pos.x,P.pos.z)&&P.pos.y>-3.5){P.pos.y=-3.5;if(P.vel.y>0)P.vel.y=0;P.under=true;if(warnT<=0){toast('Ice overhead: find a gap to breathe','w');warnT=8;}}warnT-=dt;
