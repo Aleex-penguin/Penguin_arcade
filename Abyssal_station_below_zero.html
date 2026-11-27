@@ -708,6 +708,7 @@ function refreshTitleSaveUI(){
   }else{cont.hidden=true;nw.hidden=true;go.hidden=false;meta.hidden=true;go.textContent='Begin dive';}
 }
 function startPlay(fromSave){
+  P.cine=0;
   audio();$('#title').hidden=true;$('#hud').hidden=false;state='play';
   if(!fromSave)flags.final=0;
   saveCooldown=8;saveDirty=true;
