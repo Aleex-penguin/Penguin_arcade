@@ -106,7 +106,7 @@ h1 span{display:block;color:var(--line);font-weight:700;font-size:.34em;letter-s
   <button class="btn" data-q="high">High</button>
  </div>
  <p class="cap" id="qHint" style="text-align:center;margin-top:6px;font-size:12px">Medium · balanced</p>
- <p class="cap" style="text-align:center">WASD swim · Mouse look · Space/Ctrl rise/dive · Shift boost · E interact · 1-4 hotbar · F lamp · Tab PDA · B / Builder tool</p></div>
+  <p class="cap" style="text-align:center">Left thumb: swim (push far to boost) · Right side: look · ▲ ▼ rise / dive · ACT interact · SCAN hold to scan · Hotbar: tools · MENU: inventory &amp; crafting</p></div>
 <div id="menu" class="scr" hidden></div>
 <div id="end" class="scr" hidden></div>
 
@@ -715,7 +715,6 @@ function startPlay(fromSave){
   audio();$('#title').hidden=true;$('#hud').hidden=false;state='play';
   if(!fromSave)flags.final=0;
   saveCooldown=8;saveDirty=true;
-  if(!document.body.classList.contains('touch'))toast('Click the view to capture the mouse','a');
   if(fromSave)toast('Dive resumed','a');
   const hb=$('#hotbar');
   if(hb)hb.hidden=false;
@@ -759,8 +758,7 @@ const cv=$('#gl');cv.addEventListener('mousedown',e=>{if(state!=='play'||documen
 addEventListener('mouseup',()=>md=0);
 addEventListener('mousemove',e=>{if(lockd&&state==='play'&&!P.cine){P.yaw-=e.movementX*.0022;P.pitch=clamp(P.pitch-e.movementY*.0022,-1.5,1.5);}});
 document.addEventListener('contextmenu',e=>e.preventDefault());
-if(matchMedia('(pointer:coarse)').matches||matchMedia('(hover:none)').matches||navigator.maxTouchPoints>0)document.body.classList.add('touch');
-addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');},{passive:true});
+document.body.classList.add('touch');
 {const sz=$('#sz'),lz=$('#lz'),tc=$('#touch');let sid=null,sx=0,sy=0,lid=null,lx=0,ly=0;
  const sb=document.createElement('div'),sk=document.createElement('div');sb.id='stickBase';sk.id='stickKnob';sb.append(sk);tc.append(sb);
  sz.addEventListener('pointerdown',e=>{e.preventDefault();if(sid!==null)return;sid=e.pointerId;sx=e.clientX;sy=e.clientY;sb.style.left=sx+'px';sb.style.top=sy+'px';sb.style.display='block';sk.style.transform='translate(0,0)';});
