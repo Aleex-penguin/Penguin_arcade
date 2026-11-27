@@ -530,6 +530,7 @@ const sites=[
  {id:'podA',kind:'torn',name:'Torn Drop Pod',x:25,z:45,say:'MARA: Foreign pod, same serial family as yours. Hull peeled open from the outside. Something wanted whatever was inside — or whoever.',loot:{scrap:1,flare:1}},
  {id:'podB',kind:'torn',name:'Crushed Pod',x:-70,z:55,say:'MARA: Another non-Rook pod. Crushed into the ice. Consortium serial. No survivor log.',loot:{copper:1,scrap:1}}
 ];
+buildSites();
 function nearSite(){let best=null,bd=4.5;for(const s of SITES){const y=s.y!=null?s.y:(s.kind==='under'?-s.d:0.2);const d=Math.hypot(P.pos.x-s.x,P.pos.y-y,P.pos.z-s.z);if(d<bd){bd=d;best=s;}}return best;}
 function visitSite(s){
   if(!s||s.visited){if(s&&s.visited)toast('Already logged: '+s.name,'a');return;}
