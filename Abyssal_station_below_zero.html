@@ -515,21 +515,20 @@ sites.forEach(s=>{
 (function buildCommunity(){
   [[0,4.9,0,.7],[1.5,4.6,-1,.5],[8,2.5,.4,.6],[0,2.5,-8.2,.6]].forEach(q=>Sp(g,q[3],frost,q[0],q[1],q[2],1.2,.7,1));
 }
-
- const sites=[
-    {id:'surfA',kind:'surface',name:'Glacier Lab North',x:-110,z:-85,y:null,say:'MARA: Surface lab on the North Ridge. Journals stop mid-sentence. Last readable line: “the seventh tone is not a request.”',loot:{scrap:2,quartz:1}},
-    {id:'surfB',kind:'surface',name:'Ice Camp East',x:112,z:-118,y:null,say:'MARA: Camp on the East Spur. Stoves cold. Sketches of the Frost Drifter end halfway down the page — as if the hand left.',loot:{scrap:1,copper:1,flare:1}},
-    {id:'surfC',kind:'surface',name:'Relay Shack West',x:-65,z:90,y:null,say:'MARA: Comms relay on the West Massif. Outbound only after the wipe. They never meant the AI to call for help.',loot:{copper:2,quartz:1}},
-    {id:'mtnA',kind:'mountain',name:'Ridge Observatory',x:-125,z:-95,y:null,say:'MARA: Observatory dug into the ice. Spectral logs of the Relic’s sixth and seventh tones. The crew noted the signal “answers itself.” This was never only containment.',loot:{quartz:3,scrap:1}},
-    {id:'mtnB',kind:'mountain',name:'Massif Vault',x:-55,z:100,y:null,say:'MARA: Sealed vault under the West Massif. Project Nivalis phase-two brief: “Locate the secondary song. Cage it. Wipe local AI instances if they refuse.” Your instance was listed.',loot:{titanium:2,copper:2,quartz:1}},
-    {id:'mtnC',kind:'mountain',name:'Basin Approach Lab',x:150,z:110,d:80,y:null,say:'MARA: Overlook above the deeper basin approach. Demo-charge deployment plans and a hand-drawn map of thermal vents leading to the Relic. They knew how deep it sits.',loot:{scrap:2,flare:2}},
-    {id:'habA',kind:'under',name:'Under-ice Module Beta',x:-40,z:-130,d:18,say:'MARA: Secondary habitat. Pressure seals intact, crew gone. Bunk tags match Pelagia transfer lists.',loot:{scrap:3,titanium:1}},
-    {id:'habB',kind:'under',name:'Shelf Habitat Gamma',x:55,z:-60,d:22,say:'MARA: Another under-ice pod. Containment diagrams on the wall. Nivalis was never research-only.',loot:{quartz:2,copper:2}},
-    {id:'habC',kind:'under',name:'Basin Approach Lab',x:110,z:80,d:55,say:'MARA: Staging lab for the basin. Demo-charge manifests. Your crate was not the only one — just the one still sealed.',loot:{scrap:2,titanium:2}},
-    {id:'podA',kind:'torn',name:'Torn Drop Pod',x:25,z:45,y:0.15,say:'MARA: Foreign pod, same serial family as yours. Hull peeled open from the outside. Something wanted whatever was inside — or whoever.',loot:{scrap:1,flare:1}},
-    {id:'podB',kind:'torn',name:'Crushed Pod',x:-70,z:55,y:0.15,say:'MARA: Another non-Rook pod. Crushed into the ice. Consortium serial. No survivor log.',loot:{copper:1,scrap:1}}
-  ];
-})();
+const sites=[
+ {id:'surfA',kind:'surface',name:'Glacier Lab North',x:-110,z:-85,say:'MARA: Surface lab on the North Ridge. Journals stop mid-sentence. Last readable line: “the seventh tone is not a request.”',loot:{scrap:2,quartz:1}},
+ {id:'surfB',kind:'surface',name:'Ice Camp East',x:90,z:-105,say:'MARA: Camp on the East Spur. Stoves cold. Sketches of the Frost Drifter end halfway down the page — as if the hand left.',loot:{scrap:1,copper:1,flare:1}},
+ {id:'surfC',kind:'surface',name:'Relay Shack West',x:-65,z:90,say:'MARA: Comms relay on the West Massif. Outbound only after the wipe. They never meant the AI to call for help.',loot:{copper:2,quartz:1}},
+ {id:'mtnA',kind:'mountain',name:'Ridge Observatory',x:-125,z:-95,say:'MARA: Observatory dug into the ice. Spectral logs of the Relic’s sixth and seventh tones. The crew noted the signal “answers itself.” This was never only containment.',loot:{quartz:3,scrap:1}},
+ {id:'mtnB',kind:'mountain',name:'Massif Vault',x:-55,z:100,say:'MARA: Sealed vault under the West Massif. Project Nivalis phase-two brief: “Locate the secondary song. Cage it. Wipe local AI instances if they refuse.” Your instance was listed.',loot:{titanium:2,copper:2,quartz:1}},
+ {id:'mtnC',kind:'mountain',name:'Basin Overlook Cache',x:135,z:35,say:'MARA: Overlook above the deeper basin approach. Demo-charge deployment plans and a hand-drawn map of thermal vents leading to the Relic. They knew how deep it sits.',loot:{scrap:2,flare:2}},
+ {id:'habA',kind:'under',name:'Under-ice Module Beta',x:-40,z:-130,say:'MARA: Secondary habitat. Pressure seals intact, crew gone. Bunk tags match Pelagia transfer lists.',loot:{scrap:3,titanium:1}},
+ {id:'habB',kind:'under',name:'Shelf Habitat Gamma',x:55,z:-60,say:'MARA: Another under-ice pod. Containment diagrams on the wall. Nivalis was never research-only.',loot:{quartz:2,copper:2}},
+ {id:'habC',kind:'under',name:'Basin Approach Lab',x:110,z:80,say:'MARA: Staging lab for the basin. Demo-charge manifests. Your crate was not the only one — just the one still sealed.',loot:{scrap:2,titanium:2}},
+ {id:'podA',kind:'torn',name:'Torn Drop Pod',x:25,z:45,say:'MARA: Foreign pod, same serial family as yours. Hull peeled open from the outside. Something wanted whatever was inside — or whoever.',loot:{scrap:1,flare:1}},
+ {id:'podB',kind:'torn',name:'Crushed Pod',x:-70,z:55,say:'MARA: Another non-Rook pod. Crushed into the ice. Consortium serial. No survivor log.',loot:{copper:1,scrap:1}}
+];
+ })();
 function nearSite(){let best=null,bd=4.5;for(const s of SITES){const y=s.y!=null?s.y:(s.kind==='under'?-s.d:0.2);const d=Math.hypot(P.pos.x-s.x,P.pos.y-y,P.pos.z-s.z);if(d<bd){bd=d;best=s;}}return best;}
 function visitSite(s){
   if(!s||s.visited){if(s&&s.visited)toast('Already logged: '+s.name,'a');return;}
