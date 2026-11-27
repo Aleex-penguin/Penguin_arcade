@@ -515,7 +515,8 @@ sites.forEach(s=>{
 (function buildCommunity(){
   [[0,4.9,0,.7],[1.5,4.6,-1,.5],[8,2.5,.4,.6],[0,2.5,-8.2,.6]].forEach(q=>Sp(g,q[3],frost,q[0],q[1],q[2],1.2,.7,1));
 }
-const sites=[
+
+ const sites=[
  {id:'surfA',kind:'surface',name:'Glacier Lab North',x:-110,z:-85,say:'MARA: Surface lab on the North Ridge. Journals stop mid-sentence. Last readable line: “the seventh tone is not a request.”',loot:{scrap:2,quartz:1}},
  {id:'surfB',kind:'surface',name:'Ice Camp East',x:90,z:-105,say:'MARA: Camp on the East Spur. Stoves cold. Sketches of the Frost Drifter end halfway down the page — as if the hand left.',loot:{scrap:1,copper:1,flare:1}},
  {id:'surfC',kind:'surface',name:'Relay Shack West',x:-65,z:90,say:'MARA: Comms relay on the West Massif. Outbound only after the wipe. They never meant the AI to call for help.',loot:{copper:2,quartz:1}},
@@ -528,7 +529,8 @@ const sites=[
  {id:'podA',kind:'torn',name:'Torn Drop Pod',x:25,z:45,say:'MARA: Foreign pod, same serial family as yours. Hull peeled open from the outside. Something wanted whatever was inside — or whoever.',loot:{scrap:1,flare:1}},
  {id:'podB',kind:'torn',name:'Crushed Pod',x:-70,z:55,say:'MARA: Another non-Rook pod. Crushed into the ice. Consortium serial. No survivor log.',loot:{copper:1,scrap:1}}
 ];
- })();
+
+sites.forEach(s=>{
 function nearSite(){let best=null,bd=4.5;for(const s of SITES){const y=s.y!=null?s.y:(s.kind==='under'?-s.d:0.2);const d=Math.hypot(P.pos.x-s.x,P.pos.y-y,P.pos.z-s.z);if(d<bd){bd=d;best=s;}}return best;}
 function visitSite(s){
   if(!s||s.visited){if(s&&s.visited)toast('Already logged: '+s.name,'a');return;}
