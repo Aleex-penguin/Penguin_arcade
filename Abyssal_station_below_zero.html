@@ -1267,10 +1267,63 @@ const D=[
 ['Spotlight',0,0,{scrap:2,copper:1,quartz:1},g=>{const{wh,gr,dk,lt}=DM;dB(g,.5,.06,.5,gr,0,.03,0);dB(g,.12,.3,.12,gr,0,.2,0);dB(g,.5,.3,.34,wh,0,.5,0);dB(g,.4,.22,.02,lt,0,.5,.18);dB(g,.3,.1,.1,dk,0,.5,-.2);},{mode:'ground',lit:[.5,0xfff0c8,1.8,26,.5],bx:[.55,.7,.55]}],
 ['Exterior Growbed',0,0,{scrap:3,copper:1},g=>{const{wh,soil,gn}=DM;dB(g,2.04,.28,1.04,soil,0,.17,0);dB(g,2.2,.35,.08,wh,0,.18,.56);dB(g,2.2,.35,.08,wh,0,.18,-.56);for(const s of[-1,1])dB(g,.08,.35,1.04,wh,s*1.06,.18,0);for(let i=0;i<7;i++)add(g,new T.ConeGeometry(.08,.3,5),gn,-.85+i*.28,.4,((i%2)-.5)*.5);},{mode:'ground',bx:[2.2,.4,1.2]}],
 ['Base Pipe Connector',0,0,{scrap:3,copper:1},g=>{const{gr,dk,wh,yl}=DM;dC(g,.55,.55,.14,gr,0,.07,0);dC(g,.42,.42,.5,wh,0,.45,0);for(const y of[.3,.45,.6])dC(g,.45,.45,.04,gr,0,y,0);dC(g,.3,.3,.2,dk,0,.8,0);dC(g,.08,.08,.18,yl,0,.98,0);},{mode:'ground',bx:[1,1.1,1]}],
-['Exterior Wall Light',0,0,{scrap:1,quartz:1},g=>{const{wh,dk,lt}=DM;dB(g,.3,.5,.06,dk,0,0,.03);dB(g,.28,.55,.16,wh,0,0,.14);for(let i=0;i<3;i++)dB(g,.2,.02,.02,dk,0,.12+i*.05,.23);dB(g,.16,.04,.02,lt,0,-.2,.23);for(const s of[-1,1])dB(g,.05,.3,.12,wh,s*.17,0,.1);},{mode:'wall',side:'out',lit:[0,0xdff4ff,1.4,16,.6]}]];
+['Exterior Wall Light',0,0,{scrap:1,quartz:1},g=>{const{wh,dk,lt}=DM;dB(g,.3,.5,.06,dk,0,0,.03);dB(g,.28,.55,.16,wh,0,0,.14);for(let i=0;i<3;i++)dB(g,.2,.02,.02,dk,0,.12+i*.05,.23);dB(g,.16,.04,.02,lt,0,-.2,.23);for(const s of[-1,1])dB(g,.05,.3,.12,wh,s*.17,0,.1);},{mode:'wall',side:'out',lit:[0,0xdff4ff,1.4,16,.6]}],
+['Support Beam',0,0,{scrap:3,copper:1},g=>buildSupport(g,SUPH),{sec:'Structure',mode:'support'}]];
 const DM={wh:new PH({color:0xe4eaee,shininess:60,specular:0x8899aa}),gr:new PH({color:0x8a949c,shininess:50}),dk:new PH({color:0x1e252b,shininess:35}),nv:new PH({color:0x1f2a3a,shininess:40}),bl:new PH({color:0x2e6aa6,shininess:70,specular:0x9bbcff}),yl:new PH({color:0xe8b820,shininess:50}),or:new PH({color:0xe0702a,shininess:40}),rd:new PH({color:0xb83a2a}),soil:new PH({color:0x5a4430}),sol:new PH({color:0x1f4fa8,shininess:90,specular:0x88aaff,emissive:0x0a1f4a}),cy:new T.MeshBasicMaterial({color:0x4ad8ff}),gn:new T.MeshBasicMaterial({color:0x6ff0c0}),lt:new T.MeshBasicMaterial({color:0xfff0c0})},
 dB=(g,w,h,d,m,x,y,z)=>bx(g,null,w,h,d,m,x,y,z),
 dC=(g,a,b,h,m,x,y,z)=>add(g,new T.CylinderGeometry(a,b,h,14),m,x,y,z);
+/* ===== SUPPORT BEAM: steel frame that hangs under rooms and reaches down to the terrain ===== */
+let SUPH={hl:5,hr:5,el:0,er:0};
+const SM={st:new PH({color:0xc9d2d9,shininess:60,specular:0xa8bccb}),dk:new PH({color:0x3a444c,shininess:35}),rod:new PH({color:0x8d9aa5,shininess:70,specular:0xc0d0dc}),yl:new PH({color:0xe0b020,shininess:50}),ft:new PH({color:0x59646c,shininess:20})};
+const SUPW=1.3,SUPMIN=1.6,SUPMAX=80;
+function sbox(g,w,h,d,m,x,y,z){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);g.add(o);return o;}
+function scyl(g,r,h,m,x,y,z,rx){const o=new T.Mesh(new T.CylinderGeometry(r,r,h,10),m);o.position.set(x,y,z);o.rotation.x=rx||0;g.add(o);return o;}
+function srod(g,a,b,r,m){const v=new T.Vector3(b[0]-a[0],b[1]-a[1],b[2]-a[2]),L=v.length(),o=new T.Mesh(new T.CylinderGeometry(r,r,L,8),m);o.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.normalize());g.add(o);return o;}
+/* origin = attach point on the underside of the room; frame hangs down (-y). hl/hr = left/right column heights, el/er = footing depth in terrain */
+function buildSupport(g,s){
+ const W=SUPW,hl=s.hl,hr=s.hr;
+ sbox(g,3.1,.1,.8,SM.dk,0,0,0);
+ sbox(g,2.2,.06,.4,SM.st,0,-.08,0);sbox(g,2.2,.06,.4,SM.st,0,-.28,0);sbox(g,2.2,.14,.08,SM.st,0,-.18,0);
+ [[-W,hl,s.el||0],[W,hr,s.er||0]].forEach(c=>{const x=c[0],h=c[1],e=c[2];
+  sbox(g,.4,h,.08,SM.st,x,-h/2,.21);sbox(g,.4,h,.08,SM.st,x,-h/2,-.21);sbox(g,.08,h,.5,SM.st,x,-h/2,0);
+  sbox(g,.9,.1,.9,SM.dk,x,-h+.05,0);
+  if(e>0)sbox(g,1.2,e,1.2,SM.ft,x,-h-e/2,0);
+  for(const a of[-1,1])for(const b of[-1,1])scyl(g,.05,.14,SM.rod,x+a*.34,-h+.15,b*.34);
+ });
+ const tl=[-.95,-.5],tr=[.95,-.5],bl=[-.95,-hl+.5],br=[.95,-hr+.5];
+ [tl,tr,bl,br].forEach(p=>{sbox(g,.6,.6,.05,SM.dk,p[0],p[1],0);scyl(g,.06,.1,SM.rod,p[0],p[1],.04,pi/2);});
+ srod(g,[tl[0],tl[1],.07],[br[0],br[1],.07],.05,SM.rod);
+ srod(g,[tr[0],tr[1],-.07],[bl[0],bl[1],-.07],.05,SM.rod);
+ [[tl,br,.07],[tr,bl,-.07]].forEach(q=>{const a=q[0],b=q[1],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,v=new T.Vector3(b[0]-a[0],b[1]-a[1],0).normalize();
+  srod(g,[mx-v.x*.3,my-v.y*.3,q[2]],[mx+v.x*.3,my+v.y*.3,q[2]],.08,SM.yl);});
+}
+/* what is under a column: the terrain, or the top of a placed piece that is directly below it */
+function supSurf(x,z,top){let best=groundY(x,z),emb=.55;
+ for(const q of placed){if(Math.abs(q.p.x-x)>12||Math.abs(q.p.z-z)>12)continue;
+  for(const c of q.col){if(c.t!=='b'||(c.cv!==undefined&&q.used.has(c.cv)))continue;
+   if(x<c.x0||x>c.x1||z<c.z0||z>c.z1)continue;
+   if(c.y1<=top-.3&&c.y1>best){best=c.y1;emb=0;}}}
+ return {y:best,emb};}
+function supHeights(x,y,z,ry){const cc=Math.round(Math.cos(ry)),ss=Math.round(Math.sin(ry)),a=supSurf(x-SUPW*cc,z+SUPW*ss,y),b=supSurf(x+SUPW*cc,z-SUPW*ss,y),hl=y-a.y,hr=y-b.y;
+ return {hl:clamp(hl,SUPMIN,SUPMAX),hr:clamp(hr,SUPMIN,SUPMAX),el:a.emb,er:b.emb,bad:(hl<SUPMIN||hr<SUPMIN)?'Not enough space below':(hl>SUPMAX||hr>SUPMAX)?'Too far to the ground (max '+SUPMAX+' m)':''};}
+/* solid collision boxes: two columns + the tie beam */
+function supBoxes(x,y,z,ry,s){const cc=Math.round(Math.cos(ry)),ss=Math.round(Math.sin(ry)),odd=Math.abs(ss)===1;
+ return [[-SUPW,-s.hl/2,0,.4,s.hl,.5],[SUPW,-s.hr/2,0,.4,s.hr,.5],[0,-.15,0,2.2,.3,.4]].map(q=>{const wx=x+q[0]*cc+q[2]*ss,wz=z-q[0]*ss+q[2]*cc,wy=y+q[1],w=odd?q[5]:q[3],d=odd?q[3]:q[5];return {x0:wx-w/2,x1:wx+w/2,y0:wy-q[4]/2,y1:wy+q[4]/2,z0:wz-d/2,z1:wz+d/2};});}
+function supClash(bs){for(const e of decor){if(!e.boxes)continue;for(const a of e.boxes)for(const b of bs)if(a.x0<b.x1&&a.x1>b.x0&&a.y0<b.y1&&a.y1>b.y0&&a.z0<b.z1&&a.z1>b.z0)return true;}return false;}
+function supportTarget(res,q4){
+ const org=cam.position,h=rayBoxes(org,cd,18);
+ if(!h||h.n.y>-.5){res.why='Aim at the underside of a room or platform';return res;}
+ const x=Math.round((org.x+cd.x*h.t)*2)/2,z=Math.round((org.z+cd.z*h.t)*2)/2,y=org.y+cd.y*h.t;
+ res.p=new T.Vector3(x,y,z);res.ry=q4;
+ const s=supHeights(x,y,z,q4);res.sup=s;
+ if(isDry(new T.Vector3(x,y-.8,z))){res.why='Place supports outside, under the structure';return res;}
+ if(s.bad){res.why=s.bad;return res;}
+ if(supClash(supBoxes(x,y,z,q4,s))){res.why='Another support is already here';return res;}
+ res.ok=true;return res;}
+/* rebuild the preview only when the column heights change (slopes) */
+function updSupGhost(s){const k=s.hl.toFixed(2)+'|'+s.hr.toFixed(2)+'|'+s.el+'|'+s.er;if(ghost&&ghost.userData.supKey===k)return;
+ if(ghost)ghost.traverse(o=>{if(o.isMesh&&o.geometry)o.geometry.dispose();});
+ SUPH=s;setGhost();ghost.userData.supKey=k;}
 const INTERIOR_IDX={19:'fab',20:'locker'};
 const isInterior=i=>!!INTERIOR_IDX[i];
 let building=false,sel=0,rot=0,free=false,ghost=null,ghostOK=false,sig='';
@@ -1371,7 +1424,7 @@ function collide(p,v){grd=0;
     const dn=v.x*n[0]+v.y*n[1]+v.z*n[2];if((inside&&dn>0)||(!inside&&dn<0))v.x-=n[0]*dn,v.y-=n[1]*dn,v.z-=n[2]*dn;}
   }
   for(const h of hatches)if(h.open<.8)pushBox(p,v,h.box);
-  for(const e of decor)if(e.box)pushBox(p,v,e.box);
+  for(const e of decor){if(e.box)pushBox(p,v,e.box);if(e.boxes)for(const b of e.boxes)pushBox(p,v,b);}
  }}
 
 /* ---------- keep wild animals out of every built module ---------- */
@@ -1503,8 +1556,11 @@ function place(){
 }
 /* ===== DECOR (furniture + exterior modules) ===== */
 const decor=[],DLP=[0,1].map(()=>{const l=new T.PointLight(0xfff2d0,0,16,2);scene.add(l);return l;});let decTgt=null,dlT=0;
-function addDecor(i,x,y,z,ry){const m=make(i),o=D[i][5],e={i,x,y,z,ry,m,box:null,cd:0};m.position.set(x,y,z);m.rotation.y=ry;scene.add(m);
- if(o.bx){const q=Math.round(ry/(pi/2))&1,w=q?o.bx[2]:o.bx[0],d=q?o.bx[0]:o.bx[2];e.box={x0:x-w/2,x1:x+w/2,y0:y,y1:y+o.bx[1],z0:z-d/2,z1:z+d/2};}
+function addDecor(i,x,y,z,ry,ex){const o=D[i][5],sup=o.mode==='support'?(h=>({hl:h.hl,hr:h.hr,el:h.el||0,er:h.er||0}))(ex||supHeights(x,y,z,ry)):null;
+ if(sup)SUPH=sup;
+ const m=make(i),e={i,x,y,z,ry,m,box:null,boxes:null,sup,cd:0};m.position.set(x,y,z);m.rotation.y=ry;scene.add(m);
+ if(sup)e.boxes=supBoxes(x,y,z,ry,sup);
+ else if(o.bx){const q=Math.round(ry/(pi/2))&1,w=q?o.bx[2]:o.bx[0],d=q?o.bx[0]:o.bx[2];e.box={x0:x-w/2,x1:x+w/2,y0:y,y1:y+o.bx[1],z0:z-d/2,z1:z+d/2};}
  decor.push(e);return e;}
 function rayBoxes(o,d,maxT){let best=null;const O=[o.x,o.y,o.z],V=[d.x,d.y,d.z];
  for(const q of placed){if(q.p.distanceTo(o)>maxT+14)continue;
@@ -1523,6 +1579,7 @@ function rayGround(o,d,maxT){let prev=0;
  return null;}
 function decorTarget(){
  const o=D[sel][5],org=cam.position,res={p:null,ry:0,ok:false,why:''},q4=Math.round((P.yaw+rot*pi/2)/(pi/2))*(pi/2);
+  if(o.mode==='support')return supportTarget(res,q4);
  if(o.mode==='floor'){
   const x=P.pos.x-Math.sin(P.yaw)*1.8,z=P.pos.z-Math.cos(P.yaw)*1.8,y=P.pos.y-RP;
   res.p=new T.Vector3(x,y,z);res.ry=q4;
@@ -1548,7 +1605,7 @@ function placeDecor(){
  const t=decTgt;if(!t||!t.p||!t.ok){toast(t&&t.why?t.why:'Cannot place here','w');return false;}
  if(!can(sel)){toast('Need more materials','w');return false;}
  if(!creative)for(const k in D[sel][3])inv[k]-=D[sel][3][k];
- addDecor(sel,t.p.x,t.p.y,t.p.z,t.ry);
+ addDecor(sel,t.p.x,t.p.y,t.p.z,t.ry,t.sup);
  toast('Placed: '+D[sel][0],'a');blip(640,.2);refresh();saveDirty=true;saveGame(true);return true;}
 function updDecorLights(dt){dlT-=dt;if(dlT>0)return;dlT=.35;
  const c=decor.filter(o=>D[o.i][5].lit).map(o=>({o,d:Math.hypot(o.x-cam.position.x,o.y-cam.position.y,o.z-cam.position.z)})).sort((a,b)=>a.d-b.d);
@@ -1562,8 +1619,8 @@ function decUse(o,k){const now=performance.now();if(o.cd&&now<o.cd){toast('Not r
 window.__decUse=()=>{if(cine)return null;let b=null,bd=2.4;
  for(const o of decor){const u=D[o.i][5].use;if(!u)continue;const d=Math.hypot(P.pos.x-o.x,P.pos.z-o.z);if(d<bd&&Math.abs(P.pos.y-o.y)<3){bd=d;b=o;}}
  return b?{l:D[b.i][5].use[0],a:()=>decUse(b,D[b.i][5].use[1])}:null;};
-window.__decExport=()=>decor.map(o=>({i:o.i,x:o.x,y:o.y,z:o.z,ry:o.ry}));
-window.__decImport=arr=>{while(decor.length)scene.remove(decor.pop().m);(arr||[]).forEach(e=>{if(D[e.i]&&D[e.i][5])addDecor(e.i,e.x,e.y,e.z,e.ry||0);});};
+window.__decExport=()=>decor.map(o=>({i:o.i,x:o.x,y:o.y,z:o.z,ry:o.ry,s:o.sup||undefined}));
+window.__decImport=arr=>{while(decor.length)scene.remove(decor.pop().m);(arr||[]).forEach(e=>{if(D[e.i]&&D[e.i][5])addDecor(e.i,e.x,e.y,e.z,e.ry||0,e.s);});};
 window.__intExport=()=>placedInterior.map(o=>({i:o.i,x:o.x,y:o.y,z:o.z,yaw:o.yaw,s:o.storage}));
 window.__intImport=arr=>{while(placedInterior.length)scene.remove(placedInterior.pop().m);
  (arr||[]).forEach(e=>{if(e.i!==19&&e.i!==20)return;const m=make(e.i);m.position.set(e.x,e.y,e.z);m.rotation.y=e.yaw||0;scene.add(m);
@@ -1599,7 +1656,9 @@ function del(){
   if(!building||state!=='play'||P.cine)return;
   const aim=new T.Vector3().copy(cam.position).addScaledVector(cd,10);
   if(D[sel][5]){let bi=-1,bt=1e9;
-    decor.forEach((o,k)=>{const dx=o.x-cam.position.x,dy=o.y+.5-cam.position.y,dz=o.z-cam.position.z,t=dx*cd.x+dy*cd.y+dz*cd.z;if(t<0||t>14)return;if(Math.hypot(dx-cd.x*t,dy-cd.y*t,dz-cd.z*t)<1.6&&t<bt){bt=t;bi=k;}});
+        decor.forEach((o,k)=>{const ys=[];if(o.sup){const Hm=Math.max(o.sup.hl,o.sup.hr);for(let yy=o.y-.3;yy>o.y-Hm;yy-=1.2)ys.push(yy);}else ys.push(o.y+.5);
+         decor.forEach((o,k)=>{const ys=[];if(o.sup){const Hm=Math.max(o.sup.hl,o.sup.hr);for(let yy=o.y-.3;yy>o.y-Hm;yy-=1.2)ys.push(yy);}else ys.push(o.y+.5);
+     for(const yy of ys){const dx=o.x-cam.position.x,dy=yy-cam.position.y,dz=o.z-cam.position.z,t=dx*cd.x+dy*cd.y+dz*cd.z;if(t<0||t>14)continue;if(Math.hypot(dx-cd.x*t,dy-cd.y*t,dz-cd.z*t)<1.6&&t<bt){bt=t;bi=k;}}});
     if(bi<0){toast('Aim at a '+D[sel][0]+' to remove it','w');return;}
     const o=decor.splice(bi,1)[0];scene.remove(o.m);
     if(!creative)for(const k in D[o.i][3])inv[k]=(inv[k]|0)+(D[o.i][3][k]|0);
@@ -1744,7 +1803,7 @@ let lt=performance.now(),inH=false;
   }
   if(building&&ghost&&state==='play'){
     if(D[sel][5]){
-      const t=decorTarget();decTgt=t;ghost.visible=!!t.p;
+      const t=decorTarget();decTgt=t;if(t.sup)updSupGhost(t.sup);ghost.visible=!!t.p;
       if(t.p){ghost.position.copy(t.p);ghost.rotation.y=t.ry;}
       ghostOK=!!t.ok&&can(sel);
     }else if(isInterior(sel)){
