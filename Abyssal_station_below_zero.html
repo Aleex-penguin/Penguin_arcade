@@ -765,8 +765,6 @@ document.body.classList.add('touch');
  addEventListener('pointermove',e=>{if(e.pointerId!==sid)return;let dx=(e.clientX-sx)/55,dy=(e.clientY-sy)/55;const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}tm.x=dx;tm.y=dy;tboost=m>1.35?1:0;sk.style.transform='translate('+dx*45+'px,'+dy*45+'px)';});
  const se=e=>{if(e.pointerId===sid){sid=null;tm.x=tm.y=0;tboost=0;sb.style.display='none';}};
  ['pointerup','pointercancel'].forEach(n=>addEventListener(n,se));
- const dbg=document.createElement('div');dbg.style.cssText='position:fixed;left:14px;top:150px;z-index:99999;font:12px monospace;color:#6ff0c0;background:rgba(0,0,0,.6);padding:4px 8px;pointer-events:none';document.body.append(dbg);
- setInterval(()=>{dbg.textContent='stick '+tm.x.toFixed(2)+','+tm.y.toFixed(2)+' | x '+P.pos.x.toFixed(1)+' z '+P.pos.z.toFixed(1)+' | '+state;},100);
  lz.addEventListener('pointerdown',e=>{lid=e.pointerId;lz.setPointerCapture(lid);lx=e.clientX;ly=e.clientY;});
  lz.addEventListener('pointermove',e=>{if(e.pointerId!==lid)return;if(!P.cine){P.yaw-=(e.clientX-lx)*.005;P.pitch=clamp(P.pitch-(e.clientY-ly)*.005,-1.5,1.5);}lx=e.clientX;ly=e.clientY;});
  const le=e=>{if(e.pointerId===lid)lid=null;};lz.addEventListener('pointerup',le);lz.addEventListener('pointercancel',le);
