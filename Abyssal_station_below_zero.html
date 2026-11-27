@@ -231,26 +231,32 @@ lamp.penumbra=.62;cam.add(lamp,lamp.target);lamp.target.position.set(0,0,-1);
 const fillDeep=new T.PointLight(0x153a58,.55,220);fillDeep.position.set(0,-50,0);scene.add(fillDeep);
 const fillWarm=new T.PointLight(0xff7a40,0,55,2);scene.add(fillWarm);
 
-/* ========== TERRAIN (higher quality) ========== */
-{const N=128,g=new T.PlaneGeometry(540,540,N,N);g.rotateX(-Math.PI/2);
- const p=g.attributes.position;
- for(let i=0;i<p.count;i++)p.setY(i,-depthAt(p.getX(i),p.getZ(i)));
+/* ========== TERRAIN: one mesh for seafloor + mountains + islands ========== */
+const terrain=(function(){
+ const N=220,g=new T.PlaneGeometry(540,540,N,N);g.rotateX(-Math.PI/2);
+ const p=g.attributes.position,E=new Float32Array(p.count);
+ for(let i=0;i<p.count;i++){E[i]=elevation(p.getX(i),p.getZ(i));p.setY(i,E[i]);}
  g.computeVertexNormals();
  const nr=g.attributes.normal,c=new Float32Array(p.count*3);
- const A=new T.Color(0xd4e8f2),B=new T.Color(0x081420),I=new T.Color(0x5a9ec0),m=new T.Color();
+ const A=new T.Color(0xd4e8f2),B=new T.Color(0x081420),I=new T.Color(0x5a9ec0),SNW=new T.Color(0xf4faff),RK=new T.Color(0x7a8794),RK2=new T.Color(0x3c4652),ICE=new T.Color(0xbfe0ee),m=new T.Color();
  for(let i=0;i<p.count;i++){
-  const d=-p.getY(i),t=Math.pow(clamp(d/115,0,1),.65);
-  m.copy(A).lerp(B,t);
-  const s=1-nr.getY(i);
-  m.lerp(I,clamp((s-.1)*2.4,0,.75)*(1-t*.55));
-  // subtle noise variation
-  const v=.88+hs(p.getX(i)*.55,p.getZ(i)*.55)*.22;
+  const x=p.getX(i),z=p.getZ(i),e=E[i],f=nr.getY(i),sl=1-f,v=.88+hs(x*.55,z*.55)*.22;
+  if(e>-.8){
+   m.copy(RK).lerp(RK2,clamp(sl*3,0,1)*.8).lerp(RK2,hs(x*.21,z*.21)*.3);
+   m.lerp(SNW,sst(.62,.86,f)*sst(-.5,4,e));
+   if(e<4)m.lerp(ICE,.45*(1-sst(0,4,e)));
+  }else{
+   const t=Math.pow(clamp(-e/115,0,1),.65);
+   m.copy(A).lerp(B,t);
+   m.lerp(I,clamp((sl-.1)*2.4,0,.75)*(1-t*.55));
+   if(e>-40)m.lerp(RK2,clamp((sl-.12)*2.2,0,.6)*(1-t));
+  }
   c[i*3]=m.r*v;c[i*3+1]=m.g*v;c[i*3+2]=m.b*v;
  }
  g.setAttribute('color',new T.BufferAttribute(c,3));
- const terrMat=new T.MeshPhongMaterial({vertexColors:true,flatShading:false,shininess:18,specular:0x3a5a6a});
- scene.add(new T.Mesh(g,terrMat));
-}
+ const mesh=new T.Mesh(g,new T.MeshPhongMaterial({vertexColors:true,shininess:14,specular:0x3a5a6a}));
+ scene.add(mesh);return mesh;
+})();
 
 /* snowy islands & mountain massifs (above-water land) */
 (function buildLand(){
